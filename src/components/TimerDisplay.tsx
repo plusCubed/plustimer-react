@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {formatTime, preventDefault} from '../utils/Util';
+import {formatTime} from '../utils/Util';
 import {TimerState} from '../reducers/timer';
 import './TimerDisplay.css';
 
@@ -32,8 +32,8 @@ class TimerDisplay extends React.Component<Props, TimerState> {
 
         return (
             <div className="timer"
-                 onTouchStart={preventDefault(onTouchStart)}
-                 onTouchEnd={preventDefault(onTouchEnd)}>
+                 onTouchStart={onTouchStart}
+                 onTouchEnd={onTouchEnd}>
                 {formatTime(displayTime)}
             </div>
         );

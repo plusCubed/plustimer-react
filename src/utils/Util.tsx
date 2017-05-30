@@ -12,13 +12,6 @@ export interface TimeParts {
     decimals: string;
 }
 
-export const preventDefault = (fun: (e?: React.SyntheticEvent<HTMLElement>) => void) => {
-    return (e: React.SyntheticEvent<HTMLElement>) => {
-        e.preventDefault();
-        fun(e);
-    };
-};
-
 export function timeParts(time: number): TimeParts {
     // Each entry is [minimum number of digits if not first, separator before, value]
     let hours: number = Math.floor(time / (60 * 60 * 1000));
