@@ -7,6 +7,7 @@ import {Action} from '../utils/Util';
 const mapStateToProps = (state: StoreState) => {
     return {
         displayTime: state.timer.time.elapsed,
+        mode: state.timer.mode
     };
 };
 

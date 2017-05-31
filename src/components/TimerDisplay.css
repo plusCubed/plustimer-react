@@ -15,4 +15,17 @@
     align-items: center;
     user-select: none;
     cursor: default;
+    transition: color 0s;
+}
+
+.ready {
+    transition: color 0.2s;
+}
+
+.stopped {
+    color: #F44336;
+}
+
+.handOnTimer {
+    color: #4CAF50;
 }

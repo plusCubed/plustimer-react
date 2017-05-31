@@ -9,6 +9,7 @@ export interface Props {
     onKeyDown: (e: KeyboardEvent) => void;
     onKeyUp: (e: KeyboardEvent) => void;
     displayTime: number;
+    mode: string;
 }
 
 class TimerDisplay extends React.Component<Props, TimerState> {
@@ -27,13 +28,16 @@ class TimerDisplay extends React.Component<Props, TimerState> {
         const {
             onTouchStart,
             onTouchEnd,
-            displayTime
+            displayTime,
+            mode
         } = this.props;
 
         return (
-            <div className="timer"
-                 onTouchStart={onTouchStart}
-                 onTouchEnd={onTouchEnd}>
+            <div
+                className={`timer ${mode}`}
+                onTouchStart={onTouchStart}
+                onTouchEnd={onTouchEnd}
+            >
                 {formatTime(displayTime)}
             </div>
         );
