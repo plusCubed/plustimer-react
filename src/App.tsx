@@ -1,8 +1,13 @@
 import * as React from 'react';
 import './App.css';
-import {MuiThemeProvider} from 'material-ui/styles';
-import {AppBar} from 'material-ui';
-import Timer from './containers/Timer';
+import CurrentTimer from './containers/CurrentTimer';
+import CurrentSolvesSheet from './containers/CurrentSolvesSheet';
+
+import 'typeface-roboto';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import AppBar from 'material-ui/AppBar';
+import Toolbar from 'material-ui/Toolbar';
+import Typography from 'material-ui/Typography';
 import injectTapEventPlugin = require('react-tap-event-plugin');
 
 // Needed for onTouchTap
@@ -13,9 +18,15 @@ const App = () => {
     return (
         <MuiThemeProvider>
             <div className="App">
-                <AppBar className="toolbar"/>
+                <AppBar>
+                    <Toolbar>
+                        <Typography type="title" colorInherit={true}>plusTimer</Typography>
+                    </Toolbar>
+                </AppBar>
 
-                <Timer/>
+                <CurrentTimer/>
+
+                <CurrentSolvesSheet/>
             </div>
         </MuiThemeProvider>
     );

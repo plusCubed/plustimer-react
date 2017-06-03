@@ -1,7 +1,6 @@
 import * as React from 'react';
 import {formatTime} from '../utils/Util';
-import {TimerState} from '../reducers/timer';
-import './TimerDisplay.css';
+import './Timer.css';
 
 export interface Props {
     onTouchStart: () => void;
@@ -12,7 +11,7 @@ export interface Props {
     mode: string;
 }
 
-class TimerDisplay extends React.Component<Props, TimerState> {
+class TimerDisplay extends React.Component<Props, {}> {
 
     componentDidMount(): void {
         window.addEventListener('keydown', this.props.onKeyDown);
