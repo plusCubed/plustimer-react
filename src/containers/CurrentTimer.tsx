@@ -14,16 +14,16 @@ const mapStateToProps = (state: StoreState) => {
 const mapDispatchToProps = (dispatch: Dispatch<Action>) => {
     return {
         onTouchStart: () => {
-            dispatch(down());
+            dispatch(down(performance.now()));
         },
         onTouchEnd: () => {
-            dispatch(up());
+            dispatch(up(performance.now()));
         },
         onKeyDown: (e: KeyboardEvent) => {
-            dispatch(down(e.key));
+            dispatch(down(performance.now(), e.key));
         },
         onKeyUp: (e: KeyboardEvent) => {
-            dispatch(up(e.key));
+            dispatch(up(performance.now(), e.key));
         }
     };
 };

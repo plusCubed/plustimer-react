@@ -4,11 +4,11 @@ import {CANCEL, DOWN, UP} from '../reducers/timerMode';
 import {START_TIMER, STOP_TIMER, tickTimer, transitionTimeMap} from '../reducers/timerTime';
 import {Action} from '../utils/Util';
 
-const transitionModeActionToTimeAction = (actionType: string, timerMode: string): Observable<Action> => {
-    if (timerMode in transitionTimeMap[actionType]) {
-        const timeActionCreator = transitionTimeMap[actionType][timerMode];
+const transitionModeActionToTimeAction = (action: Action, timerMode: string): Observable<Action> => {
+    if (timerMode in transitionTimeMap[action.type]) {
+        const timeActionCreator = transitionTimeMap[action.type][timerMode];
         if (!!timeActionCreator) {
-            return Observable.of(timeActionCreator());
+            return Observable.of(timeActionCreator(action.payload.timestamp));
         }
     }
     return Observable.empty();
@@ -17,7 +17,7 @@ const transitionModeActionToTimeAction = (actionType: string, timerMode: string)
 export const modeActionToTimeAction = (action$: ActionsObservable<Action>, store: any) => {
     return Observable.merge(action$.ofType(UP), action$.ofType(DOWN), action$.ofType(CANCEL))
         .flatMap(action => {
-            return transitionModeActionToTimeAction(action.type, store.getState().timer.mode);
+            return transitionModeActionToTimeAction(action, store.getState().timer.mode);
         });
 };
 
@@ -27,7 +27,7 @@ export const timeActionToTick = (action$: ActionsObservable<Action>) => {
             return Observable.of(0, Scheduler.animationFrame)
                 .repeat()
                 .takeUntil(action$.ofType(STOP_TIMER))
-                .map(i => tickTimer());
+                .map(i => tickTimer(performance.now()));
         });
 };
 

@@ -19,7 +19,7 @@
 }
 
 .ready {
-    transition: color 0.2s;
+    transition: color 0.5s;
 }
 
 .stopped {

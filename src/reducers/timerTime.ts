@@ -6,22 +6,23 @@ export const STOP_TIMER = 'STOP_TIMER';
 export const RESET_TIMER = 'RESET_TIMER';
 
 // TIMER TIME ACTION CREATORS
-export const startTimer = (): Action => ({
+export const startTimer = (timestamp: number): Action => ({
     type: START_TIMER,
-    payload: performance.now()
+    payload: timestamp
 });
 
-export const stopTimer = (): Action => ({
+export const stopTimer = (timestamp: number): Action => ({
     type: STOP_TIMER,
-    payload: performance.now()
+    payload: timestamp
 });
 
 export const resetTimer = (): Action => ({
     type: RESET_TIMER
 });
 
-export const tickTimer = (): Action => ({
-    type: TICK_TIMER
+export const tickTimer = (timestamp: number): Action => ({
+    type: TICK_TIMER,
+    payload: timestamp
 });
 
 // TIMER TIME CONSTANTS
@@ -42,11 +43,13 @@ export const transitionTimeMap = {
 
 // TIMER TIME REDUCER
 export interface TimeState {
+    running: boolean;
     start: number;
     elapsed: number;
 }
 
 const initialTimeState: TimeState = {
+    running: false,
     start: 0,
     elapsed: 0
 };
@@ -54,25 +57,36 @@ const initialTimeState: TimeState = {
 export const timerTimeReducer = (state = initialTimeState, action: Action) => {
     switch (action.type) {
         case START_TIMER:
-            return {
-                ...state,
-                start: action.payload,
-            };
+            if (!state.running) {
+                return {
+                    ...state,
+                    running: true,
+                    start: action.payload,
+                };
+            } else {
+                return state;
+            }
         case RESET_TIMER:
             return {
+                running: false,
                 start: 0,
                 elapsed: 0
             };
         case TICK_TIMER:
             return {
                 ...state,
-                elapsed: performance.now() - state.start
-            };
-        case STOP_TIMER:
-            return {
-                ...state,
                 elapsed: action.payload - state.start
             };
+        case STOP_TIMER:
+            if (state.running) {
+                return {
+                    ...state,
+                    running: false,
+                    elapsed: action.payload - state.start
+                };
+            } else {
+                return state;
+            }
         default:
             return state;
     }
