@@ -5,13 +5,6 @@
     position: fixed;
     transform: translate3d(0, calc(100% - 48px - 24px), 0);
     will-change: transform;
-
-    /* position: absolute;
-     z-index: 10 !important;
-     margin: 0 auto;
-     left: 0;
-     right: 0;
-     transform: translate3d(0, calc(100% - 48px - 24px), 0);*/
 }
 
 .container {

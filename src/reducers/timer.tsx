@@ -1,13 +1,13 @@
 // TIMER MODE ACTIONS
 import {combineReducers} from 'redux';
-import {timerTimeReducer, TimeState} from './timerTime';
+import {timerTimeReducer, TimeStoreState} from './timerTime';
 import {timerModeReducer} from './timerMode';
 
 // TIMER REDUCER
 
-export interface TimerState {
+export interface TimerStoreState {
     mode: string;
-    time: TimeState;
+    time: TimeStoreState;
 }
 
 export const timerReducer = combineReducers({

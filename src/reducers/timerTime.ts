@@ -42,13 +42,13 @@ export const transitionTimeMap = {
 };
 
 // TIMER TIME REDUCER
-export interface TimeState {
+export interface TimeStoreState {
     running: boolean;
     start: number;
     elapsed: number;
 }
 
-const initialTimeState: TimeState = {
+const initialTimeState: TimeStoreState = {
     running: false,
     start: 0,
     elapsed: 0

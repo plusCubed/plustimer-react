@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {AutoSizer, CellMeasurer, CellMeasurerCache, Grid, GridCellProps} from 'react-virtualized';
+import {AutoSizer, CellMeasurer, CellMeasurerCache, Grid, GridCellProps, ScrollParams} from 'react-virtualized';
 import defaultRenderCellWrapper from './defaultRenderCellWrapper';
 
 type IdealItemWidthInput = {
@@ -39,8 +39,7 @@ type RenderCellWrapperInput = {
     isItem: boolean,
 };
 
-interface Props<TItem> {
-    className?: string;
+type Props<TItem> = {
     idealItemWidth: number | ((input: IdealItemWidthInput) => number);
     dynamicRowHeight?: boolean;
     items: Array<TItem>;
@@ -49,12 +48,16 @@ interface Props<TItem> {
     header?: any | ((input: RenderHeaderInput) => any) | null;
     footer?: any | ((input: RenderFooterInput) => any) | null;
     renderCellWrapper?: (input: RenderCellWrapperInput) => any;
-}
+
+    // Grid props
+    className?: string;
+    onScroll?: (params: ScrollParams) => any;
+};
 
 // NOTE: Component is intentionally used instead of PureComponent,
 // as renderItem's internals may adjust independent of props provided to
 // this component
-export default class VirtualizedItemGrid<TItem> extends React.Component<Props<TItem>, {}> {
+export default class VirtualizedItemGrid<TItem> extends React.PureComponent<Props<TItem>, {}> {
 
     public static defaultProps = {
         dynamicRowHeight: false,
@@ -206,7 +209,14 @@ export default class VirtualizedItemGrid<TItem> extends React.Component<Props<TI
         if (!containerWidth) {
             return null;
         }
-        const {className, items, overscanRowCount, header, footer} = this.props;
+        const {
+            items,
+            overscanRowCount,
+            header,
+            footer,
+            ...passThroughProps
+        } = this.props;
+
         const itemCount = items.length;
 
         const idealItemWidth = Math.max(1, this.getIdealItemWidth(containerWidth, containerHeight));
@@ -235,7 +245,6 @@ export default class VirtualizedItemGrid<TItem> extends React.Component<Props<TI
         return (
             <Grid
                 cellRenderer={cellRenderer}
-                className={className}
                 columnCount={columnCount}
                 columnWidth={columnWidth}
                 height={containerHeight}
@@ -244,6 +253,7 @@ export default class VirtualizedItemGrid<TItem> extends React.Component<Props<TI
                 rowHeight={cache.rowHeight as any}
                 width={containerWidth}
                 overscanRowCount={overscanRowCount}
+                {...passThroughProps}
             />
         );
     }

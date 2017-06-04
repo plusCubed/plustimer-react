@@ -2,16 +2,22 @@ import * as React from 'react';
 import {formatTime} from '../utils/Util';
 import './Timer.css';
 
-export interface Props {
-    onTouchStart: () => void;
-    onTouchEnd: () => void;
-    onKeyDown: (e: KeyboardEvent) => void;
-    onKeyUp: (e: KeyboardEvent) => void;
-    displayTime: number;
-    mode: string;
+export interface StoreStateProps {
+    readonly displayTime: number;
+    readonly mode: string;
 }
 
-class TimerDisplay extends React.Component<Props, {}> {
+export interface DispatchProps {
+    readonly onTouchStart: () => void;
+    readonly onTouchEnd: () => void;
+    readonly onKeyDown: (e: KeyboardEvent) => void;
+    readonly onKeyUp: (e: KeyboardEvent) => void;
+}
+
+export interface Props extends StoreStateProps, DispatchProps {
+}
+
+class TimerDisplay extends React.PureComponent<Props, {}> {
 
     componentDidMount(): void {
         window.addEventListener('keydown', this.props.onKeyDown);
