@@ -32,7 +32,7 @@ function dampenedHookeForce(displacement: number,
     // Where:
     // x is the vector displacement of the end of the spring from its equilibrium,
     // k is a constant describing the tightness of the spring.
-    var hookeForce = -1 * (stiffness * displacement);
+    const hookeForce = -1 * (stiffness * displacement);
 
     // Applying friction to Hooke's Law for realistic physics
     // <http://gafferongames.com/game-physics/spring-physics/>
@@ -69,7 +69,7 @@ function tick(particle: any, stiffness: number, damping: number) {
     // Increase velocity by acceleration.
     particle.velocity += acceleration;
     // Update distance from resting.
-    particle.x += particle.velocity / 100;
+    particle.x += particle.velocity;
 
     return particle;
 }
@@ -91,7 +91,7 @@ function accumulateCurvePoints(x: number, velocity: number, mass: number, stiffn
     var points = [];
 
     while (!isParticleResting(p)) {
-        if (points.length === 100) {
+        if (points.length === 200) {
             console.log('SOMETHINGS WRONG ABORT ABORT');
             return points;
         }
@@ -118,12 +118,12 @@ function generateAnimationCss(points: any[],
     // a given point distance.
 
     // Convert to range from 0 - 100 (for 0% - 100% keyframes).
-    var frameSize = 100 / (points.length - 1);
+    const frameSize = 100 / (points.length - 1);
 
     // Build keyframe string
-    var keyframes = points.reduce((frames, point, i) => {
+    const keyframes = points.reduce((frames, point, i) => {
         // Create the percentage key for the frame. Round to nearest 5 decimals.
-        var percent = roundTo(frameSize * i, 5);
+        const percent = roundTo(frameSize * i, 5);
         // Wrap the mapped point value in a keyframe. Mapper is expected to return
         // a valid set of CSS properties as a string.
         return frames + asCssStatement(percent + '%', mapper(point)) + '\n';
@@ -131,10 +131,10 @@ function generateAnimationCss(points: any[],
 
     // Wrap keyframe string into @keyframes statement. Give animation a name
     // so we can reference it.
-    var keyframeStatement = asCssStatement('@keyframes ' + name + ' ', keyframes);
+    const keyframeStatement = asCssStatement('@keyframes ' + name + ' ', keyframes);
 
     // Build properties string for our animation classname.
-    var properties =
+    const properties =
         asCssRule('animation-duration', duration) +
         asCssRule('animation-name', name) +
         asCssRule('animation-timing-function', 'linear') +
@@ -142,10 +142,13 @@ function generateAnimationCss(points: any[],
 
     // Wrap properties string as a CSS class statement. Give class same name
     // as animation.
-    var animationStatement = asCssStatement('.' + name, properties);
+    // var animationStatement = asCssStatement('.' + name, properties);
 
     // Return our combined animation rule set string.
-    return keyframeStatement + animationStatement;
+    return {
+        keyframes: keyframeStatement,
+        animationStyles: properties
+    };
 }
 
 function appendStyle(headEl: HTMLElement, css: string) {
@@ -158,51 +161,12 @@ function appendStyle(headEl: HTMLElement, css: string) {
     return styleEl;
 }
 
-export function animateSpringCss(x: number,
-                                 velocity: number,
-                                 mass: number,
-                                 stiffness: number,
-                                 damping: number,
-                                 mapper: (x: number) => string,
-                                 fps?: number) {
-    fps = fps || 60;
-
-    // Accumulate the points of the spring curve
-    var points = accumulateCurvePoints(x, velocity, mass, stiffness, damping);
-
-    // Compute the timespan of the animation based on the number of frames we
-    // have and the fps we desire.
-    var duration = (points.length / fps) * 1000;
-
-    // Generate a unique name for this animation.
-    var name = 'spring-' + id();
-
-    // Create CSS animation classname.
-    var css = generateAnimationCss(points, name, duration + 'ms', mapper);
-
-    return css;
-
-    /*// Create style element and append it to head element.
-     var styleEl = appendStyle(document.head, css);
-
-     // Add animation classname to element.
-     el.classList.add(name);
-
-     setTimeout(
-         function cleanupAnimation() {
-             // Append final style to element.
-             el.style.cssText += mapper(0);
-             // Remove animation classname and styles. We're done with it.
-             document.head.removeChild(styleEl);
-             // Remove classname appended to element.
-             el.classList.remove(name);
-         },
-         duration + 1
-     );*/
-}
-
-export function animateSpringViaCss(el: HTMLElement,
-                                    x: number,
+/**
+ * @param x Initial displacement (px)
+ * @param velocity Initial velocity (px/s)
+ * @param mapper CSS Keyframe mapper
+ */
+export function animateSpringViaCss(x: number,
                                     velocity: number,
                                     mass: number,
                                     stiffness: number,
@@ -212,7 +176,8 @@ export function animateSpringViaCss(el: HTMLElement,
     fps = fps || 60;
 
     // Accumulate the points of the spring curve
-    var points = accumulateCurvePoints(x, velocity, mass, stiffness, damping);
+    // Divide velocity by fps for velocity in px/frame
+    var points = accumulateCurvePoints(x, velocity / fps, mass, stiffness, damping);
 
     // Compute the timespan of the animation based on the number of frames we
     // have and the fps we desire.
@@ -225,22 +190,15 @@ export function animateSpringViaCss(el: HTMLElement,
     var css = generateAnimationCss(points, name, duration + 'ms', mapper);
 
     // Create style element and append it to head element.
-    var styleEl = appendStyle(document.head, css);
+    var styleEl = appendStyle(document.head, css.keyframes);
 
-    // Add animation classname to element.
-    el.classList.add(name);
-
-    setTimeout(
-        function cleanupAnimation() {
-            // Append final style to element.
-            el.style.cssText += mapper(0);
+    return {
+        animationStyles: css.animationStyles,
+        callback: () => {
             // Remove animation classname and styles. We're done with it.
             document.head.removeChild(styleEl);
-            // Remove classname appended to element.
-            el.classList.remove(name);
-        },
-        duration + 1
-    );
+        }
+    };
 }
 
 export function animateSpring(x: number,

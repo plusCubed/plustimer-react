@@ -2,6 +2,7 @@ import * as React from 'react';
 import './SolvesSheet.css';
 import VirtualizedItemGrid from '../assets/virtualized-item-grid/VirtualizedItemGrid';
 import {ScrollParams} from 'react-virtualized';
+import {animateSpringViaCss} from '../utils/spring';
 
 export interface StoreStateProps {
     readonly solves: Array<number>;
@@ -15,6 +16,7 @@ export interface Props extends StoreStateProps, DispatchProps {
 
 export interface State {
     readonly offset: number;
+    readonly isExpanded: boolean;
 }
 
 const SolveDisplay = ({item}: any) => {
@@ -33,9 +35,7 @@ enum ScrollState {
 
 class SolvesSheet extends React.PureComponent<Props, State> {
     static collapsedY = '100% - 48px - 24px';
-    static expandedY = '16px';
-
-    private isExpanded = false;
+    static expandedY = '16px + 64px';
 
     private isAnimating = false;
     private scrollState: ScrollState;
@@ -43,16 +43,31 @@ class SolvesSheet extends React.PureComponent<Props, State> {
     private lastY = -1;
     private lastDy = 0;
     private lastTimestamp = -1;
+    private lastVelocity: number;
     private isSecondTouch = false;
 
     private isScrolledToTop = true;
+
+    private oldTop: number;
+    private animationCallback: any;
+
+    private solvesSheet: HTMLElement;
+
+    constructor(props: Props) {
+        super(props);
+        this.state = {
+            offset: 0,
+            isExpanded: false
+        };
+    }
+
     handleScroll = (params: ScrollParams) => {
         this.isScrolledToTop = (params.scrollTop === 0);
     };
-    private lastVelocity: number;
+
     handleTouchMove = (e: React.TouchEvent<HTMLElement>) => {
         if (this.isAnimating) {
-            return;
+            this.stopAnimation();
         }
 
         let touchobj = e.changedTouches[0];
@@ -67,7 +82,7 @@ class SolvesSheet extends React.PureComponent<Props, State> {
 
             // Second touch event: determine direction, whether to move the sheet
 
-            if (this.scrollState !== ScrollState.SCROLLING && !this.isExpanded ||
+            if (this.scrollState !== ScrollState.SCROLLING && !this.state.isExpanded ||
                 this.isScrolledToTop && dY > 0) {
                 // this.setScrollEnabled(false);
                 this.scrollState = ScrollState.PANNING;
@@ -89,18 +104,20 @@ class SolvesSheet extends React.PureComponent<Props, State> {
         }
 
         this.lastY = touchobj.clientY;
-        this.lastVelocity = dY / (performance.now() - this.lastTimestamp);
+        this.lastVelocity = dY / (performance.now() - this.lastTimestamp) * 1000;
         this.lastTimestamp = performance.now();
     };
+
     handleTouchEnd = (e: React.TouchEvent<HTMLElement>) => {
-        if (this.isAnimating /*|| this.platform.is('core')*/) {
-            return;
+        // If touch move wasn't fired in the last 50ms, velocity is 0
+        if (performance.now() - this.lastTimestamp > 50) {
+            this.lastVelocity = 0;
         }
 
         if (this.scrollState === ScrollState.PANNING && this.state.offset !== 0) {
             // If moving the sheet, set expanded status
 
-            this.animateExpanded(this.lastDy < 0, this.lastVelocity);
+            this.animateExpanded(this.lastDy < 0);
         }
 
         this.scrollState = ScrollState.IDLE;
@@ -109,34 +126,80 @@ class SolvesSheet extends React.PureComponent<Props, State> {
         this.lastDy = 0;
     };
 
-    constructor(props: Props) {
-        super(props);
-        this.state = {
-            offset: 0
-        };
-    }
-
-    animateExpanded(isExpanded: boolean, velocity: number) {
-        this.isExpanded = isExpanded;
-
-        this.setState({offset: 0});
-        this.isAnimating = true;
+    animateExpanded(isExpanded: boolean) {
         // this.setScrollEnabled(isExpanded);
 
-        const stiffness = 170;
-        const damping = 2 * Math.sqrt(stiffness);
+        this.oldTop = this.solvesSheet.getBoundingClientRect().top;
+
+        this.isAnimating = true;
+        this.setState({
+            isExpanded: isExpanded,
+            offset: 0
+        });
+    }
+
+    componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, prevContext: any): void {
+        if (this.isAnimating) {
+            const newTop = this.solvesSheet.getBoundingClientRect().top;
+
+            const invert = newTop - this.oldTop;
+
+            const mass = 1;
+            const stiffness = 0.05;
+            const damping = 2 * Math.sqrt(stiffness * mass);
+
+            const mapper = this.state.isExpanded ?
+                (x: number) => {
+                    return `transform: translate3d(0, calc(${SolvesSheet.expandedY} - ${x}px), 0)`;
+                } :
+                (x: number) => {
+                    return `transform: translate3d(0, calc(${SolvesSheet.collapsedY} - ${x}px), 0)`;
+                };
+
+            const springAnimValues =
+                animateSpringViaCss(invert, -this.lastVelocity, mass, stiffness, damping, mapper);
+
+            this.animationCallback = springAnimValues.callback;
+
+            requestAnimationFrame(() => {
+                this.solvesSheet.style.cssText = springAnimValues.animationStyles;
+            });
+        }
+    }
+
+    handleAnimationEnd = (e: React.AnimationEvent<HTMLElement>) => {
+        if (this.animationCallback) {
+            this.animationCallback();
+            this.animationCallback = null;
+        }
+
+        this.stopAnimation();
+    };
+
+    stopAnimation() {
+        this.isAnimating = false;
+        this.resetStyle();
+    }
+
+    resetStyle() {
+        this.solvesSheet.style.cssText = '';
+        this.solvesSheet.style.transform = this.getTransformStyle();
     }
 
     render() {
         const {solves} = this.props;
+
         const style = {
-            transform: `translate3d(0, calc(${SolvesSheet.collapsedY} - ${-this.state.offset}px), 0)`
+            transform: this.getTransformStyle()
         };
+
         return (
             <div
                 className="solves-sheet"
+                ref={(solvesSheet) => this.solvesSheet = solvesSheet}
                 onTouchMove={this.handleTouchMove}
                 onTouchEnd={this.handleTouchEnd}
+                onAnimationEnd={this.handleAnimationEnd}
                 style={style}
             >
                 <div className="container">
@@ -152,6 +215,12 @@ class SolvesSheet extends React.PureComponent<Props, State> {
                 </div>
             </div>
         );
+    }
+
+    private getTransformStyle() {
+        return this.state.isExpanded ?
+            `translate3d(0, calc(${SolvesSheet.expandedY} - ${-this.state.offset}px), 0)` :
+            `translate3d(0, calc(${SolvesSheet.collapsedY} - ${-this.state.offset}px), 0)`;
     }
 }
 
