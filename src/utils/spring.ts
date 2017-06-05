@@ -9,7 +9,7 @@ Notes on springs:
 
 function roundTo(num: number, decimals: number) {
     // Round a number to a given number of decimal places.
-    var d = Math.pow(10, decimals);
+    const d = Math.pow(10, decimals);
     return Math.round(num * d) / d;
 }
 
@@ -85,10 +85,10 @@ function accumulateCurvePoints(x: number, velocity: number, mass: number, stiffn
     // Returns an array representing x values over time..
 
     // Create a temporary particle object.
-    var p = particle(x, velocity, mass);
+    const p = particle(x, velocity, mass);
 
     // Create a points array to accumulate into.
-    var points = [];
+    const points = [];
 
     while (!isParticleResting(p)) {
         if (points.length === 200) {
@@ -153,7 +153,7 @@ function generateAnimationCss(points: any[],
 
 function appendStyle(headEl: HTMLElement, css: string) {
     // Create a new style element.
-    var styleEl = document.createElement('style');
+    const styleEl = document.createElement('style');
     // Assign the text content.
     styleEl.textContent = css;
     // Append style to head.
@@ -177,20 +177,20 @@ export function animateSpringViaCss(x: number,
 
     // Accumulate the points of the spring curve
     // Divide velocity by fps for velocity in px/frame
-    var points = accumulateCurvePoints(x, velocity / fps, mass, stiffness, damping);
+    const points = accumulateCurvePoints(x, velocity / fps, mass, stiffness, damping);
 
     // Compute the timespan of the animation based on the number of frames we
     // have and the fps we desire.
-    var duration = (points.length / fps) * 1000;
+    const duration = (points.length / fps) * 1000;
 
     // Generate a unique name for this animation.
-    var name = 'spring-' + id();
+    const name = 'spring-' + id();
 
     // Create CSS animation classname.
-    var css = generateAnimationCss(points, name, duration + 'ms', mapper);
+    const css = generateAnimationCss(points, name, duration + 'ms', mapper);
 
     // Create style element and append it to head element.
-    var styleEl = appendStyle(document.head, css.keyframes);
+    const styleEl = appendStyle(document.head, css.keyframes);
 
     return {
         animationStyles: css.animationStyles,
