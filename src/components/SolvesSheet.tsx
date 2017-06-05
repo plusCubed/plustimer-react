@@ -15,8 +15,8 @@ export interface Props extends StoreStateProps, DispatchProps {
 }
 
 export interface State {
-    readonly offset: number;
     readonly isExpanded: boolean;
+    readonly isAnimating: boolean;
 }
 
 const SolveDisplay = ({item}: any) => {
@@ -37,7 +37,6 @@ class SolvesSheet extends React.PureComponent<Props, State> {
     static collapsedY = '100% - 48px - 24px';
     static expandedY = '16px + 64px';
 
-    private isAnimating = false;
     private scrollState: ScrollState;
 
     private lastY = -1;
@@ -51,13 +50,15 @@ class SolvesSheet extends React.PureComponent<Props, State> {
     private oldTop: number;
     private animationCallback: any;
 
+    private offset = 0;
+
     private solvesSheet: HTMLElement;
 
     constructor(props: Props) {
         super(props);
         this.state = {
-            offset: 0,
-            isExpanded: false
+            isExpanded: false,
+            isAnimating: false
         };
     }
 
@@ -66,7 +67,7 @@ class SolvesSheet extends React.PureComponent<Props, State> {
     };
 
     handleTouchMove = (e: React.TouchEvent<HTMLElement>) => {
-        if (this.isAnimating) {
+        if (this.state.isAnimating) {
             this.stopAnimation();
         }
 
@@ -86,7 +87,7 @@ class SolvesSheet extends React.PureComponent<Props, State> {
                 this.isScrolledToTop && dY > 0) {
                 // this.setScrollEnabled(false);
                 this.scrollState = ScrollState.PANNING;
-                this.setState({offset: 0});
+                this.setOffset(0);
             }
 
             this.isSecondTouch = false;
@@ -97,7 +98,7 @@ class SolvesSheet extends React.PureComponent<Props, State> {
 
             if (this.scrollState === ScrollState.PANNING) {
                 // this.setScrollEnabled(false);
-                this.setState({offset: this.state.offset + dY});
+                this.setOffset(this.offset + dY);
             }
 
             this.lastDy = dY;
@@ -114,7 +115,7 @@ class SolvesSheet extends React.PureComponent<Props, State> {
             this.lastVelocity = 0;
         }
 
-        if (this.scrollState === ScrollState.PANNING && this.state.offset !== 0) {
+        if (this.scrollState === ScrollState.PANNING && this.offset !== 0) {
             // If moving the sheet, set expanded status
 
             this.animateExpanded(this.lastDy < 0);
@@ -131,22 +132,27 @@ class SolvesSheet extends React.PureComponent<Props, State> {
 
         this.oldTop = this.solvesSheet.getBoundingClientRect().top;
 
-        this.isAnimating = true;
+        this.setOffset(0);
         this.setState({
             isExpanded: isExpanded,
-            offset: 0
+            isAnimating: true
         });
     }
 
+    setOffset(offset: number) {
+        this.offset = offset;
+        this.updateDOMTransformStyle();
+    }
+
     componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, prevContext: any): void {
-        if (this.isAnimating) {
+        if (this.state.isAnimating) {
             const newTop = this.solvesSheet.getBoundingClientRect().top;
 
             const invert = newTop - this.oldTop;
 
-            const mass = 1;
-            const stiffness = 0.05;
-            const damping = 2 * Math.sqrt(stiffness * mass);
+            const mass = 50;
+            const stiffness = 5;
+            const damping = 2 * Math.sqrt(stiffness * mass) * 0.6;
 
             const mapper = this.state.isExpanded ?
                 (x: number) => {
@@ -177,12 +183,14 @@ class SolvesSheet extends React.PureComponent<Props, State> {
     };
 
     stopAnimation() {
-        this.isAnimating = false;
-        this.resetStyle();
+        this.solvesSheet.style.cssText = '';
+        this.updateDOMTransformStyle();
+        this.setState({
+            isAnimating: false
+        });
     }
 
-    resetStyle() {
-        this.solvesSheet.style.cssText = '';
+    updateDOMTransformStyle() {
         this.solvesSheet.style.transform = this.getTransformStyle();
     }
 
@@ -219,8 +227,8 @@ class SolvesSheet extends React.PureComponent<Props, State> {
 
     private getTransformStyle() {
         return this.state.isExpanded ?
-            `translate3d(0, calc(${SolvesSheet.expandedY} - ${-this.state.offset}px), 0)` :
-            `translate3d(0, calc(${SolvesSheet.collapsedY} - ${-this.state.offset}px), 0)`;
+            `translate3d(0, calc(${SolvesSheet.expandedY} - ${-this.offset}px), 0)` :
+            `translate3d(0, calc(${SolvesSheet.collapsedY} - ${-this.offset}px), 0)`;
     }
 }
 
