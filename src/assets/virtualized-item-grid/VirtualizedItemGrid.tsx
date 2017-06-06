@@ -42,8 +42,8 @@ type RenderCellWrapperInput = {
 type Props<TItem> = {
     idealItemWidth: number | ((input: IdealItemWidthInput) => number);
     dynamicRowHeight?: boolean;
-    items: Array<TItem>;
-    renderItem: (input: RenderItemInput<TItem>) => any;
+    items: Array<any>;
+    renderItem: (input: RenderItemInput<any>) => any;
     overscanRowCount?: number;
     header?: any | ((input: RenderHeaderInput) => any) | null;
     footer?: any | ((input: RenderFooterInput) => any) | null;
@@ -210,10 +210,14 @@ export default class VirtualizedItemGrid<TItem> extends React.PureComponent<Prop
             return null;
         }
         const {
+            idealItemWidth: iiw,
+            dynamicRowHeight,
             items,
+            renderItem,
             overscanRowCount,
             header,
             footer,
+            renderCellWrapper,
             ...passThroughProps
         } = this.props;
 
