@@ -1,6 +1,15 @@
 const fs = require("fs");
 const path = require("path");
 const paths = require("react-scripts/config/paths");
+const {TsConfigPathsPlugin} = require('awesome-typescript-loader');
+
+const options = {
+    plugins: [
+        ['transform-react-jsx', {
+            pragma: 'h'
+        }]
+    ]
+};
 
 module.exports = function override(config, env) {
     // change appIndexJs path to tsx file
@@ -26,7 +35,8 @@ module.exports = function override(config, env) {
             loader: require.resolve('awesome-typescript-loader'),
             query: {
                 useBabel: true,
-                useCache: true
+                useCache: true,
+                babelOptions: options
             },
         }
     );
@@ -41,6 +51,12 @@ module.exports = function override(config, env) {
     // add extensions
     config.resolve.extensions.push('.tsx');
     config.resolve.extensions.push('.ts');
+
+    // use preact
+    Object.assign({}, config.resolve.alias, {
+        "react": "preact-compat",
+        "react-dom": "preact-compat"
+    });
 
     return config;
 };
