@@ -3,6 +3,8 @@ import './SolvesSheet.css';
 import VirtualizedItemGrid from '../assets/virtualized-item-grid/VirtualizedItemGrid';
 import {ScrollParams} from 'react-virtualized';
 import {animateSpringViaCss} from '../utils/spring';
+import CaretUp from 'material-ui-icons/KeyboardArrowUp';
+import CaretDown from 'material-ui-icons/KeyboardArrowDown';
 
 export interface StoreStateProps {
     readonly solves: Array<number>;
@@ -182,6 +184,10 @@ class SolvesSheet extends React.PureComponent<Props, State> {
         this.stopAnimation();
     };
 
+    handleCaretClick = () => {
+        this.animateExpanded(!this.state.isExpanded);
+    };
+
     stopAnimation() {
         this.solvesSheet.style.cssText = '';
         this.updateDOMTransformStyle();
@@ -210,6 +216,15 @@ class SolvesSheet extends React.PureComponent<Props, State> {
                 onAnimationEnd={this.handleAnimationEnd}
                 style={style}
             >
+                <div
+                    className="caret-icon"
+                    onClick={this.handleCaretClick}
+                >
+                    {this.state.isExpanded ?
+                        <CaretDown/> :
+                        <CaretUp/>
+                    }
+                </div>
                 <div className="container">
                     <div className="solves-background">
                         <VirtualizedItemGrid
