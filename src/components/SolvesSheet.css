@@ -1,7 +1,7 @@
 .solves-sheet {
     width: 100%;
-    height: 100%;
-    top: 0;
+    height: calc(100% - 64px);
+    top: 64px;
     position: fixed;
     transform: translate3d(0, calc(100% - 48px - 24px), 0);
     will-change: transform;
@@ -25,7 +25,7 @@
 .solves-background {
     box-shadow: 0px -4px 22px -8px rgba(0, 0, 0, 0.75);
     background: white;
-    height: 100%;
+    height: calc(100% - 24px);
 }
 
 .solves-grid {

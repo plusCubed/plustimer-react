@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {AutoSizer, CellMeasurer, CellMeasurerCache, Grid, GridCellProps, ScrollParams} from 'react-virtualized';
+import {AutoSizer, CellMeasurer, CellMeasurerCache, Grid, GridCellProps} from 'react-virtualized';
 import defaultRenderCellWrapper from './defaultRenderCellWrapper';
 
 type IdealItemWidthInput = {
@@ -50,8 +50,9 @@ type Props<TItem> = {
     renderCellWrapper?: (input: RenderCellWrapperInput) => any;
 
     // Grid props
-    className?: string;
-    onScroll?: (params: ScrollParams) => any;
+    style?: any;
+    className?: any;
+    onScroll?: any;
 };
 
 // NOTE: Component is intentionally used instead of PureComponent,
@@ -228,7 +229,7 @@ export default class VirtualizedItemGrid<TItem> extends React.PureComponent<Prop
         // Max whole number of columns that will fit
         const columnCount = Math.trunc(containerWidth / minItemWidth);
         // Truncate to whole number pixels (otherwise virtualscroll puts last item on next line)
-        const columnWidth = Math.trunc(containerWidth / columnCount);
+        const columnWidth = containerWidth / columnCount;
 
         const rowCount = Math.ceil(itemCount / columnCount);
 

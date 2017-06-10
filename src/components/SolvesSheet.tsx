@@ -37,7 +37,7 @@ enum ScrollState {
 
 class SolvesSheet extends React.PureComponent<Props, State> {
     static collapsedY = '100% - 48px - 24px';
-    static expandedY = '16px + 64px';
+    static expandedY = '0px';
 
     private scrollState: ScrollState;
 
@@ -55,6 +55,8 @@ class SolvesSheet extends React.PureComponent<Props, State> {
     private offset = 0;
 
     private solvesSheet: HTMLElement;
+
+    private gridStyle: React.CSSProperties = {};
 
     constructor(props: Props) {
         super(props);
@@ -194,6 +196,14 @@ class SolvesSheet extends React.PureComponent<Props, State> {
         this.setState({
             isAnimating: false
         });
+
+        this.gridStyle = {overflowY: this.state.isExpanded ? 'auto' : 'hidden'};
+    }
+
+    getTransformStyle() {
+        return this.state.isExpanded ?
+            `translate3d(0, calc(${SolvesSheet.expandedY} - ${-this.offset}px), 0)` :
+            `translate3d(0, calc(${SolvesSheet.collapsedY} - ${-this.offset}px), 0)`;
     }
 
     updateDOMTransformStyle() {
@@ -228,6 +238,7 @@ class SolvesSheet extends React.PureComponent<Props, State> {
                 <div className="container">
                     <div className="solves-background">
                         <VirtualizedItemGrid
+                            style={this.gridStyle}
                             minItemWidth={64}
                             items={solves}
                             renderItem={SolveDisplay}
@@ -238,12 +249,6 @@ class SolvesSheet extends React.PureComponent<Props, State> {
                 </div>
             </div>
         );
-    }
-
-    private getTransformStyle() {
-        return this.state.isExpanded ?
-            `translate3d(0, calc(${SolvesSheet.expandedY} - ${-this.offset}px), 0)` :
-            `translate3d(0, calc(${SolvesSheet.collapsedY} - ${-this.offset}px), 0)`;
     }
 }
 
