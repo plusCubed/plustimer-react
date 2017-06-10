@@ -3,11 +3,11 @@ import {connect, Dispatch} from 'react-redux';
 import {StoreState} from '../reducers/index';
 import {Action} from '../utils/Util';
 import SolvesSheet, {DispatchProps, StoreStateProps} from '../components/SolvesSheet';
-import {getReverseSolves} from '../reducers/solves';
+import {getNewToOldSolves} from '../reducers/solves';
 
 const mapStateToProps = (state: StoreState): StoreStateProps => {
     return {
-        solves: getReverseSolves(state)
+        solves: getNewToOldSolves(state)
     };
 };
 

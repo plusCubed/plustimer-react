@@ -1,6 +1,7 @@
 import {Action} from '../utils/Util';
 import {Solve} from '../services/solves-service';
 import {StoreState} from './index';
+import {createSelector} from 'reselect';
 
 export const FETCH_SOLVES = 'SOLVES/FETCH_SOLVES';
 export const FETCH_SOLVES_SUCCESS = 'SOLVES/FETCH_SOLVES_SUCCESS';
@@ -26,9 +27,12 @@ export const deleteSolve = (id: string): Action => ({
     payload: id
 });
 
-export const getReverseSolves = (state: StoreState): Solve[] => {
-    return state.solves.slice().reverse();
-};
+const getSolves = (state: StoreState) => state.solves;
+
+export const getNewToOldSolves = createSelector(
+    getSolves,
+    (solves) => solves.slice().reverse()
+);
 
 // ACTION CREATORS
 
