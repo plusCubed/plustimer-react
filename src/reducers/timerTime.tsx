@@ -25,33 +25,19 @@ export const tickTimer = (timestamp: number): Action => ({
     payload: timestamp
 });
 
-// TIMER TIME CONSTANTS
-// The new mode & which action it corresponds to
-export const transitionTimeMap = {
-    'TIMER/DOWN': {
-        'handOnTimer': resetTimer,
-        'stopped': stopTimer
-    },
-    'TIMER/UP': {
-        'running': startTimer,
-        'ready': null
-    },
-    'TIMER/CANCEL': {
-        'ready': resetTimer
-    }
-};
-
 // TIMER TIME REDUCER
 export interface TimeStoreState {
     running: boolean;
     start: number;
     elapsed: number;
+    stoppedTimestamp: number;
 }
 
 const initialTimeState: TimeStoreState = {
     running: false,
     start: 0,
-    elapsed: 0
+    elapsed: 0,
+    stoppedTimestamp: 0
 };
 
 export const timerTimeReducer = (state = initialTimeState, action: Action) => {
@@ -82,7 +68,8 @@ export const timerTimeReducer = (state = initialTimeState, action: Action) => {
                 return {
                     ...state,
                     running: false,
-                    elapsed: action.payload - state.start
+                    elapsed: action.payload - state.start,
+                    stoppedTimestamp: action.payload
                 };
             } else {
                 return state;

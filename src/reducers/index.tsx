@@ -1,15 +1,16 @@
 import {combineReducers} from 'redux';
 import {timerReducer, TimerStoreState} from './timer';
-import {solvesSheetReducer, SolvesSheetStoreState} from './solvesSheet';
+import {Solve} from '../services/solves-service';
+import {solvesReducer} from './solves';
 
 export interface StoreState {
     timer: TimerStoreState;
-    solvesSheet: SolvesSheetStoreState;
+    solves: Solve[];
 }
 
 const rootReducer = combineReducers({
     timer: timerReducer,
-    solvesSheet: solvesSheetReducer,
+    solves: solvesReducer,
 });
 
 export default rootReducer;

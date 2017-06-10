@@ -5,9 +5,11 @@ import {ScrollParams} from 'react-virtualized';
 import {animateSpringViaCss} from '../utils/spring';
 import CaretUp from 'material-ui-icons/KeyboardArrowUp';
 import CaretDown from 'material-ui-icons/KeyboardArrowDown';
+import {Solve} from '../services/solves-service';
+import {formatTime} from '../utils/Util';
 
 export interface StoreStateProps {
-    readonly solves: Array<number>;
+    readonly solves: Solve[];
 }
 
 export interface DispatchProps {
@@ -21,12 +23,10 @@ export interface State {
     readonly isAnimating: boolean;
 }
 
-const SolveDisplay = ({item}: any) => {
+const SolveDisplay = ({item}: { item: Solve }) => {
     return (
-        <div
-            className="cell"
-        >
-            {item}
+        <div className="cell">
+            {formatTime(item.time)}
         </div>
     );
 };
@@ -228,7 +228,7 @@ class SolvesSheet extends React.PureComponent<Props, State> {
                 <div className="container">
                     <div className="solves-background">
                         <VirtualizedItemGrid
-                            idealItemWidth={64}
+                            minItemWidth={64}
                             items={solves}
                             renderItem={SolveDisplay}
                             className="solves-grid"

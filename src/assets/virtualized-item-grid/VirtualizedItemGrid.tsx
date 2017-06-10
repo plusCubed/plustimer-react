@@ -40,7 +40,7 @@ type RenderCellWrapperInput = {
 };
 
 type Props<TItem> = {
-    idealItemWidth: number | ((input: IdealItemWidthInput) => number);
+    minItemWidth: number | ((input: IdealItemWidthInput) => number);
     dynamicRowHeight?: boolean;
     items: Array<any>;
     renderItem: (input: RenderItemInput<any>) => any;
@@ -67,12 +67,12 @@ export default class VirtualizedItemGrid<TItem> extends React.PureComponent<Prop
         renderCellWrapper: defaultRenderCellWrapper,
     };
 
-    getIdealItemWidth(containerWidth: number, containerHeight: number) {
-        const {idealItemWidth} = this.props;
-        if (typeof idealItemWidth === 'function') {
-            return idealItemWidth({containerWidth, containerHeight});
+    getMinItemWidth(containerWidth: number, containerHeight: number) {
+        const {minItemWidth} = this.props;
+        if (typeof minItemWidth === 'function') {
+            return minItemWidth({containerWidth, containerHeight});
         }
-        return idealItemWidth;
+        return minItemWidth;
     }
 
     renderHeader(style: Style,
@@ -210,7 +210,7 @@ export default class VirtualizedItemGrid<TItem> extends React.PureComponent<Prop
             return null;
         }
         const {
-            idealItemWidth: iiw,
+            minItemWidth: miw,
             dynamicRowHeight,
             items,
             renderItem,
@@ -223,18 +223,15 @@ export default class VirtualizedItemGrid<TItem> extends React.PureComponent<Prop
 
         const itemCount = items.length;
 
-        const idealItemWidth = Math.max(1, this.getIdealItemWidth(containerWidth, containerHeight));
+        const minItemWidth = Math.max(1, this.getMinItemWidth(containerWidth, containerHeight));
 
-        const columnCountEstimate = Math.max(1, Math.floor(containerWidth / idealItemWidth));
-        const rowCount = Math.ceil(itemCount / columnCountEstimate);
-        // We can now recalculate the columnCount knowing how many rows we must
-        // display. In the typical case, this is going to be equivalent to
-        // `columnCountEstimate`, but if in the case of 5 items and 4 columns, we
-        // can fill out to display a a 3x2 with 1 hole instead of a 4x2 with 3
-        // holes.
-        const columnCount = Math.max(1, itemCount && Math.ceil(itemCount / rowCount));
+        // Max whole number of columns that will fit
+        const columnCount = Math.trunc(containerWidth / minItemWidth);
+        // Truncate to whole number pixels (otherwise virtualscroll puts last item on next line)
+        const columnWidth = Math.trunc(containerWidth / columnCount);
 
-        const columnWidth = containerWidth / columnCount;
+        const rowCount = Math.ceil(itemCount / columnCount);
+
         const extraRowCount = (header ? 1 : 0) + (footer ? 1 : 0);
 
         const cache = new CellMeasurerCache({
