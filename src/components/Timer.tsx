@@ -24,7 +24,7 @@ class TimerDisplay extends React.PureComponent<Props, {}> {
         window.addEventListener('keydown', (e: KeyboardEvent) => {
             if (!this.keyPressed) {
                 this.keyPressed = true;
-                if (e.key === ' ' || this.props.mode === TimerMode.Ready) {
+                if (e.key === ' ' || this.props.mode === TimerMode.Running) {
                     this.props.onDown();
                 }
             }
