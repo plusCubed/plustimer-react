@@ -1,6 +1,7 @@
 import * as React from 'react';
 import {formatTime} from '../utils/Util';
 import './Timer.css';
+import {TimerMode} from '../reducers/timerMode';
 
 export interface StoreStateProps {
     readonly displayTime: number;
@@ -8,10 +9,8 @@ export interface StoreStateProps {
 }
 
 export interface DispatchProps {
-    readonly onTouchStart: () => void;
-    readonly onTouchEnd: () => void;
-    readonly onKeyDown: (e: KeyboardEvent) => void;
-    readonly onKeyUp: (e: KeyboardEvent) => void;
+    readonly onDown: () => void;
+    readonly onUp: () => void;
 }
 
 export interface Props extends StoreStateProps, DispatchProps {
@@ -19,20 +18,36 @@ export interface Props extends StoreStateProps, DispatchProps {
 
 class TimerDisplay extends React.PureComponent<Props, {}> {
 
+    private keyPressed: boolean;
+
     componentDidMount(): void {
-        window.addEventListener('keydown', this.props.onKeyDown);
-        window.addEventListener('keyup', this.props.onKeyUp);
+        window.addEventListener('keydown', (e: KeyboardEvent) => {
+            if (!this.keyPressed) {
+                this.keyPressed = true;
+                if (e.key === ' ' || this.props.mode === TimerMode.Ready) {
+                    this.props.onDown();
+                }
+            }
+        });
+        window.addEventListener('keyup', (e: KeyboardEvent) => {
+            if (this.keyPressed) {
+                this.keyPressed = false;
+                if (e.key === ' ' || this.props.mode === TimerMode.Stopped) {
+                    this.props.onUp();
+                }
+            }
+        });
     }
 
     componentWillUnmount(): void {
-        window.removeEventListener('keydown', this.props.onKeyDown);
-        window.removeEventListener('keyup', this.props.onKeyUp);
+        window.removeEventListener('keydown');
+        window.removeEventListener('keyup');
     }
 
     render() {
         const {
-            onTouchStart,
-            onTouchEnd,
+            onDown,
+            onUp,
             displayTime,
             mode
         } = this.props;
@@ -40,8 +55,8 @@ class TimerDisplay extends React.PureComponent<Props, {}> {
         return (
             <div
                 className={`timer ${mode}`}
-                onTouchStart={onTouchStart}
-                onTouchEnd={onTouchEnd}
+                onTouchStart={onDown}
+                onTouchEnd={onUp}
             >
                 {formatTime(displayTime)}
             </div>

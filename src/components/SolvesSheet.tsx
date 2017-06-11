@@ -1,6 +1,6 @@
 import * as React from 'react';
 import './SolvesSheet.css';
-import VirtualizedItemGrid from '../assets/virtualized-item-grid/VirtualizedItemGrid';
+import VirtualizedItemGrid from './virtualized-item-grid/VirtualizedItemGrid';
 import {ScrollParams} from 'react-virtualized';
 import {animateSpringViaCss} from '../utils/spring';
 import CaretUp from 'material-ui-icons/KeyboardArrowUp';

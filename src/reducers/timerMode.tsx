@@ -5,19 +5,17 @@ export const DOWN = 'TIMER/DOWN';
 export const CANCEL = 'TIMER/CANCEL';
 
 // TIMER MODE ACTION CREATORS
-export const up = (timestamp: number, key?: string): Action => ({
+export const up = (timestamp: number): Action => ({
     type: UP,
     payload: {
-        timestamp: timestamp,
-        key: key
+        timestamp: timestamp
     }
 });
 
-export const down = (timestamp: number, key?: string): Action => ({
+export const down = (timestamp: number): Action => ({
     type: DOWN,
     payload: {
-        timestamp: timestamp,
-        key: key
+        timestamp: timestamp
     }
 });
 
@@ -66,12 +64,16 @@ function transitionMode(actionType: string, timerMode: string): string {
 export const timerModeReducer = (state = TimerMode.Ready, action: Action) => {
     switch (action.type) {
         case UP:
-            if (action.payload.key && action.payload.key !== ' ' && state !== TimerMode.Stopped) {
+            if (action.payload.key && action.payload.key !== ' ' && state === TimerMode.Stopped) {
                 return state;
+            } else {
+                return transitionMode(action.type, state);
             }
         case DOWN:
-            if (action.payload.key && action.payload.key !== ' ' && state !== TimerMode.Ready) {
+            if (action.payload.key && action.payload.key !== ' ' && state === TimerMode.Ready) {
                 return state;
+            } else {
+                return transitionMode(action.type, state);
             }
         case CANCEL:
             return transitionMode(action.type, state);

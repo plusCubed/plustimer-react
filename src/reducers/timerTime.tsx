@@ -27,14 +27,12 @@ export const tickTimer = (timestamp: number): Action => ({
 
 // TIMER TIME REDUCER
 export interface TimeStoreState {
-    running: boolean;
     start: number;
     elapsed: number;
     stoppedTimestamp: number;
 }
 
 const initialTimeState: TimeStoreState = {
-    running: false,
     start: 0,
     elapsed: 0,
     stoppedTimestamp: 0
@@ -43,20 +41,17 @@ const initialTimeState: TimeStoreState = {
 export const timerTimeReducer = (state = initialTimeState, action: Action) => {
     switch (action.type) {
         case START_TIMER:
-            if (!state.running) {
-                return {
-                    ...state,
-                    running: true,
-                    start: action.payload,
-                };
-            } else {
-                return state;
-            }
+            return {
+                ...state,
+                running: true,
+                start: action.payload,
+            };
         case RESET_TIMER:
             return {
                 running: false,
                 start: 0,
-                elapsed: 0
+                elapsed: 0,
+                stoppedTimestamp: 0
             };
         case TICK_TIMER:
             return {
@@ -64,16 +59,12 @@ export const timerTimeReducer = (state = initialTimeState, action: Action) => {
                 elapsed: action.payload - state.start
             };
         case STOP_TIMER:
-            if (state.running) {
-                return {
-                    ...state,
-                    running: false,
-                    elapsed: action.payload - state.start,
-                    stoppedTimestamp: action.payload
-                };
-            } else {
-                return state;
-            }
+            return {
+                ...state,
+                running: false,
+                elapsed: action.payload - state.start,
+                stoppedTimestamp: action.payload
+            };
         default:
             return state;
     }
