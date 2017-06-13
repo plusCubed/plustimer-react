@@ -3,14 +3,9 @@ import {Solve} from '../services/solves-service';
 import {StoreState} from './index';
 import {createSelector} from 'reselect';
 
-export const FETCH_SOLVES = 'SOLVES/FETCH_SOLVES';
 export const FETCH_SOLVES_SUCCESS = 'SOLVES/FETCH_SOLVES_SUCCESS';
 export const ADD_UPDATE_SOLVE = 'SOLVES/ADD_SOLVE';
 export const DELETE_SOLVE = 'SOLVES/DELETE_SOLVE';
-
-export const fetchSolves = (): Action => ({
-    type: FETCH_SOLVES
-});
 
 export const fetchSolvesSuccess = (solves: Solve[]): Action => ({
     type: FETCH_SOLVES_SUCCESS,

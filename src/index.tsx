@@ -15,13 +15,18 @@ import {Provider} from 'react-redux';
 import {createEpicMiddleware} from 'redux-observable';
 
 import {composeWithDevTools} from 'redux-devtools-extension/logOnlyInProduction';
+import {ScrambleService} from './services/scramble.service';
 
 const solvesService = new SolvesService();
+const scrambleService = new ScrambleService();
 
 const epicMiddleware = createEpicMiddleware(
     rootEpic,
     {
-        dependencies: {solvesService: solvesService}
+        dependencies: {
+            solvesService: solvesService,
+            scrambleService: scrambleService
+        }
     }
 );
 const store = createStore(

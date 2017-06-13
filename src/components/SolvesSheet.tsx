@@ -36,7 +36,7 @@ enum ScrollState {
 }
 
 class SolvesSheet extends React.PureComponent<Props, State> {
-    static collapsedY = '100% - 48px - 24px';
+    static collapsedY = '100% - 48px - 48px';
     static expandedY = '0px';
 
     private scrollState: ScrollState;
@@ -193,11 +193,10 @@ class SolvesSheet extends React.PureComponent<Props, State> {
     stopAnimation() {
         this.solvesSheet.style.cssText = '';
         this.updateDOMTransformStyle();
+        this.gridStyle = {overflowY: this.state.isExpanded ? 'auto' : 'hidden'};
         this.setState({
             isAnimating: false
         });
-
-        this.gridStyle = {overflowY: this.state.isExpanded ? 'auto' : 'hidden'};
     }
 
     getTransformStyle() {
@@ -217,10 +216,12 @@ class SolvesSheet extends React.PureComponent<Props, State> {
             transform: this.getTransformStyle()
         };
 
+        const solvesSheetRef = (solvesSheet: HTMLElement) => this.solvesSheet = solvesSheet;
+
         return (
             <div
                 className="solves-sheet"
-                ref={(solvesSheet) => this.solvesSheet = solvesSheet}
+                ref={solvesSheetRef}
                 onTouchMove={this.handleTouchMove}
                 onTouchEnd={this.handleTouchEnd}
                 onAnimationEnd={this.handleAnimationEnd}

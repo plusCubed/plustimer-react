@@ -38,17 +38,15 @@ const initialTimeState: TimeStoreState = {
     stoppedTimestamp: 0
 };
 
-export const timerTimeReducer = (state = initialTimeState, action: Action) => {
+export const timerTimeReducer = (state = initialTimeState, action: Action): TimeStoreState => {
     switch (action.type) {
         case START_TIMER:
             return {
                 ...state,
-                running: true,
                 start: action.payload,
             };
         case RESET_TIMER:
             return {
-                running: false,
                 start: 0,
                 elapsed: 0,
                 stoppedTimestamp: 0
@@ -61,7 +59,6 @@ export const timerTimeReducer = (state = initialTimeState, action: Action) => {
         case STOP_TIMER:
             return {
                 ...state,
-                running: false,
                 elapsed: action.payload - state.start,
                 stoppedTimestamp: action.payload
             };
