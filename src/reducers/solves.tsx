@@ -4,7 +4,7 @@ import {StoreState} from './index';
 import {createSelector} from 'reselect';
 
 export const FETCH_SOLVES_SUCCESS = 'SOLVES/FETCH_SOLVES_SUCCESS';
-export const ADD_UPDATE_SOLVE = 'SOLVES/ADD_SOLVE';
+export const ADD_UPDATE_SOLVE = 'SOLVES/ADD_UPDATE_SOLVE';
 export const DELETE_SOLVE = 'SOLVES/DELETE_SOLVE';
 
 export const fetchSolvesSuccess = (solves: Solve[]): Action => ({
@@ -47,7 +47,7 @@ export const solvesReducer = (state: Solve[] = [], action: Action) => {
                 });
             } else {
                 // ADD
-                return [...state, ...action.payload];
+                return [...state, action.payload];
             }
         default:
             return state;

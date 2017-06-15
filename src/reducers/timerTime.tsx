@@ -59,8 +59,8 @@ export const timerTimeReducer = (state = initialTimeState, action: Action): Time
         case STOP_TIMER:
             return {
                 ...state,
-                elapsed: action.payload - state.start,
-                stoppedTimestamp: action.payload
+                elapsed: Math.trunc(action.payload - state.start),
+                stoppedTimestamp: Math.trunc(Date.now() / 1000)
             };
         default:
             return state;
