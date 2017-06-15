@@ -1,5 +1,11 @@
-import {Observable, Observer, Subscriber} from 'rxjs/Rx';
 import * as PouchDB from 'pouchdb';
+import {Observable} from 'rxjs/Observable';
+import {Subscriber} from 'rxjs/Subscriber';
+import {Observer} from 'rxjs/Observer';
+import 'rxjs/add/observable/of';
+import 'rxjs/add/observable/fromPromise';
+import 'rxjs/add/operator/mergeMap';
+import 'rxjs/add/operator/map';
 
 export class Solve {
     readonly _id: string;
@@ -22,7 +28,7 @@ export class SolvesService {
     initDB(): Observable<any> {
         return Observable.create((subscriber: Subscriber<any>) => {
             if (!this.db) {
-                this.db = new PouchDB('solves.db');
+                this.db = new (PouchDB as any).default('solves.db');
             }
             subscriber.next(this.db);
             subscriber.complete();

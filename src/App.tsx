@@ -9,11 +9,6 @@ import AppBar from 'material-ui/AppBar';
 import Toolbar from 'material-ui/Toolbar';
 import Typography from 'material-ui/Typography';
 import CurrentScramble from './containers/CurrentScramble';
-import injectTapEventPlugin = require('react-tap-event-plugin');
-
-// Needed for onTouchTap
-// http://stackoverflow.com/a/34015469/988941
-injectTapEventPlugin();
 
 const App = () => {
     return (

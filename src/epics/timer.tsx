@@ -1,11 +1,25 @@
 import {ActionsObservable, combineEpics, Epic} from 'redux-observable';
-import {Observable, Scheduler} from 'rxjs/Rx';
 import {CANCEL, DOWN, UP} from '../reducers/timerMode';
 import {resetTimer, START_TIMER, startTimer, STOP_TIMER, stopTimer, tickTimer} from '../reducers/timerTime';
 import {Action} from '../utils/Util';
 import {Solve, SolvesService} from '../services/solves-service';
-import {ScrambleService} from '../services/scramble.service';
+import {ScrambleService} from '../services/scramble-service';
 import {advanceScramble, FETCH_SCRAMBLE_SUCCESS, fetchScrambleStart, fetchScrambleSuccess} from '../reducers/scramble';
+import {Observable} from 'rxjs/Observable';
+import {animationFrame} from 'rxjs/scheduler/animationFrame';
+import 'rxjs/add/observable/of';
+import 'rxjs/add/observable/merge';
+import 'rxjs/add/observable/empty';
+import 'rxjs/add/observable/zip';
+import 'rxjs/add/operator/onErrorResumeNext';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/mergeMap';
+import 'rxjs/add/operator/repeat';
+import 'rxjs/add/operator/takeUntil';
+import 'rxjs/add/operator/filter';
+import 'rxjs/add/operator/startWith';
+import 'rxjs/add/operator/let';
+import {catchEmitError} from './errorHandling';
 
 // The new mode & which action it corresponds to
 export const transitionTimeMap = {
@@ -33,17 +47,19 @@ export const modeToTimeEpic = (action$: ActionsObservable<Action>, store: any): 
                 }
             }
             return Observable.empty();
-        });
+        })
+        .let(catchEmitError);
 };
 
 export const timeToTickEpic = (action$: ActionsObservable<Action>): Observable<Action> => {
     return action$.ofType(START_TIMER)
         .flatMap(action => {
-            return Observable.of(0, Scheduler.animationFrame)
+            return Observable.of(0, animationFrame)
                 .repeat()
                 .takeUntil(action$.ofType(STOP_TIMER))
                 .map(i => tickTimer(performance.now()));
-        });
+        })
+        .let(catchEmitError);
 };
 
 export const finishSolveEpic = (action$: ActionsObservable<Action>,
@@ -57,7 +73,8 @@ export const finishSolveEpic = (action$: ActionsObservable<Action>,
             solvesService.add(solve);
 
             return Observable.empty();
-        });
+        })
+        .let(catchEmitError);
 };
 
 export const fetchScrambleEpic = (action$: ActionsObservable<Action>,
@@ -73,19 +90,21 @@ export const fetchScrambleEpic = (action$: ActionsObservable<Action>,
             scrambleService.getScramble()
                 .map(scramble => fetchScrambleSuccess(scramble))
                 .startWith(fetchScrambleStart())
-        );
+        )
+        .let(catchEmitError);
 };
 
 export const advanceScrambleEpic = (action$: ActionsObservable<Action>, store: any): Observable<Action> => {
     const triggerAdvanceScramble$ = action$.ofType(UP)
         .filter(action => store.getState().timer.mode === 'ready')
-        .startWith({type: 'ADVANCE SCRAMBLE_ON_START'} as Action);
+        .startWith({type: 'ADVANCE_ON_START'} as Action);
     const fetchScrambleSuccess$ = action$.ofType(FETCH_SCRAMBLE_SUCCESS);
 
     return Observable.zip(fetchScrambleSuccess$, triggerAdvanceScramble$)
         .map(actions => {
             return advanceScramble();
-        });
+        })
+        .let(catchEmitError);
 };
 
 export default combineEpics(

@@ -1,4 +1,8 @@
-import {Observable, Subject} from 'rxjs/Rx';
+import {Subject} from 'rxjs/Subject';
+import {Observable} from 'rxjs/Observable';
+import 'rxjs/add/operator/take';
+import 'rxjs/add/operator/filter';
+import 'rxjs/add/operator/map';
 
 export class ScrambleService {
     private worker: Worker;

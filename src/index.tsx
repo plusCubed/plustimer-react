@@ -15,7 +15,7 @@ import {Provider} from 'react-redux';
 import {createEpicMiddleware} from 'redux-observable';
 
 import {composeWithDevTools} from 'redux-devtools-extension/logOnlyInProduction';
-import {ScrambleService} from './services/scramble.service';
+import {ScrambleService} from './services/scramble-service';
 
 const solvesService = new SolvesService();
 const scrambleService = new ScrambleService();

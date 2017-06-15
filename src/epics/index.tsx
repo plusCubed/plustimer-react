@@ -1,7 +1,6 @@
-import {combineEpics} from 'redux-observable';
-
 import timerEpic from './timer';
 import solvesEpic from './solves';
+import {combineEpics} from 'redux-observable';
 
 const rootEpic = combineEpics(
     timerEpic,

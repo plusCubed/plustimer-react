@@ -1,6 +1,8 @@
 import * as React from 'react';
-import {AutoSizer, CellMeasurer, CellMeasurerCache, Grid, GridCellProps} from 'react-virtualized';
 import defaultRenderCellWrapper from './defaultRenderCellWrapper';
+import {AutoSizer} from 'react-virtualized/dist/es/AutoSizer';
+import {Grid, GridCellProps} from 'react-virtualized/dist/es/Grid';
+import {CellMeasurer, CellMeasurerCache} from 'react-virtualized/dist/es/CellMeasurer';
 
 type IdealItemWidthInput = {
     containerWidth: number,

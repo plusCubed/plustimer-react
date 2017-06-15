@@ -2,7 +2,11 @@ import {ActionsObservable, combineEpics, Epic} from 'redux-observable';
 import {Action} from '../utils/Util';
 import {addUpdateSolve, deleteSolve, fetchSolvesSuccess} from '../reducers/solves';
 import {Solve, SolvesService} from '../services/solves-service';
-import {Observable} from 'rxjs/Rx';
+import {Observable} from 'rxjs/Observable';
+import 'rxjs/add/observable/merge';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/let';
+import {catchEmitError} from './errorHandling';
 
 const dbSolvesEpic = (action$: ActionsObservable<Action>,
                       store: any,
@@ -11,7 +15,8 @@ const dbSolvesEpic = (action$: ActionsObservable<Action>,
     // Doesn't actually care about actions. Grabs solves and starts observing updates to database
 
     const allSolves$ = solvesService.getAll()
-        .map((solves: Solve[]) => fetchSolvesSuccess(solves));
+        .map((solves: Solve[]) => fetchSolvesSuccess(solves))
+        .let(catchEmitError);
 
     const changes$ = solvesService.getChanges()
         .map((change: PouchDB.Core.ChangesResponseChange<Solve>) => {
@@ -22,7 +27,8 @@ const dbSolvesEpic = (action$: ActionsObservable<Action>,
             }
         });
 
-    return Observable.merge(allSolves$, changes$);
+    return Observable.merge(allSolves$, changes$)
+        .let(catchEmitError);
 };
 
 export default combineEpics(dbSolvesEpic as Epic<Action, {}>);
