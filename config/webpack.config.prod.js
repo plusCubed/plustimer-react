@@ -10,6 +10,8 @@ const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 const SWPrecacheWebpackPlugin = require('sw-precache-webpack-plugin');
 const eslintFormatter = require('react-dev-utils/eslintFormatter');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
+const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer');
+
 const paths = require('./paths');
 const getClientEnvironment = require('./env');
 
@@ -82,12 +84,14 @@ module.exports = {
         // We also include JSX as a common component filename extension to support
         // some tools, although we do not recommend using it, see:
         // https://github.com/facebookincubator/create-react-app/issues/290
-        extensions: ['.js', '.json', '.jsx'],
+        extensions: ['.js', '.json', '.jsx', '.ts', '.tsx'],
         alias: {
 
             // Support React Native Web
             // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
             'react-native': 'react-native-web',
+            'react': 'preact-compat',
+            'react-dom': 'preact-compat'
         },
         plugins: [
             // Prevents users from importing files from outside of src/ (or node_modules/).
@@ -121,6 +125,12 @@ module.exports = {
                 ],
                 include: paths.appSrc,
             },
+            {
+                test: /\.(ts|tsx)$/,
+                loader: require.resolve('tslint-loader'),
+                enforce: 'pre',
+                include: paths.appSrc,
+            },
             // ** ADDING/UPDATING LOADERS **
             // The "file" loader handles all assets unless explicitly excluded.
             // The `exclude` list *must* be updated with every change to loader extensions.
@@ -133,6 +143,7 @@ module.exports = {
                 exclude: [
                     /\.html$/,
                     /\.(js|jsx)$/,
+                    /\.(ts|tsx)$/,
                     /\.css$/,
                     /\.json$/,
                     /\.bmp$/,
@@ -160,7 +171,14 @@ module.exports = {
                 test: /\.(js|jsx)$/,
                 include: paths.appSrc,
                 loader: require.resolve('babel-loader'),
-
+            },
+            {
+                test: /\.(ts|tsx)$/,
+                include: paths.appSrc,
+                loader: require.resolve('awesome-typescript-loader'),
+                query: {
+                    useBabel: true
+                },
             },
             // The notation here is somewhat confusing.
             // "postcss" loader applies autoprefixer to our CSS.
@@ -306,6 +324,7 @@ module.exports = {
         // https://github.com/jmblog/how-to-optimize-momentjs-with-webpack
         // You can remove this if you don't use Moment.js:
         new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+        new BundleAnalyzerPlugin()
     ],
     // Some libraries import Node modules but don't use them in the browser.
     // Tell Webpack to provide empty mocks for them so importing them works.
