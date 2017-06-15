@@ -29,6 +29,7 @@ export class SolvesService {
         return Observable.create((subscriber: Subscriber<any>) => {
             if (!this.db) {
                 this.db = new (PouchDB as any)('solves.db');
+                (window as any).PouchDB = PouchDB;
             }
             subscriber.next(this.db);
             subscriber.complete();
