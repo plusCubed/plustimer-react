@@ -1,4 +1,4 @@
-this.addEventListener("message", function (e) {
+self.addEventListener("message", function (e) {
     switch (e.data.command) {
         case "getRandomScramble":
             this.postMessage({

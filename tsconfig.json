@@ -8,7 +8,7 @@
       "dom"
     ],
     "sourceMap": true,
-    "allowJs": true,
+    "allowJs": false,
     "jsx": "react",
     "moduleResolution": "node",
     "rootDir": "src",
@@ -24,7 +24,6 @@
     "node_modules",
     "build",
     "config",
-    "public/assets",
     "scripts",
     "acceptance-tests",
     "webpack",

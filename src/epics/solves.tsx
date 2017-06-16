@@ -1,3 +1,4 @@
+import * as PouchDB from 'pouchdb';
 import {ActionsObservable, combineEpics, Epic} from 'redux-observable';
 import {Action} from '../utils/Util';
 import {addUpdateSolve, deleteSolve, fetchSolvesSuccess} from '../reducers/solves';

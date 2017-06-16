@@ -4,13 +4,15 @@ import 'rxjs/add/operator/take';
 import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/map';
 
+const ScrambleWorker = require('worker-loader!./scramble-worker');
+
 export class ScrambleService {
     private worker: Worker;
     private requestedScrambles$: Subject<MessageEvent>;
     private nextCommandId = 0;
 
     constructor() {
-        this.worker = new Worker('assets/scramble-worker.js');
+        this.worker = new ScrambleWorker();
 
         this.requestedScrambles$ = new Subject();
 
