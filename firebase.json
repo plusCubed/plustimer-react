@@ -6,6 +6,52 @@
         "source": "**",
         "destination": "/index.html"
       }
+    ],
+    "headers": [
+      {
+        "source": "/",
+        "headers": [
+          {
+            "key": "Link",
+            "value": "</static/media/roboto-latin-500.bb474f16.woff2>;rel=preload;as=font;crossorigin, </static/media/roboto-latin-400.7e367be0.woff2>;rel=preload;as=font;crossorigin, </static/media/digital-7-mono.60c7d1be.woff2>;rel=preload;as=font;crossorigin"
+          }
+        ]
+      },
+      {
+        "source": "**",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=3600, no-cache"
+          },
+          {
+            "key": "Access-Control-Allow-Origin",
+            "value": "*"
+          },
+          {
+            "key": "Access-Control-Max-Age",
+            "value": "600"
+          }
+        ]
+      },
+      {
+        "source": "/service-worker.js",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "private, no-cache"
+          }
+        ]
+      },
+      {
+        "source": "/static/js/*.js",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=31536000"
+          }
+        ]
+      }
     ]
   }
 }

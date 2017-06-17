@@ -17,6 +17,8 @@ import {createEpicMiddleware} from 'redux-observable';
 import {composeWithDevTools} from 'redux-devtools-extension/logOnlyInProduction';
 import {ScrambleService} from './services/scramble-service';
 
+import 'default-passive-events/default-passive-events';
+
 import 'preact/devtools';
 
 const solvesService = new SolvesService();
