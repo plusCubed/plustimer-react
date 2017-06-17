@@ -57,6 +57,8 @@ class SolvesSheet extends React.PureComponent<Props, State> {
     private solvesSheet: HTMLElement;
 
     private gridStyle: React.CSSProperties = {};
+    
+    private solvesSheetRef: (solvesSheet: HTMLElement) => HTMLElement;
 
     constructor(props: Props) {
         super(props);
@@ -64,6 +66,8 @@ class SolvesSheet extends React.PureComponent<Props, State> {
             isExpanded: false,
             isAnimating: false
         };
+
+        this.solvesSheetRef = (solvesSheet: HTMLElement) => this.solvesSheet = solvesSheet;
     }
 
     handleScroll = (params: ScrollParams) => {
@@ -91,7 +95,7 @@ class SolvesSheet extends React.PureComponent<Props, State> {
                 this.isScrolledToTop && dY > 0) {
                 // this.setScrollEnabled(false);
                 this.scrollState = ScrollState.PANNING;
-                this.setOffset(0);
+                this.updateOffset(0);
             }
 
             this.isSecondTouch = false;
@@ -102,7 +106,7 @@ class SolvesSheet extends React.PureComponent<Props, State> {
 
             if (this.scrollState === ScrollState.PANNING) {
                 // this.setScrollEnabled(false);
-                this.setOffset(this.offset + dY);
+                this.updateOffset(this.offset + dY);
             }
 
             this.lastDy = dY;
@@ -136,14 +140,14 @@ class SolvesSheet extends React.PureComponent<Props, State> {
 
         this.oldTop = this.solvesSheet.getBoundingClientRect().top;
 
-        this.setOffset(0);
+        this.offset = 0;
         this.setState({
             isExpanded: isExpanded,
             isAnimating: true
         });
     }
 
-    setOffset(offset: number) {
+    updateOffset(offset: number) {
         this.offset = offset;
         this.updateDOMTransformStyle();
     }
@@ -216,12 +220,10 @@ class SolvesSheet extends React.PureComponent<Props, State> {
             transform: this.getTransformStyle()
         };
 
-        const solvesSheetRef = (solvesSheet: HTMLElement) => this.solvesSheet = solvesSheet;
-
         return (
             <div
                 className="solves-sheet"
-                ref={solvesSheetRef}
+                ref={this.solvesSheetRef}
                 onTouchMove={this.handleTouchMove}
                 onTouchEnd={this.handleTouchEnd}
                 onAnimationEnd={this.handleAnimationEnd}
