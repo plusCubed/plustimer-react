@@ -55,10 +55,10 @@ class SolvesSheet extends React.PureComponent<Props, State> {
     private offset = 0;
 
     private solvesSheet: HTMLElement;
+    private grid: any;
 
-    private gridStyle: React.CSSProperties = {};
-    
-    private solvesSheetRef: (solvesSheet: HTMLElement) => HTMLElement;
+    private solvesSheetRef: (solvesSheet: HTMLElement) => void;
+    private gridRef: (grid: any) => void;
 
     constructor(props: Props) {
         super(props);
@@ -68,6 +68,7 @@ class SolvesSheet extends React.PureComponent<Props, State> {
         };
 
         this.solvesSheetRef = (solvesSheet: HTMLElement) => this.solvesSheet = solvesSheet;
+        this.gridRef = (grid: any) => this.grid = grid;
     }
 
     handleScroll = (params: ScrollParams) => {
@@ -86,6 +87,7 @@ class SolvesSheet extends React.PureComponent<Props, State> {
 
             // Initial touch event: set baseline Y
             this.isSecondTouch = true;
+            this.lastY = touchobj.clientY;
 
         } else if (this.isSecondTouch) {
 
@@ -95,7 +97,8 @@ class SolvesSheet extends React.PureComponent<Props, State> {
                 this.isScrolledToTop && dY > 0) {
                 // this.setScrollEnabled(false);
                 this.scrollState = ScrollState.PANNING;
-                this.updateOffset(0);
+                this.updateDOMOffset(dY);
+                this.updateDOMGridStyle(true);
             }
 
             this.isSecondTouch = false;
@@ -106,30 +109,29 @@ class SolvesSheet extends React.PureComponent<Props, State> {
 
             if (this.scrollState === ScrollState.PANNING) {
                 // this.setScrollEnabled(false);
-                this.updateOffset(this.offset + dY);
+                this.updateDOMOffset(this.offset + dY);
+
+                this.lastDy = dY;
+                this.lastY = touchobj.clientY;
+                this.lastVelocity = dY / (performance.now() - this.lastTimestamp) * 1000;
+                this.lastTimestamp = performance.now();
             }
-
-            this.lastDy = dY;
         }
-
-        this.lastY = touchobj.clientY;
-        this.lastVelocity = dY / (performance.now() - this.lastTimestamp) * 1000;
-        this.lastTimestamp = performance.now();
     };
 
     handleTouchEnd = (e: React.TouchEvent<HTMLElement>) => {
-        // If touch move wasn't fired in the last 50ms, velocity is 0
-        if (performance.now() - this.lastTimestamp > 50) {
-            this.lastVelocity = 0;
-        }
-
         if (this.scrollState === ScrollState.PANNING && this.offset !== 0) {
-            // If moving the sheet, set expanded status
+            // If touch move wasn't fired in the last 50ms, velocity is 0
+            if (performance.now() - this.lastTimestamp > 50) {
+                this.lastVelocity = 0;
+            }
 
+            // If moving the sheet, set expanded status
             this.animateExpanded(this.lastDy < 0);
         }
 
         this.scrollState = ScrollState.IDLE;
+        this.isSecondTouch = false;
 
         this.lastY = -1;
         this.lastDy = 0;
@@ -147,20 +149,15 @@ class SolvesSheet extends React.PureComponent<Props, State> {
         });
     }
 
-    updateOffset(offset: number) {
-        this.offset = offset;
-        this.updateDOMTransformStyle();
-    }
-
     componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, prevContext: any): void {
-        if (this.state.isAnimating) {
+        if (this.state.isAnimating && !prevState.isAnimating) {
             const newTop = this.solvesSheet.getBoundingClientRect().top;
 
             const invert = newTop - this.oldTop;
 
             const mass = 50;
             const stiffness = 5;
-            const damping = 2 * Math.sqrt(stiffness * mass) * 0.6;
+            const damping = 2 * Math.sqrt(stiffness * mass) * 0.7;
 
             const mapper = this.state.isExpanded ?
                 (x: number) => {
@@ -197,7 +194,7 @@ class SolvesSheet extends React.PureComponent<Props, State> {
     stopAnimation() {
         this.solvesSheet.style.cssText = '';
         this.updateDOMTransformStyle();
-        this.gridStyle = {overflowY: this.state.isExpanded ? 'auto' : 'hidden'};
+        this.updateDOMGridStyle(false);
         this.setState({
             isAnimating: false
         });
@@ -207,6 +204,18 @@ class SolvesSheet extends React.PureComponent<Props, State> {
         return this.state.isExpanded ?
             `translate3d(0, calc(${SolvesSheet.expandedY} - ${-this.offset}px), 0)` :
             `translate3d(0, calc(${SolvesSheet.collapsedY} - ${-this.offset}px), 0)`;
+    }
+
+    updateDOMOffset(offset: number) {
+        this.offset = offset;
+        this.updateDOMTransformStyle();
+    }
+
+    updateDOMGridStyle(panning: boolean) {
+        if (this.grid) {
+            this.grid._scrollingContainer.style.overflowY = this.state.isExpanded && !panning ? 'auto' : 'hidden';
+            this.grid._scrollingContainer.style.touchAction = this.state.isExpanded && !panning ? 'auto' : 'none';
+        }
     }
 
     updateDOMTransformStyle() {
@@ -241,7 +250,7 @@ class SolvesSheet extends React.PureComponent<Props, State> {
                 <div className="container">
                     <div className="solves-background">
                         <VirtualizedItemGrid
-                            style={this.gridStyle}
+                            innerRef={this.gridRef}
                             minItemWidth={64}
                             items={solves}
                             renderItem={SolveDisplay}

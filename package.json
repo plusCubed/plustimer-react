@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@types/enzyme": "^2.8.0",
-    "@types/jest": "^19.2.4",
+    "@types/jest": "^20.0.0",
     "@types/material-ui": "^0.17.11",
     "@types/node": "^7.0.31",
     "@types/pouchdb": "^6.1.1",

@@ -55,6 +55,7 @@ type Props<TItem> = {
     style?: any;
     className?: any;
     onScroll?: any;
+    innerRef?: any;
 };
 
 // NOTE: Component is intentionally used instead of PureComponent,
@@ -69,6 +70,11 @@ export default class VirtualizedItemGrid<TItem> extends React.PureComponent<Prop
         footer: (null),
         renderCellWrapper: defaultRenderCellWrapper,
     };
+
+    private containerWidth: number;
+    private containerHeight: number;
+    private cellRenderer: any;
+    private cache: CellMeasurerCache;
 
     getMinItemWidth(containerWidth: number, containerHeight: number) {
         const {minItemWidth} = this.props;
@@ -221,6 +227,7 @@ export default class VirtualizedItemGrid<TItem> extends React.PureComponent<Prop
             header,
             footer,
             renderCellWrapper,
+            innerRef,
             ...passThroughProps
         } = this.props;
 
@@ -237,24 +244,33 @@ export default class VirtualizedItemGrid<TItem> extends React.PureComponent<Prop
 
         const extraRowCount = (header ? 1 : 0) + (footer ? 1 : 0);
 
-        const cache = new CellMeasurerCache({
-            keyMapper: () => `${containerWidth}:${containerHeight}:${header ? 1 : 0}:${footer ? 1 : 0}`,
-            defaultWidth: columnWidth,
-            fixedWidth: true
-        });
+        // Keep cache and cell renderer same unless container size changes
+        if (this.containerWidth !== containerWidth || this.containerHeight !== containerHeight) {
+            const cache = new CellMeasurerCache({
+                keyMapper: () => `${containerWidth}:${containerHeight}:${header ? 1 : 0}:${footer ? 1 : 0}`,
+                defaultWidth: columnWidth,
+                fixedWidth: true
+            });
 
-        const cellRenderer = (data: GridCellProps) =>
-            this.renderCell(data, columnCount, rowCount, columnWidth, containerWidth, cache);
+            const cellRenderer = (data: GridCellProps) =>
+                this.renderCell(data, columnCount, rowCount, columnWidth, containerWidth, cache);
+
+            this.containerWidth = containerWidth;
+            this.containerHeight = containerHeight;
+            this.cellRenderer = cellRenderer;
+            this.cache = cache;
+        }
 
         return (
             <Grid
-                cellRenderer={cellRenderer}
+                ref={innerRef}
+                cellRenderer={this.cellRenderer}
                 columnCount={columnCount}
                 columnWidth={columnWidth}
                 height={containerHeight}
                 rowCount={rowCount + extraRowCount}
-                deferredMeasurementCache={cache}
-                rowHeight={cache.rowHeight as any}
+                deferredMeasurementCache={this.cache}
+                rowHeight={this.cache.rowHeight as any}
                 width={containerWidth}
                 overscanRowCount={overscanRowCount}
                 {...passThroughProps}
