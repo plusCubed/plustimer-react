@@ -1,8 +1,7 @@
 import * as React from 'react';
 
 export interface Props {
-    children: any;
-    style: {};
+    style: React.CSSProperties;
 }
 
 export default class CellWrapper extends React.PureComponent<Props, {}> {

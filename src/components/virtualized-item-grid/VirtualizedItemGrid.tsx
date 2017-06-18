@@ -31,10 +31,8 @@ type RenderFooterInput = {
     isScrolling: boolean,
 };
 
-type Style = {};
-
 type RenderCellWrapperInput = {
-    style: Style,
+    style: React.CSSProperties,
     children: any,
     isHeader: boolean,
     isFooter: boolean,
@@ -84,7 +82,7 @@ export default class VirtualizedItemGrid<TItem> extends React.PureComponent<Prop
         return minItemWidth;
     }
 
-    renderHeader(style: Style,
+    renderHeader(style: React.CSSProperties,
                  header: (any | ((input: RenderHeaderInput) => any)),
                  isVisible: boolean,
                  isScrolling: boolean) {
@@ -111,7 +109,7 @@ export default class VirtualizedItemGrid<TItem> extends React.PureComponent<Prop
         );
     }
 
-    renderFooter(style: Style,
+    renderFooter(style: React.CSSProperties,
                  footer: (any | ((input: RenderFooterInput) => any)),
                  isVisible: boolean,
                  isScrolling: boolean) {
@@ -138,7 +136,7 @@ export default class VirtualizedItemGrid<TItem> extends React.PureComponent<Prop
         );
     }
 
-    renderItem(style: Style, element: any, key?: string) {
+    renderItem(style: React.CSSProperties, element: any, key?: string) {
         const {renderCellWrapper} = this.props;
         const CellWrapper = renderCellWrapper as (input: RenderCellWrapperInput) => any;
 
@@ -194,7 +192,6 @@ export default class VirtualizedItemGrid<TItem> extends React.PureComponent<Prop
             <CellMeasurer
                 cache={cache}
                 columnIndex={columnIndex}
-                key={key}
                 parent={parent as any}
                 rowIndex={rowIndex}
             >
@@ -261,6 +258,10 @@ export default class VirtualizedItemGrid<TItem> extends React.PureComponent<Prop
             this.cache = cache;
         }
 
+        const itemCountProp = {
+            itemCount: itemCount
+        };
+
         return (
             <Grid
                 ref={innerRef}
@@ -274,6 +275,7 @@ export default class VirtualizedItemGrid<TItem> extends React.PureComponent<Prop
                 width={containerWidth}
                 overscanRowCount={overscanRowCount}
                 {...passThroughProps}
+                {...itemCountProp}
             />
         );
     }

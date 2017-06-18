@@ -302,7 +302,8 @@ module.exports = {
             },
             ServiceWorker: {
                 output: 'service-worker.js',
-                navigateFallbackURL: '/'
+                navigateFallbackURL: '/',
+                events: true
             }
         }),
         // Moment.js is an extremely popular library that bundles large locale files

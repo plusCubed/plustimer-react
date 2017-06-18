@@ -87,8 +87,6 @@ class SolvesSheet extends React.PureComponent<Props, State> {
 
             // Initial touch event: set baseline Y
             this.isSecondTouch = true;
-            this.lastY = touchobj.clientY;
-
         } else if (this.isSecondTouch) {
 
             // Second touch event: determine direction, whether to move the sheet
@@ -111,12 +109,13 @@ class SolvesSheet extends React.PureComponent<Props, State> {
                 // this.setScrollEnabled(false);
                 this.updateDOMOffset(this.offset + dY);
 
-                this.lastDy = dY;
-                this.lastY = touchobj.clientY;
                 this.lastVelocity = dY / (performance.now() - this.lastTimestamp) * 1000;
                 this.lastTimestamp = performance.now();
             }
         }
+
+        this.lastDy = dY;
+        this.lastY = touchobj.clientY;
     };
 
     handleTouchEnd = (e: React.TouchEvent<HTMLElement>) => {
