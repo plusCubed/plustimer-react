@@ -8,6 +8,7 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const ManifestPlugin = require('webpack-manifest-plugin');
 const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 const SWPrecacheWebpackPlugin = require('sw-precache-webpack-plugin');
+const OfflinePlugin = require('offline-plugin');
 const eslintFormatter = require('react-dev-utils/eslintFormatter');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
 const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer');
@@ -56,7 +57,10 @@ module.exports = {
     // You can exclude the *.map files from the build during deployment.
     devtool: 'source-map',
     // In production, we only want to load the polyfills and the app code.
-    entry: [require.resolve('./polyfills'), paths.appIndexJs],
+    entry: {
+        polyfills: require.resolve('./polyfills'),
+        main: paths.appIndexJs
+    },
     output: {
         // The build folder.
         path: paths.appBuild,
@@ -292,31 +296,14 @@ module.exports = {
         }),
         // Generate a service worker script that will precache, and keep up to date,
         // the HTML & assets that are part of the Webpack build.
-        new SWPrecacheWebpackPlugin({
-            // By default, a cache-busting query parameter is appended to requests
-            // used to populate the caches, to ensure the responses are fresh.
-            // If a URL is already hashed by Webpack, then there is no concern
-            // about it being stale, and the cache-busting can be skipped.
-            dontCacheBustUrlsMatching: /\.\w{8}\./,
-            filename: 'service-worker.js',
-            logger(message) {
-                if (message.indexOf('Total precache size is') === 0) {
-                    // This message occurs for every build and is a bit too noisy.
-                    return;
-                }
-                console.log(message);
+        new OfflinePlugin({
+            AppCache: {
+                FALLBACK: {'/': '/'}
             },
-            minify: true,
-            // For unknown URLs, fallback to the index page
-            navigateFallback: publicUrl + '/index.html',
-            // Ignores URLs starting from /__ (useful for Firebase):
-            // https://github.com/facebookincubator/create-react-app/issues/2237#issuecomment-302693219
-            navigateFallbackWhitelist: [/^(?!\/__).*/],
-            // Don't precache sourcemaps (they're large) and build asset manifest:
-            staticFileGlobsIgnorePatterns: [/\.map$/, /asset-manifest\.json$/],
-            // Work around Windows path issue in SWPrecacheWebpackPlugin:
-            // https://github.com/facebookincubator/create-react-app/issues/2235
-            stripPrefix: paths.appBuild.replace(/\\/g, '/') + '/',
+            ServiceWorker: {
+                output: 'service-worker.js',
+                navigateFallbackURL: '/'
+            }
         }),
         // Moment.js is an extremely popular library that bundles large locale files
         // by default due to how Webpack interprets its code. This is a practical
@@ -324,7 +311,19 @@ module.exports = {
         // https://github.com/jmblog/how-to-optimize-momentjs-with-webpack
         // You can remove this if you don't use Moment.js:
         new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-        new BundleAnalyzerPlugin()
+        //Web interface for analyzing bundles
+        new BundleAnalyzerPlugin(),
+        //Code split with vendor chunk
+        new webpack.optimize.CommonsChunkPlugin({
+            name: 'vendor',
+            minChunks: function (module) {
+                // this assumes your vendor imports exist in the node_modules directory
+                return module.context && module.context.indexOf('node_modules') !== -1;
+            }
+        }),
+        new webpack.optimize.CommonsChunkPlugin({
+            name: 'manifest'
+        })
     ],
     // Some libraries import Node modules but don't use them in the browser.
     // Tell Webpack to provide empty mocks for them so importing them works.
