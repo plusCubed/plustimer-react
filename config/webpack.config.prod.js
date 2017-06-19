@@ -57,10 +57,7 @@ module.exports = {
     // You can exclude the *.map files from the build during deployment.
     devtool: 'source-map',
     // In production, we only want to load the polyfills and the app code.
-    entry: {
-        polyfills: require.resolve('./polyfills'),
-        main: paths.appIndexJs
-    },
+    entry: [require.resolve('./polyfills'), paths.appIndexJs],
     output: {
         // The build folder.
         path: paths.appBuild,
@@ -324,7 +321,9 @@ module.exports = {
         }),
         new webpack.optimize.CommonsChunkPlugin({
             name: 'manifest'
-        })
+        }),
+        new webpack.NamedChunksPlugin(),
+        new webpack.NamedModulesPlugin()
     ],
     // Some libraries import Node modules but don't use them in the browser.
     // Tell Webpack to provide empty mocks for them so importing them works.
