@@ -1,13 +1,6 @@
 import * as React from 'react';
-import defaultRenderCellWrapper from './defaultRenderCellWrapper';
 import {AutoSizer} from 'react-virtualized/dist/es/AutoSizer';
 import {Grid, GridCellProps} from 'react-virtualized/dist/es/Grid';
-import {CellMeasurer, CellMeasurerCache} from 'react-virtualized/dist/es/CellMeasurer';
-
-type IdealItemWidthInput = {
-    containerWidth: number,
-    containerHeight: number,
-};
 
 type RenderItemInput<TItem> = {
     isVisible: boolean,
@@ -21,33 +14,12 @@ type RenderItemInput<TItem> = {
     index: number,
 };
 
-type RenderHeaderInput = {
-    isVisible: boolean,
-    isScrolling: boolean,
-};
-
-type RenderFooterInput = {
-    isVisible: boolean,
-    isScrolling: boolean,
-};
-
-type RenderCellWrapperInput = {
-    style: React.CSSProperties,
-    children: any,
-    isHeader: boolean,
-    isFooter: boolean,
-    isItem: boolean,
-};
-
 type Props<TItem> = {
-    minItemWidth: number | ((input: IdealItemWidthInput) => number);
+    minItemWidth: number;
     dynamicRowHeight?: boolean;
     items: Array<any>;
     renderItem: (input: RenderItemInput<any>) => any;
     overscanRowCount?: number;
-    header?: any | ((input: RenderHeaderInput) => any) | null;
-    footer?: any | ((input: RenderFooterInput) => any) | null;
-    renderCellWrapper?: (input: RenderCellWrapperInput) => any;
 
     // Grid props
     style?: any;
@@ -63,16 +35,12 @@ export default class VirtualizedItemGrid<TItem> extends React.PureComponent<Prop
 
     public static defaultProps = {
         dynamicRowHeight: false,
-        overscanRowCount: 2,
-        header: (null),
-        footer: (null),
-        renderCellWrapper: defaultRenderCellWrapper,
+        overscanRowCount: 10,
     };
 
     private containerWidth: number;
     private containerHeight: number;
     private cellRenderer: any;
-    private cache: CellMeasurerCache;
 
     getMinItemWidth(containerWidth: number, containerHeight: number) {
         const {minItemWidth} = this.props;
@@ -82,103 +50,16 @@ export default class VirtualizedItemGrid<TItem> extends React.PureComponent<Prop
         return minItemWidth;
     }
 
-    renderHeader(style: React.CSSProperties,
-                 header: (any | ((input: RenderHeaderInput) => any)),
-                 isVisible: boolean,
-                 isScrolling: boolean) {
-
-        const {renderCellWrapper} = this.props;
-        const CellWrapper = renderCellWrapper as (input: RenderCellWrapperInput) => any;
-
-        let element;
-        if (typeof header === 'function') {
-            const Header = header;
-            element = <Header isVisible={isVisible} isScrolling={isScrolling}/>;
-        } else {
-            element = header;
-        }
-        return (
-            <CellWrapper
-                key="header"
-                style={style}
-                isHeader={true}
-                isFooter={false}
-                isItem={false}
-                children={element}
-            />
-        );
-    }
-
-    renderFooter(style: React.CSSProperties,
-                 footer: (any | ((input: RenderFooterInput) => any)),
-                 isVisible: boolean,
-                 isScrolling: boolean) {
-
-        const {renderCellWrapper} = this.props;
-        const CellWrapper = renderCellWrapper as (input: RenderCellWrapperInput) => any;
-
-        let element;
-        if (typeof footer === 'function') {
-            const Footer = footer;
-            element = <Footer isVisible={isVisible} isScrolling={isScrolling}/>;
-        } else {
-            element = footer;
-        }
-        return (
-            <CellWrapper
-                key="footer"
-                style={style}
-                isHeader={false}
-                isFooter={true}
-                isItem={false}
-                children={element}
-            />
-        );
-    }
-
-    renderItem(style: React.CSSProperties, element: any, key?: string) {
-        const {renderCellWrapper} = this.props;
-        const CellWrapper = renderCellWrapper as (input: RenderCellWrapperInput) => any;
-
-        return (
-            <CellWrapper
-                key={key || 'item'}
-                style={style}
-                isHeader={false}
-                isFooter={false}
-                isItem={true}
-                children={element}
-            />
-        );
-    }
-
     renderCell(cellData: GridCellProps,
                columnCount: number,
                rowCount: number,
-               columnWidth: number,
-               containerWidth: number,
-               cache: CellMeasurerCache) {
+               columnWidth: number) {
 
-        const {key, parent, style, isVisible, isScrolling, columnIndex, rowIndex} = cellData;
+        const {key, style, isVisible, isScrolling, columnIndex, rowIndex} = cellData;
         const visible = isVisible || false;
         const scrolling = isScrolling || false;
-        const {items, renderItem: ItemComponent, header, footer} = this.props;
+        const {items, renderItem: ItemComponent} = this.props;
         let normalizedRowIndex = rowIndex;
-        if (header) {
-            if (rowIndex === 0) {
-                if (columnIndex === 0) {
-                    return this.renderHeader({...style, width: containerWidth}, header, visible, scrolling);
-                }
-                return null;
-            }
-            normalizedRowIndex -= 1;
-        }
-        if (footer && normalizedRowIndex === rowCount) {
-            if (columnIndex === 0) {
-                return this.renderFooter({...style, width: containerWidth}, footer, visible, scrolling);
-            }
-            return null;
-        }
         const index = (normalizedRowIndex * columnCount) + columnIndex;
         if (index >= items.length) {
             return null;
@@ -188,12 +69,10 @@ export default class VirtualizedItemGrid<TItem> extends React.PureComponent<Prop
             return null;
         }
 
-        const element = (
-            <CellMeasurer
-                cache={cache}
-                columnIndex={columnIndex}
-                parent={parent as any}
-                rowIndex={rowIndex}
+        return (
+            <div
+                key={key}
+                style={style}
             >
                 <ItemComponent
                     isVisible={visible}
@@ -206,9 +85,8 @@ export default class VirtualizedItemGrid<TItem> extends React.PureComponent<Prop
                     item={items[index]}
                     index={index}
                 />
-            </CellMeasurer>
+            </div>
         );
-        return this.renderItem(style, element, key);
     }
 
     renderWithKnownSize(containerWidth: number, containerHeight: number) {
@@ -221,9 +99,6 @@ export default class VirtualizedItemGrid<TItem> extends React.PureComponent<Prop
             items,
             renderItem,
             overscanRowCount,
-            header,
-            footer,
-            renderCellWrapper,
             innerRef,
             ...passThroughProps
         } = this.props;
@@ -239,23 +114,14 @@ export default class VirtualizedItemGrid<TItem> extends React.PureComponent<Prop
 
         const rowCount = Math.ceil(itemCount / columnCount);
 
-        const extraRowCount = (header ? 1 : 0) + (footer ? 1 : 0);
-
         // Keep cache and cell renderer same unless container size changes
         if (this.containerWidth !== containerWidth || this.containerHeight !== containerHeight) {
-            const cache = new CellMeasurerCache({
-                keyMapper: () => `${containerWidth}:${containerHeight}:${header ? 1 : 0}:${footer ? 1 : 0}`,
-                defaultWidth: columnWidth,
-                fixedWidth: true
-            });
-
             const cellRenderer = (data: GridCellProps) =>
-                this.renderCell(data, columnCount, rowCount, columnWidth, containerWidth, cache);
+                this.renderCell(data, columnCount, rowCount, columnWidth);
 
             this.containerWidth = containerWidth;
             this.containerHeight = containerHeight;
             this.cellRenderer = cellRenderer;
-            this.cache = cache;
         }
 
         const itemCountProp = {
@@ -269,9 +135,8 @@ export default class VirtualizedItemGrid<TItem> extends React.PureComponent<Prop
                 columnCount={columnCount}
                 columnWidth={columnWidth}
                 height={containerHeight}
-                rowCount={rowCount + extraRowCount}
-                deferredMeasurementCache={this.cache}
-                rowHeight={this.cache.rowHeight as any}
+                rowCount={rowCount}
+                rowHeight={48}
                 width={containerWidth}
                 overscanRowCount={overscanRowCount}
                 {...passThroughProps}

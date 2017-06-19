@@ -87,13 +87,12 @@ class SolvesSheet extends React.PureComponent<Props, State> {
 
             // Initial touch event: set baseline Y
             this.isSecondTouch = true;
+
         } else if (this.isSecondTouch) {
 
             // Second touch event: determine direction, whether to move the sheet
-
             if (this.scrollState !== ScrollState.SCROLLING && !this.state.isExpanded ||
                 this.isScrolledToTop && dY > 0) {
-                // this.setScrollEnabled(false);
                 this.scrollState = ScrollState.PANNING;
                 this.updateDOMOffset(dY);
                 this.updateDOMGridStyle(true);
@@ -104,9 +103,7 @@ class SolvesSheet extends React.PureComponent<Props, State> {
         } else {
 
             // Later touch events: move the sheet
-
             if (this.scrollState === ScrollState.PANNING) {
-                // this.setScrollEnabled(false);
                 this.updateDOMOffset(this.offset + dY);
 
                 this.lastVelocity = dY / (performance.now() - this.lastTimestamp) * 1000;

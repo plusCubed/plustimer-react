@@ -21,6 +21,8 @@ import 'default-passive-events/default-passive-events';
 
 import 'preact/devtools';
 
+import './patch.js';
+
 const solvesService = new SolvesService();
 const scrambleService = new ScrambleService();
 
