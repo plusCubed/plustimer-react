@@ -16,6 +16,6 @@ const mapDispatchToProps = (dispatch: Dispatch<Action>): DispatchProps => {
 const CurrentScramble = connect(
     mapStateToProps,
     mapDispatchToProps
-)<{}>(Scramble);
+)(Scramble);
 
 export default CurrentScramble;

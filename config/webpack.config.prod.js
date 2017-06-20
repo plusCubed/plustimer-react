@@ -7,7 +7,6 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const ManifestPlugin = require('webpack-manifest-plugin');
 const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
-const SWPrecacheWebpackPlugin = require('sw-precache-webpack-plugin');
 const OfflinePlugin = require('offline-plugin');
 const eslintFormatter = require('react-dev-utils/eslintFormatter');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
@@ -309,8 +308,6 @@ module.exports = {
         // https://github.com/jmblog/how-to-optimize-momentjs-with-webpack
         // You can remove this if you don't use Moment.js:
         new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-        //Web interface for analyzing bundles
-        new BundleAnalyzerPlugin(),
         //Code split with vendor chunk
         new webpack.optimize.CommonsChunkPlugin({
             name: 'vendor',
@@ -319,11 +316,11 @@ module.exports = {
                 return module.context && module.context.indexOf('node_modules') !== -1;
             }
         }),
-        new webpack.optimize.CommonsChunkPlugin({
-            name: 'manifest'
-        }),
         new webpack.NamedChunksPlugin(),
-        new webpack.NamedModulesPlugin()
+        new webpack.NamedModulesPlugin(),
+        new webpack.optimize.ModuleConcatenationPlugin(),
+        //Web interface for analyzing bundles
+        new BundleAnalyzerPlugin(),
     ],
     // Some libraries import Node modules but don't use them in the browser.
     // Tell Webpack to provide empty mocks for them so importing them works.
