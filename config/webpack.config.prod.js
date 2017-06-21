@@ -316,9 +316,11 @@ module.exports = {
                 return module.context && module.context.indexOf('node_modules') !== -1;
             }
         }),
+        new webpack.optimize.CommonsChunkPlugin({
+            name: 'manifest'
+        }),
         new webpack.NamedChunksPlugin(),
         new webpack.NamedModulesPlugin(),
-        new webpack.optimize.ModuleConcatenationPlugin(),
         //Web interface for analyzing bundles
         new BundleAnalyzerPlugin(),
     ],

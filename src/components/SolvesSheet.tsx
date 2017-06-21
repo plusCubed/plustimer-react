@@ -57,7 +57,7 @@ class SolvesSheet extends React.PureComponent<Props, State> {
     private solvesSheet: HTMLElement;
     private grid: any;
 
-    private solvesSheetRef: (solvesSheet: HTMLElement) => void;
+    private solvesSheetRef: (solvesSheet: HTMLElement | null) => void;
     private gridRef: (grid: any) => void;
 
     constructor(props: Props) {
