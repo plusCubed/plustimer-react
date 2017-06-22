@@ -1,5 +1,8 @@
+import './polyfills.js';
+
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import './patch.js';
 
 import './index.css';
 
@@ -20,8 +23,6 @@ import {ScrambleService} from './services/scramble-service';
 import 'default-passive-events/default-passive-events';
 
 import 'preact/devtools';
-
-import './patch.js';
 
 const solvesService = new SolvesService();
 const scrambleService = new ScrambleService();

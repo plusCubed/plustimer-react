@@ -56,7 +56,7 @@ module.exports = {
     // You can exclude the *.map files from the build during deployment.
     devtool: 'source-map',
     // In production, we only want to load the polyfills and the app code.
-    entry: [require.resolve('./polyfills'), paths.appIndexJs],
+    entry: [paths.appIndexJs],
     output: {
         // The build folder.
         path: paths.appBuild,
@@ -293,6 +293,8 @@ module.exports = {
         // Generate a service worker script that will precache, and keep up to date,
         // the HTML & assets that are part of the Webpack build.
         new OfflinePlugin({
+            excludes: ['**/.*', '**/*.map', 'asset-manifest.json'],
+            externals: ['/manifest.json', '/icons/android-chrome-192x192.png', '/icons/android-chrome-512x512.png'],
             AppCache: {
                 FALLBACK: {'/': '/'}
             },

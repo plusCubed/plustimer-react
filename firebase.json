@@ -13,7 +13,7 @@
         "headers": [
           {
             "key": "Link",
-            "value": "</static/media/roboto-latin-500.bb474f16.woff2>;rel=preload;as=font;crossorigin, </static/media/roboto-latin-400.7e367be0.woff2>;rel=preload;as=font;crossorigin, </static/media/digital-7-mono.60c7d1be.woff2>;rel=preload;as=font;crossorigin"
+            "value": "</static/media/roboto-latin-500.4b218fc7.woff2>;rel=preload;as=font;crossorigin, </static/media/roboto-latin-400.a2647ffe.woff2>;rel=preload;as=font;crossorigin, </static/media/digital-7-mono.60c7d1be.woff2>;rel=preload;as=font;crossorigin"
           }
         ]
       },
