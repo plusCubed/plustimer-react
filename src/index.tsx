@@ -23,16 +23,19 @@ import {ScrambleService} from './services/scramble-service';
 import 'default-passive-events/default-passive-events';
 
 import 'preact/devtools';
+import {AccountService} from './services/account-service';
 
 const solvesService = new SolvesService();
 const scrambleService = new ScrambleService();
+const accountService = new AccountService();
 
 const epicMiddleware = createEpicMiddleware(
     rootEpic,
     {
         dependencies: {
             solvesService: solvesService,
-            scrambleService: scrambleService
+            scrambleService: scrambleService,
+            accountService: accountService
         }
     }
 );
