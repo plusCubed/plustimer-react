@@ -69,7 +69,7 @@ module.exports = {
         publicPath: publicPath,
         // Point sourcemap entries to original disk location
         devtoolModuleFilenameTemplate: info =>
-            path.resolve(info.absoluteResourcePath),
+            path.resolve(info.absoluteResourcePath).replace(/\\/g, '/'),
     },
     resolve: {
         // This allows you to set a fallback for where Webpack should look for modules.
