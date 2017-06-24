@@ -1,5 +1,3 @@
-import './polyfills.js';
-
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import './patch.js';

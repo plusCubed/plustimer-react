@@ -56,7 +56,7 @@ module.exports = {
     // You can exclude the *.map files from the build during deployment.
     devtool: 'source-map',
     // In production, we only want to load the polyfills and the app code.
-    entry: [paths.appIndexJs],
+    entry: [require.resolve('./polyfills'), paths.appIndexJs],
     output: {
         // The build folder.
         path: paths.appBuild,
@@ -247,6 +247,19 @@ module.exports = {
         new HtmlWebpackPlugin({
             inject: true,
             template: paths.appHtml,
+            //Workaround to get the correct order in index.html
+            chunksSortMode: function (chunk1, chunk2) {
+                const orders = ['manifest', 'vendor', 'main'];
+                const order1 = orders.indexOf(chunk1.names[0]);
+                const order2 = orders.indexOf(chunk2.names[0]);
+                if (order1 > order2) {
+                    return 1;
+                } else if (order1 < order2) {
+                    return -1;
+                } else {
+                    return 0;
+                }
+            },
             minify: {
                 removeComments: true,
                 collapseWhitespace: true,
@@ -290,6 +303,15 @@ module.exports = {
         new ManifestPlugin({
             fileName: 'asset-manifest.json',
         }),
+        // Moment.js is an extremely popular library that bundles large locale files
+        // by default due to how Webpack interprets its code. This is a practical
+        // solution that requires the user to opt into importing specific locales.
+        // https://github.com/jmblog/how-to-optimize-momentjs-with-webpack
+        // You can remove this if you don't use Moment.js:
+        new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+
+        //CUSTOM------------------------------------------------------------------------------
+
         // Generate a service worker script that will precache, and keep up to date,
         // the HTML & assets that are part of the Webpack build.
         new OfflinePlugin({
@@ -304,12 +326,6 @@ module.exports = {
                 events: true
             }
         }),
-        // Moment.js is an extremely popular library that bundles large locale files
-        // by default due to how Webpack interprets its code. This is a practical
-        // solution that requires the user to opt into importing specific locales.
-        // https://github.com/jmblog/how-to-optimize-momentjs-with-webpack
-        // You can remove this if you don't use Moment.js:
-        new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
         //Code split with vendor chunk
         new webpack.optimize.CommonsChunkPlugin({
             name: 'vendor',
