@@ -1,0 +1,8 @@
+.app-bar-text {
+    flex: 1;
+}
+
+.app-bar-avatar {
+    width: 24px;
+    height: 24px;
+}

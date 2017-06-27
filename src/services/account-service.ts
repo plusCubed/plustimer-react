@@ -1,6 +1,5 @@
 import superlogin from 'superlogin-client';
 import {Observable} from 'rxjs/Observable';
-import {Subscriber} from 'rxjs/Subscriber';
 
 export class AccountService {
 
@@ -14,10 +13,6 @@ export class AccountService {
     }
 
     login(): Observable<any> {
-        return Observable.create((subscriber: Subscriber<any>) => {
-            superlogin.socialAuth('wca');
-
-            subscriber.complete();
-        });
+        return Observable.fromPromise(superlogin.socialAuth('wca'));
     }
 }
