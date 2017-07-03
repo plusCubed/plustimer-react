@@ -84,7 +84,9 @@ module.exports = {
         // We also include JSX as a common component filename extension to support
         // some tools, although we do not recommend using it, see:
         // https://github.com/facebookincubator/create-react-app/issues/290
-        extensions: ['.js', '.json', '.jsx', '.ts', '.tsx'],
+        // `web` extension prefixes have been added for better support
+        // for React Native Web.
+        extensions: ['.web.js', '.js', '.json', '.web.jsx', '.jsx', '.ts', '.tsx'],
         alias: {
 
             // Support React Native Web
@@ -213,7 +215,9 @@ module.exports = {
                                 {
                                     loader: require.resolve('postcss-loader'),
                                     options: {
-                                        ident: 'postcss', // https://webpack.js.org/guides/migrating/#complex-options
+                                        // Necessary for external CSS imports to work
+                                        // https://github.com/facebookincubator/create-react-app/issues/2677
+                                        ident: 'postcss',
                                         plugins: () => [
                                             require('postcss-flexbugs-fixes'),
                                             autoprefixer({
@@ -342,6 +346,7 @@ module.exports = {
         }),
         new webpack.NamedChunksPlugin(),
         new webpack.NamedModulesPlugin(),
+        new webpack.optimize.ModuleConcatenationPlugin(),
         //Web interface for analyzing bundles
         new BundleAnalyzerPlugin(),
     ],
