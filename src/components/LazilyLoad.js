@@ -1,72 +1,69 @@
-import React from "react";
+import React from 'react';
 
 class LazilyLoad extends React.Component {
+  constructor() {
+    super(...arguments);
+    this.state = {
+      isLoaded: false
+    };
+  }
 
-    constructor() {
-        super(...arguments);
-        this.state = {
-            isLoaded: false,
-        };
+  componentDidMount() {
+    this._isMounted = true;
+    this.load();
+  }
+
+  componentDidUpdate(previous) {
+    const shouldLoad = !!Object.keys(this.props.modules).filter(key => {
+      return this.props.modules[key] !== previous.modules[key];
+    }).length;
+    if (shouldLoad) {
+      this.load();
     }
+  }
 
-    componentDidMount() {
-        this._isMounted = true;
-        this.load();
-    }
+  componentWillUnmount() {
+    this._isMounted = false;
+  }
 
-    componentDidUpdate(previous) {
-        const shouldLoad = !!Object.keys(this.props.modules).filter((key) => {
-            return this.props.modules[key] !== previous.modules[key];
-        }).length;
-        if (shouldLoad) {
-            this.load();
-        }
-    }
+  load() {
+    this.setState({
+      isLoaded: false
+    });
 
-    componentWillUnmount() {
-        this._isMounted = false;
-    }
+    const { modules } = this.props;
+    const keys = Object.keys(modules);
 
-    load() {
-        this.setState({
-            isLoaded: false,
-        });
+    Promise.all(keys.map(key => modules[key]()))
+      .then(values =>
+        keys.reduce((agg, key, index) => {
+          agg[key] = values[index];
+          return agg;
+        }, {})
+      )
+      .then(result => {
+        if (!this._isMounted) return null;
+        this.setState({ modules: result, isLoaded: true });
+      });
+  }
 
-        const {modules} = this.props;
-        const keys = Object.keys(modules);
-
-        Promise.all(keys.map((key) => modules[key]()))
-            .then((values) => (keys.reduce((agg, key, index) => {
-                agg[key] = values[index];
-                return agg;
-            }, {})))
-            .then((result) => {
-                if (!this._isMounted) return null;
-                this.setState({modules: result, isLoaded: true});
-            });
-    }
-
-    render() {
-        if (!this.state.isLoaded) return null;
-        return React.Children.only(this.props.children(this.state.modules));
-    }
+  render() {
+    if (!this.state.isLoaded) return null;
+    return React.Children.only(this.props.children(this.state.modules));
+  }
 }
 
 LazilyLoad.propTypes = {
-    children: React.PropTypes.func.isRequired,
+  children: React.PropTypes.func.isRequired
 };
 
 export const LazilyLoadFactory = (Component, modules) => {
-    return (props) => (
-        <LazilyLoad modules={modules}>
-            {(mods) => <Component {...mods} {...props} />}
-        </LazilyLoad>
-    );
+  return props =>
+    <LazilyLoad modules={modules}>
+      {mods => <Component {...mods} {...props} />}
+    </LazilyLoad>;
 };
 
-export const importLazy = (promise) => (
-    promise.then((result) => result.default)
-);
-
+export const importLazy = promise => promise.then(result => result.default);
 
 export default LazilyLoad;

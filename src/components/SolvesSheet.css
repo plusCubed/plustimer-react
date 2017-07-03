@@ -1,44 +1,44 @@
 .solves-sheet {
-    width: 100%;
-    height: calc(100% - 64px);
-    top: 64px;
-    position: fixed;
-    transform: translate3d(0, calc(100% - 48px - 24px), 0);
+  width: 100%;
+  height: calc(100% - 64px);
+  top: 64px;
+  position: fixed;
+  transform: translate3d(0, calc(100% - 48px - 24px), 0);
 }
 
 .caret-icon {
-    height: 48px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+  height: 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .container {
-    width: 100%;
-    max-width: 800px;
-    height: 100%;
-    position: absolute;
-    z-index: 10 !important;
-    margin: 0 auto;
-    left: 0;
-    right: 0;
+  width: 100%;
+  max-width: 800px;
+  height: 100%;
+  position: absolute;
+  z-index: 10 !important;
+  margin: 0 auto;
+  left: 0;
+  right: 0;
 }
 
 .solves-background {
-    box-shadow: 0px -4px 22px -8px rgba(0, 0, 0, 0.75);
-    background: white;
-    height: calc(100% - 48px);
+  box-shadow: 0px -4px 22px -8px rgba(0, 0, 0, 0.75);
+  background: white;
+  height: calc(100% - 48px);
 }
 
 .solves-grid {
-    outline: 0px solid transparent;
-    overflow-x: hidden;
+  outline: 0px solid transparent;
+  overflow-x: hidden;
 }
 
 .cell {
-    height: 48px;
-    text-align: center;
-    line-height: 48px;
-    vertical-align: middle;
+  height: 48px;
+  text-align: center;
+  line-height: 48px;
+  vertical-align: middle;
 }

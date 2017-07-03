@@ -10,20 +10,19 @@ import 'typeface-roboto';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
 const App = () => {
-    return (
-        <MuiThemeProvider>
-            <div className="App">
+  return (
+    <MuiThemeProvider>
+      <div className="App">
+        <CurrentTimerAppBar />
 
-                <CurrentTimerAppBar/>
+        <CurrentScramble />
 
-                <CurrentScramble/>
+        <CurrentTimer />
 
-                <CurrentTimer/>
-
-                <CurrentSolvesSheet/>
-            </div>
-        </MuiThemeProvider>
-    );
+        <CurrentSolvesSheet />
+      </div>
+    </MuiThemeProvider>
+  );
 };
 
 export default App;

@@ -1,4 +1,4 @@
-import {options} from "preact";
+import { options } from 'preact';
 
 let r = Promise.resolve();
 options.debounceRendering = f => r.then(f);

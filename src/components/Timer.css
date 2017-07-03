@@ -1,33 +1,33 @@
 @font-face {
-    font-family: digital-7-mono;
-    src: url("../assets/digital-7-mono.woff2") format("woff2");
+  font-family: digital-7-mono;
+  src: url("../assets/digital-7-mono.woff2") format("woff2");
 }
 
 .timer {
-    width: 100%;
-    height: calc(100% - 56px - 64px);
-    top: 64px;
-    bottom: 56px;
-    font-size: 15vw;
-    font-family: digital-7-mono, monospace;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    user-select: none;
-    cursor: default;
-    transition: color 0s;
-    position: fixed;
+  width: 100%;
+  height: calc(100% - 56px - 64px);
+  top: 64px;
+  bottom: 56px;
+  font-size: 15vw;
+  font-family: digital-7-mono, monospace;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  user-select: none;
+  cursor: default;
+  transition: color 0s;
+  position: fixed;
 }
 
 .ready {
-    transition: color 0.5s;
+  transition: color 0.5s;
 }
 
 .stopped {
-    color: #F44336;
+  color: #f44336;
 }
 
 .handOnTimer {
-    color: #4CAF50;
+  color: #4caf50;
 }
