@@ -15,7 +15,7 @@ import {applyMiddleware, createStore} from 'redux';
 import {Provider} from 'react-redux';
 import {createEpicMiddleware} from 'redux-observable';
 
-import {composeWithDevTools} from 'redux-devtools-extension/logOnlyInProduction';
+import {composeWithDevTools} from 'redux-devtools-extension';
 import {ScrambleService} from './services/scramble-service';
 
 import 'default-passive-events/default-passive-events';
