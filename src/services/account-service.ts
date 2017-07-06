@@ -1,4 +1,4 @@
-import superlogin from 'superlogin-client';
+import superlogin from '@pluscubed/superlogin-client';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 import 'rxjs/add/operator/take';
@@ -13,6 +13,7 @@ export class AccountService {
 
   constructor() {
     const config = {
+      serverUrl: AccountService.ENDPOINT,
       socialUrl: AccountService.ENDPOINT + '/auth',
       baseUrl: '/auth',
       storage: 'local',
@@ -32,12 +33,6 @@ export class AccountService {
 
   login(): Observable<any> {
     // Workaround superlogin-client expecting direct window.opener call
-    const login = Observable.fromPromise(
-      superlogin.socialAuth('wca')
-    ).catch(err => {
-      return Observable.of(err);
-    });
-    const response = this.authSession$.take(1);
-    return Observable.forkJoin(login, response).map(result => result[1]);
+    return Observable.fromPromise(superlogin.socialAuth('wca'));
   }
 }

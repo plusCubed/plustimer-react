@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@pluscubed/superlogin-client": "^0.7.0",
     "@types/enzyme": "^2.8.1",
     "@types/jest": "^20.0.2",
     "@types/node": "^8.0.7",
@@ -15,7 +16,7 @@
     "@types/reselect": "^2.2.0",
     "default-passive-events": "^0.1.1",
     "enzyme": "^2.9.1",
-    "material-ui": "^1.0.0-alpha.20",
+    "material-ui": "^1.0.0-alpha.21",
     "material-ui-icons": "^1.0.0-alpha.19",
     "pouchdb": "^6.2.0",
     "preact": "^8.1.0",
@@ -29,8 +30,7 @@
     "redux-devtools-extension": "^2.13.2",
     "redux-observable": "^0.14.1",
     "reselect": "^3.0.1",
-    "rxjs": "^5.4.1",
-    "superlogin-client": "^0.6.1",
+    "rxjs": "^5.4.2",
     "typeface-roboto": "^0.0.29"
   },
   "devDependencies": {
@@ -68,7 +68,7 @@
     "react-dev-utils": "^3.0.2",
     "react-error-overlay": "^1.0.9",
     "style-loader": "^0.18.2",
-    "tslint": "^5.4.3",
+    "tslint": "^5.5.0",
     "tslint-config-prettier": "^1.1.0",
     "tslint-loader": "^3.5.3",
     "tslint-react": "^3.0.0",
@@ -79,7 +79,7 @@
     "webpack-dev-server": "^2.5.0",
     "webpack-manifest-plugin": "^1.1.0",
     "whatwg-fetch": "^2.0.3",
-    "worker-loader": "^0.8.0"
+    "worker-loader": "^0.8.1"
   },
   "scripts": {
     "start": "node scripts/start",
