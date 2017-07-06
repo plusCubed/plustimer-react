@@ -3,8 +3,7 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/take';
 import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/map';
-
-const ScrambleWorker = require('worker-loader?name=./static/js/scramble-worker.[hash:8].js!./scramble-worker');
+import * as ScrambleWorker from 'worker-loader?name=./static/js/scramble-worker.[hash:8].js!./scramble-worker';
 
 export class ScrambleService {
   private worker: Worker;
