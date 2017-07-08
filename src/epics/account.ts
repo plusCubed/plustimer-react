@@ -19,7 +19,7 @@ const signInEpic = (
     .map(session => loginSuccess(session));
 
   const login$ = action$.ofType(LOGIN).flatMap(() => {
-    return accountService.login().flatMap(session => Observable.empty());
+    return accountService.login();
   });
 
   return Observable.merge(loginSuccess$, login$).let(catchEmitError);
