@@ -1,8 +1,12 @@
-import superlogin from '@pluscubed/superlogin-client';
+import superlogin, {
+  ConfigurationOptions,
+  Session
+} from '@pluscubed/superlogin-client';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 import 'rxjs/add/operator/take';
 import 'rxjs/add/observable/forkJoin';
+import { Observer } from 'rxjs/Observer';
 
 export class AccountService {
   private static ENDPOINT = process.env.NODE_ENV === 'production'
@@ -12,7 +16,7 @@ export class AccountService {
   private authSession$: Subject<any>;
 
   constructor() {
-    const config = {
+    const config: ConfigurationOptions = {
       serverUrl: AccountService.ENDPOINT,
       socialUrl: AccountService.ENDPOINT + '/auth',
       baseUrl: '/auth',
@@ -31,8 +35,31 @@ export class AccountService {
     window.addEventListener('message', listener);
   }
 
+  authenticate(): Observable<ProfileSession> {
+    return Observable.fromPromise(superlogin.authenticate());
+  }
+
   login(): Observable<any> {
-    // Workaround superlogin-client expecting direct window.opener call
     return Observable.fromPromise(superlogin.socialAuth('wca'));
   }
+
+  onLogin(): Observable<any> {
+    return Observable.create((observer: Observer<any>) => {
+      superlogin.on('login', session => {
+        observer.next(session);
+      });
+    });
+  }
+}
+
+export interface Profile {
+  id: string;
+  displayName: string;
+  emails?: [{ value: string }];
+  photos?: [{ value: string; type: 'default' | 'thumbnail' }];
+  wca_id: number;
+}
+
+export interface ProfileSession extends Session {
+  profile: Profile;
 }

@@ -7,23 +7,22 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/let';
 import { catchEmitError } from './errorHandling';
 import { AccountService } from '../services/account-service';
-import { SIGN_IN } from '../reducers/account';
+import { LOGIN, loginSuccess } from '../reducers/account';
 
 const signInEpic = (
   action$: ActionsObservable<Action>,
   store: any,
   { accountService }: { accountService: AccountService }
 ): Observable<Action> => {
-  const signIn$ = action$.ofType(SIGN_IN).flatMap(() => {
-    return accountService.login().map(session => {
-      return {
-        type: 'SIGN_IN_SESSION',
-        payload: session
-      } as Action;
-    });
+  const loginSuccess$ = accountService
+    .authenticate()
+    .map(session => loginSuccess(session));
+
+  const login$ = action$.ofType(LOGIN).flatMap(() => {
+    return accountService.login().flatMap(session => Observable.empty());
   });
 
-  return Observable.merge(signIn$).let(catchEmitError);
+  return Observable.merge(loginSuccess$, login$).let(catchEmitError);
 };
 
 export default combineEpics(signInEpic as Epic<Action, {}>);

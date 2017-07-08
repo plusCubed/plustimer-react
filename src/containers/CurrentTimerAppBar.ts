@@ -5,17 +5,30 @@ import TimerAppBar, {
 } from '../components/TimerAppBar';
 import { StoreState } from '../reducers/index';
 import { Action } from '../utils/Util';
-import { signIn } from '../reducers/account';
+import { login } from '../reducers/account';
+
+import noProfileImg from '../assets/temp_avatar.png';
 
 const mapStateToProps = (state: StoreState): StoreStateProps => {
-  return {};
+  return {
+    loggedIn: !!state.account.session,
+    avatarAltName: !!state.account.session
+      ? state.account.session.profile.displayName
+      : undefined,
+    avatarImg: !!state.account.session
+      ? state.account.session.profile.photos
+        ? state.account.session.profile.photos[0].value
+        : noProfileImg
+      : undefined
+  };
 };
 
 const mapDispatchToProps = (dispatch: Dispatch<Action>): DispatchProps => {
   return {
-    handleAvatarClick: () => {
-      dispatch(signIn());
-    }
+    handleLoginClick: () => {
+      dispatch(login());
+    },
+    handleAvatarClick: () => {}
   };
 };
 

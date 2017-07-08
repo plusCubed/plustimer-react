@@ -1,21 +1,33 @@
 import { Action } from '../utils/Util';
+import { ProfileSession } from '../services/account-service';
 
-export const SIGN_IN = 'AVATAR/SIGN_IN';
+export const LOGIN = 'ACCOUNT/LOGIN';
+export const LOGIN_SUCCESS = 'ACCOUNT/LOGIN_SUCCESS';
 
-export const signIn = (): Action => ({
-  type: SIGN_IN
+export const login = (): Action => ({
+  type: LOGIN
+});
+
+export const loginSuccess = (session: ProfileSession): Action => ({
+  type: LOGIN_SUCCESS,
+  payload: session
 });
 
 export interface AccountStoreState {
-  signedIn: boolean;
+  session?: ProfileSession;
 }
 
 const initialStoreState: AccountStoreState = {
-  signedIn: false
+  session: undefined
 };
 
 export const accountReducer = (state = initialStoreState, action: Action) => {
   switch (action.type) {
+    case LOGIN_SUCCESS:
+      return {
+        ...state,
+        session: action.payload
+      };
     default:
       return state;
   }
