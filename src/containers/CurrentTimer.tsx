@@ -1,8 +1,7 @@
 import { connect, Dispatch } from 'react-redux';
 import Timer, { DispatchProps, StoreStateProps } from '../components/Timer';
 import { down, up } from '../reducers/timerMode';
-import { StoreState } from '../reducers/index';
-import { Action } from '../utils/Util';
+import { Action, StoreState } from '../reducers/index';
 
 const mapStateToProps = (state: StoreState): StoreStateProps => {
   return {

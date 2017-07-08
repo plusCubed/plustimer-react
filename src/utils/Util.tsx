@@ -1,11 +1,4 @@
-import * as Redux from 'redux';
 import * as React from 'react';
-
-export interface Action extends Redux.Action {
-  type: string;
-  payload?: any;
-  error?: boolean;
-}
 
 export interface TimeParts {
   secString: string;

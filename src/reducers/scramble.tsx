@@ -1,4 +1,4 @@
-import { Action } from '../utils/Util';
+import { Action } from './index';
 
 export const FETCH_SCRAMBLE_START = 'SCRAMBLE/FETCH_SCRAMBLE_START';
 export const FETCH_SCRAMBLE_SUCCESS = 'SCRAMBLE/FETCH_SCRAMBLE_SUCCESS';

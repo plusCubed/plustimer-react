@@ -1,4 +1,4 @@
-import { Action } from '../utils/Util';
+import { Action } from './index';
 
 export const UP = 'TIMER/UP';
 export const DOWN = 'TIMER/DOWN';

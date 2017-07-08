@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs/Observable';
-import { Action } from '../utils/Util';
 import 'rxjs/add/observable/of';
 import 'rxjs/add/operator/catch';
+import { Action } from '../reducers/index';
 
 export const catchEmitError = (obs: Observable<Action>): Observable<Action> => {
   return obs.catch((err: Error, caught: Observable<Action>) => {

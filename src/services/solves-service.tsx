@@ -7,14 +7,22 @@ import 'rxjs/add/observable/fromPromise';
 import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/map';
 
-export class Solve {
+export interface DbObject {
   readonly _id: string;
+  readonly type: string;
+}
+
+export class Solve implements DbObject {
+  readonly _id: string;
+  readonly type: string;
   readonly time: number;
   readonly timestamp: number;
   readonly scramble: string;
 
   constructor(time: number, timestamp: number, scramble: string) {
-    this._id = '';
+    this._id = `${timestamp}-${time}`;
+    this.type = 'solve';
+
     this.time = time;
     this.timestamp = timestamp;
     this.scramble = scramble;
@@ -22,7 +30,8 @@ export class Solve {
 }
 
 export class SolvesService {
-  private db: any;
+  private db: PouchDB.Database;
+  private remoteDb: PouchDB.Database;
 
   initDB(): Observable<any> {
     return Observable.create((subscriber: Subscriber<any>) => {
@@ -35,8 +44,16 @@ export class SolvesService {
     });
   }
 
+  startSync(url: string) {
+    this.remoteDb = new (PouchDB as any)(url);
+    this.db.sync(this.remoteDb, {
+      live: true,
+      retry: true
+    });
+  }
+
   add(solve: Solve) {
-    return this.db.post(solve);
+    return this.db.put(solve);
   }
 
   getAll(): Observable<Array<Solve>> {

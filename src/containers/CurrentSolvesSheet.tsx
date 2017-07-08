@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { connect, Dispatch } from 'react-redux';
-import { StoreState } from '../reducers/index';
-import { Action } from '../utils/Util';
+import { Action, StoreState } from '../reducers/index';
 import SolvesSheet, {
   DispatchProps,
   StoreStateProps

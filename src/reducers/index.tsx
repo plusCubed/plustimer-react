@@ -1,9 +1,15 @@
-import { combineReducers } from 'redux';
+import { Action as ReduxAction, combineReducers } from 'redux';
 import { timerReducer, TimerStoreState } from './timer';
 import { Solve } from '../services/solves-service';
 import { solvesReducer } from './solves';
 import { scrambleReducer, ScrambleStoreState } from './scramble';
 import { accountReducer, AccountStoreState } from './account';
+
+export interface Action extends ReduxAction {
+  type: string;
+  payload?: any;
+  error?: boolean;
+}
 
 export interface StoreState {
   timer: TimerStoreState;

@@ -8,7 +8,6 @@ import {
   stopTimer,
   tickTimer
 } from '../reducers/timerTime';
-import { Action } from '../utils/Util';
 import { Solve, SolvesService } from '../services/solves-service';
 import { ScrambleService } from '../services/scramble-service';
 import {
@@ -32,6 +31,7 @@ import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/startWith';
 import 'rxjs/add/operator/let';
 import { catchEmitError } from './errorHandling';
+import { Action } from '../reducers/index';
 
 // The new mode & which action it corresponds to
 export const transitionTimeMap = {

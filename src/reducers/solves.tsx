@@ -1,6 +1,5 @@
-import { Action } from '../utils/Util';
 import { Solve } from '../services/solves-service';
-import { StoreState } from './index';
+import { Action, StoreState } from './index';
 import { createSelector } from 'reselect';
 
 export const FETCH_SOLVES_SUCCESS = 'SOLVES/FETCH_SOLVES_SUCCESS';

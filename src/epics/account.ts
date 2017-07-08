@@ -1,5 +1,4 @@
 import { ActionsObservable, combineEpics, Epic } from 'redux-observable';
-import { Action } from '../utils/Util';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/merge';
 import 'rxjs/add/observable/empty';
@@ -8,6 +7,7 @@ import 'rxjs/add/operator/let';
 import { catchEmitError } from './errorHandling';
 import { AccountService } from '../services/account-service';
 import { LOGIN, loginSuccess } from '../reducers/account';
+import { Action } from '../reducers/index';
 
 const signInEpic = (
   action$: ActionsObservable<Action>,

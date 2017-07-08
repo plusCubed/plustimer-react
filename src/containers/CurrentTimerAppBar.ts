@@ -3,8 +3,7 @@ import TimerAppBar, {
   DispatchProps,
   StoreStateProps
 } from '../components/TimerAppBar';
-import { StoreState } from '../reducers/index';
-import { Action } from '../utils/Util';
+import { Action, StoreState } from '../reducers/index';
 import { login } from '../reducers/account';
 
 import noProfileImg from '../assets/temp_avatar.png';

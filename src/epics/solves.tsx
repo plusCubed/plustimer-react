@@ -1,17 +1,22 @@
 import * as PouchDB from 'pouchdb';
 import { ActionsObservable, combineEpics, Epic } from 'redux-observable';
-import { Action } from '../utils/Util';
 import {
   addUpdateSolve,
   deleteSolve,
   fetchSolvesSuccess
 } from '../reducers/solves';
 import { Solve, SolvesService } from '../services/solves-service';
+
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/merge';
+import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/let';
+
 import { catchEmitError } from './errorHandling';
+import { LOGIN_SUCCESS } from '../reducers/account';
+import { Session } from '@pluscubed/superlogin-client';
+import { Action } from '../reducers/index';
 
 const dbSolvesEpic = (
   action$: ActionsObservable<Action>,
@@ -38,4 +43,24 @@ const dbSolvesEpic = (
   return Observable.merge(allSolves$, changes$).let(catchEmitError);
 };
 
-export default combineEpics(dbSolvesEpic as Epic<Action, {}>);
+const startSyncEpic = (
+  action$: ActionsObservable<Action>,
+  store: any,
+  { solvesService }: { solvesService: SolvesService }
+): Observable<Action> => {
+  //Start syncing when login is successful
+  const startSync$ = action$
+    .ofType(LOGIN_SUCCESS)
+    .map(action => action.payload)
+    .flatMap((session: Session) => {
+      solvesService.startSync(session.userDBs['user']);
+      return Observable.empty();
+    });
+
+  return Observable.merge(startSync$).let(catchEmitError);
+};
+
+export default combineEpics(
+  dbSolvesEpic as Epic<Action, {}>,
+  startSyncEpic as Epic<Action, {}>
+);

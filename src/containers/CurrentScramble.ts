@@ -3,9 +3,8 @@ import {
   Scramble,
   StoreStateProps
 } from '../components/Scramble';
-import { StoreState } from '../reducers/index';
+import { Action, StoreState } from '../reducers/index';
 import { connect, Dispatch } from 'react-redux';
-import { Action } from '../utils/Util';
 
 const mapStateToProps = (state: StoreState): StoreStateProps => {
   return {

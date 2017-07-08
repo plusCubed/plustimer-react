@@ -1,4 +1,4 @@
-import { Action } from '../utils/Util';
+import { Action } from './index';
 
 export const TICK_TIMER = 'TIMER/TICK_TIMER';
 export const START_TIMER = 'START_TIMER';

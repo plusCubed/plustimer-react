@@ -1,5 +1,5 @@
-import { Action } from '../utils/Util';
 import { ProfileSession } from '../services/account-service';
+import { Action } from './index';
 
 export const LOGIN = 'ACCOUNT/LOGIN';
 export const LOGIN_SUCCESS = 'ACCOUNT/LOGIN_SUCCESS';
