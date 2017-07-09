@@ -45,7 +45,9 @@ export const solvesReducer = (state: Solve[] = [], action: Action) => {
         });
       } else {
         // ADD
-        return [...state, action.payload];
+        return [...state, action.payload].sort((a: Solve, b: Solve) => {
+          return a.timestamp - b.timestamp;
+        });
       }
     case DELETE_SOLVE:
       return state.filter(solve => solve._id !== action.payload);
