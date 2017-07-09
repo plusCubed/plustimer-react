@@ -47,6 +47,8 @@ export const solvesReducer = (state: Solve[] = [], action: Action) => {
         // ADD
         return [...state, action.payload];
       }
+    case DELETE_SOLVE:
+      return state.filter(solve => solve._id !== action.payload);
     default:
       return state;
   }
