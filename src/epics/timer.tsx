@@ -95,6 +95,8 @@ export const finishSolveEpic = (
     .flatMap(action => {
       const timerState = store.getState().timer;
       const solve = new Solve(
+        'puzzle-333',
+        'Normal',
         timerState.time.elapsed,
         timerState.time.stoppedTimestamp,
         ''

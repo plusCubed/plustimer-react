@@ -1,39 +1,65 @@
-import { Solve } from '../services/solves-service';
+import { Config, Doc, Solve } from '../services/solves-service';
 import { Action, StoreState } from './index';
 import { createSelector } from 'reselect';
 
-export const FETCH_SOLVES_SUCCESS = 'SOLVES/FETCH_SOLVES_SUCCESS';
-export const ADD_UPDATE_SOLVE = 'SOLVES/ADD_UPDATE_SOLVE';
-export const DELETE_SOLVE = 'SOLVES/DELETE_SOLVE';
+export const FETCH_DOCS_SUCCESS = 'SOLVES/FETCH_SOLVES_SUCCESS';
+export const ADD_UPDATE_DOC = 'SOLVES/ADD_UPDATE_SOLVE';
+export const DELETE_DOC = 'SOLVES/DELETE_SOLVE';
 
-export const fetchSolvesSuccess = (solves: Solve[]): Action => ({
-  type: FETCH_SOLVES_SUCCESS,
-  payload: solves
+export const fetchDocsSuccess = (docs: Doc[]): Action => ({
+  type: FETCH_DOCS_SUCCESS,
+  payload: docs
 });
 
-export const addUpdateSolve = (solve: Solve): Action => ({
-  type: ADD_UPDATE_SOLVE,
-  payload: solve
+export const addUpdateDoc = (doc: Doc): Action => ({
+  type: ADD_UPDATE_DOC,
+  payload: doc
 });
 
-export const deleteSolve = (id: string): Action => ({
-  type: DELETE_SOLVE,
+export const deleteDoc = (id: string): Action => ({
+  type: DELETE_DOC,
   payload: id
 });
 
-const getSolves = (state: StoreState) => state.solves;
+const getDocs = (state: StoreState) => state.docs;
 
-export const getNewToOldSolves = createSelector(getSolves, solves =>
-  solves.slice().reverse()
+const getConfig = createSelector(
+  getDocs,
+  docs => docs.find(doc => doc._id === 'config') as Config
+);
+
+const getSolves = createSelector(
+  getDocs,
+  docs => docs.filter(doc => doc._id.startsWith('solve')) as Solve[]
+);
+
+export const getCurrentSolves = createSelector(
+  [getSolves, getConfig],
+  (solves, config) =>
+    solves.filter(
+      solve =>
+        solve.puzzleId === config.currentPuzzleId &&
+        solve.category === config.currentCategory
+    )
+);
+
+export const getNewToOldSolves = createSelector(getCurrentSolves, solves =>
+  //TODO: Use binary search instead of sorting every time
+  solves
+    .sort((a: Solve, b: Solve) => {
+      return a.timestamp - b.timestamp;
+    })
+    .slice()
+    .reverse()
 );
 
 // ACTION CREATORS
 
-export const solvesReducer = (state: Solve[] = [], action: Action) => {
+export const solvesReducer = (state: Doc[] = [], action: Action) => {
   switch (action.type) {
-    case FETCH_SOLVES_SUCCESS:
+    case FETCH_DOCS_SUCCESS:
       return action.payload;
-    case ADD_UPDATE_SOLVE:
+    case ADD_UPDATE_DOC:
       const exists = state.find(solve => solve._id === action.payload._id);
 
       if (exists) {
@@ -45,11 +71,9 @@ export const solvesReducer = (state: Solve[] = [], action: Action) => {
         });
       } else {
         // ADD
-        return [...state, action.payload].sort((a: Solve, b: Solve) => {
-          return a.timestamp - b.timestamp;
-        });
+        return [...state, action.payload];
       }
-    case DELETE_SOLVE:
+    case DELETE_DOC:
       return state.filter(solve => solve._id !== action.payload);
     default:
       return state;
