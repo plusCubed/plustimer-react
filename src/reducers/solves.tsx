@@ -5,6 +5,8 @@ import { createSelector } from 'reselect';
 export const FETCH_DOCS_SUCCESS = 'SOLVES/FETCH_SOLVES_SUCCESS';
 export const ADD_UPDATE_DOC = 'SOLVES/ADD_UPDATE_SOLVE';
 export const DELETE_DOC = 'SOLVES/DELETE_SOLVE';
+export const SELECT_PUZZLE = 'SOLVES/SELECT_PUZZLE';
+export const SELECT_CATEGORY = 'SOLVES/SELECT_CATEGORY';
 
 export const fetchDocsSuccess = (docs: Doc[]): Action => ({
   type: FETCH_DOCS_SUCCESS,
@@ -21,9 +23,19 @@ export const deleteDoc = (id: string): Action => ({
   payload: id
 });
 
+export const selectPuzzle = (index: number): Action => ({
+  type: SELECT_PUZZLE,
+  payload: index
+});
+
+export const selectCategory = (index: number): Action => ({
+  type: SELECT_CATEGORY,
+  payload: index
+});
+
 const getDocs = (state: StoreState) => state.docs;
 
-const getConfig = createSelector(
+export const getConfig = createSelector(
   getDocs,
   docs => docs.find(doc => doc._id === 'config') as Config
 );
@@ -46,6 +58,12 @@ export const getCategories = createSelector(
     if (puzzle) return puzzle.categories;
     else return [];
   }
+);
+
+export const getCurrentPuzzle = createSelector(
+  [getPuzzles, getConfig],
+  (puzzles: Puzzle[], config: Config) =>
+    puzzles.find(puzzle => puzzle._id === config.currentPuzzleId)
 );
 
 export const getCurrentPuzzleIndex = createSelector(

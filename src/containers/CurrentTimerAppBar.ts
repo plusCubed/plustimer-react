@@ -11,7 +11,9 @@ import {
   getCategories,
   getCurrentCategoryIndex,
   getCurrentPuzzleIndex,
-  getPuzzleNames
+  getPuzzleNames,
+  selectCategory,
+  selectPuzzle
 } from '../reducers/solves';
 
 const mapStateToProps = (state: StoreState): StoreStateProps => {
@@ -37,7 +39,13 @@ const mapDispatchToProps = (dispatch: Dispatch<Action>): DispatchProps => {
     handleLoginClick: () => {
       dispatch(login());
     },
-    handleAvatarClick: () => {}
+    handleAvatarClick: () => {},
+    handlePuzzleSelected: index => {
+      dispatch(selectPuzzle(index));
+    },
+    handleCategorySelected: index => {
+      dispatch(selectCategory(index));
+    }
   };
 };
 

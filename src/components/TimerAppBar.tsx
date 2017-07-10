@@ -21,6 +21,8 @@ export interface StoreStateProps {
 export interface DispatchProps {
   readonly handleAvatarClick: () => void;
   readonly handleLoginClick: () => void;
+  readonly handlePuzzleSelected: (index: number) => void;
+  readonly handleCategorySelected: (index: number) => void;
 }
 
 export interface Props extends StoreStateProps, DispatchProps {}
@@ -34,7 +36,9 @@ const TimerAppBar = ({
   selectedPuzzle,
   selectedCategory,
   handleAvatarClick,
-  handleLoginClick
+  handleLoginClick,
+  handlePuzzleSelected,
+  handleCategorySelected
 }: Props) => {
   return (
     <AppBar>
@@ -45,13 +49,13 @@ const TimerAppBar = ({
 
         <Selector
           options={puzzles}
-          handleSelect={() => {}}
+          handleSelect={handlePuzzleSelected}
           selectedIndex={selectedPuzzle}
         />
 
         <Selector
           options={categories}
-          handleSelect={() => {}}
+          handleSelect={handleCategorySelected}
           selectedIndex={selectedCategory}
         />
 

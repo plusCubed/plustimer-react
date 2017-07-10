@@ -108,6 +108,13 @@ export class SolvesService {
     return this.db.put(solve);
   }
 
+  setConfig(config: Config) {
+    if (!config._rev) {
+      throw 'Configuration object must have valid _rev!';
+    }
+    return this.db.put(config);
+  }
+
   getAllDocs(): Observable<Array<Doc>> {
     return this.initDB()
       .flatMap(() =>

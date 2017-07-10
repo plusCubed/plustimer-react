@@ -1,7 +1,16 @@
 import * as PouchDB from 'pouchdb';
 import { ActionsObservable, combineEpics, Epic } from 'redux-observable';
-import { addUpdateDoc, deleteDoc, fetchDocsSuccess } from '../reducers/solves';
-import { Solve, SolvesService } from '../services/solves-service';
+import {
+  addUpdateDoc,
+  deleteDoc,
+  fetchDocsSuccess,
+  SELECT_PUZZLE,
+  SELECT_CATEGORY,
+  getConfig,
+  getPuzzles,
+  getCurrentPuzzle
+} from '../reducers/solves';
+import { Puzzle, Solve, SolvesService } from '../services/solves-service';
 
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/merge';
@@ -14,6 +23,7 @@ import { catchEmitError } from './errorHandling';
 import { LOGIN_SUCCESS } from '../reducers/account';
 import { Session } from '@pluscubed/superlogin-client';
 import { Action } from '../reducers/index';
+import { LightStore } from './index';
 
 const dbSolvesEpic = (
   action$: ActionsObservable<Action>,
@@ -59,7 +69,53 @@ const startSyncEpic = (
   return Observable.merge(startSync$).let(catchEmitError);
 };
 
+const selectPuzzleEpic = (
+  action$: ActionsObservable<Action>,
+  store: LightStore,
+  { solvesService }: { solvesService: SolvesService }
+): Observable<Action> => {
+  const selectPuzzle$ = action$
+    .ofType(SELECT_PUZZLE)
+    .map(action => action.payload)
+    .flatMap((index: number) => {
+      const currentConfig = getConfig(store.getState());
+      const puzzles = getPuzzles(store.getState());
+      const newConfig = {
+        ...currentConfig,
+        currentPuzzleId: puzzles[index]._id
+      };
+      solvesService.setConfig(newConfig);
+      return Observable.empty();
+    });
+
+  return Observable.merge(selectPuzzle$).let(catchEmitError);
+};
+
+const selectCategoryEpic = (
+  action$: ActionsObservable<Action>,
+  store: LightStore,
+  { solvesService }: { solvesService: SolvesService }
+): Observable<Action> => {
+  const selectCategory$ = action$
+    .ofType(SELECT_CATEGORY)
+    .map(action => action.payload)
+    .flatMap((index: number) => {
+      const currentConfig = getConfig(store.getState());
+      const puzzle = getCurrentPuzzle(store.getState());
+      const newConfig = {
+        ...currentConfig,
+        currentCategory: puzzle!.categories[index]
+      };
+      solvesService.setConfig(newConfig);
+      return Observable.empty();
+    });
+
+  return Observable.merge(selectCategory$).let(catchEmitError);
+};
+
 export default combineEpics(
   dbSolvesEpic as Epic<Action, {}>,
-  startSyncEpic as Epic<Action, {}>
+  startSyncEpic as Epic<Action, {}>,
+  selectPuzzleEpic as Epic<Action, {}>,
+  selectCategoryEpic as Epic<Action, {}>
 );
