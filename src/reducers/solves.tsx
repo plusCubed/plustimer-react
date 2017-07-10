@@ -97,7 +97,7 @@ export const getNewToOldSolves = createSelector(getCurrentSolves, solves =>
   //TODO: Use binary search instead of sorting every time
   solves
     .sort((a: Solve, b: Solve) => {
-      return a.timestamp - b.timestamp;
+      return a._id.localeCompare(b._id);
     })
     .slice()
     .reverse()

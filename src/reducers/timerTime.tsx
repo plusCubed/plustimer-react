@@ -29,13 +29,13 @@ export const tickTimer = (timestamp: number): Action => ({
 export interface TimeStoreState {
   start: number;
   elapsed: number;
-  stoppedTimestamp: number;
+  stoppedTimestamp?: Date;
 }
 
 const initialTimeState: TimeStoreState = {
   start: 0,
   elapsed: 0,
-  stoppedTimestamp: 0
+  stoppedTimestamp: undefined
 };
 
 export const timerTimeReducer = (
@@ -52,7 +52,7 @@ export const timerTimeReducer = (
       return {
         start: 0,
         elapsed: 0,
-        stoppedTimestamp: 0
+        stoppedTimestamp: undefined
       };
     case TICK_TIMER:
       return {
@@ -63,7 +63,7 @@ export const timerTimeReducer = (
       return {
         ...state,
         elapsed: Math.trunc(action.payload - state.start),
-        stoppedTimestamp: Math.trunc(Date.now() / 1000)
+        stoppedTimestamp: new Date()
       };
     default:
       return state;

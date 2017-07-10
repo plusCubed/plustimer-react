@@ -20,24 +20,24 @@ export class Solve implements Doc {
   readonly puzzleId: string;
   readonly category: string;
   readonly time: number;
-  readonly timestamp: number;
+  readonly timestamp: string;
   readonly scramble: string;
 
   constructor(
     puzzleId: string,
     category: string,
     time: number,
-    timestamp: number,
+    timestamp: Date,
     scramble: string
   ) {
     const puzzleIdClean = puzzleId.replace('puzzle-', '');
-    this._id = `solve-${puzzleIdClean}-${category}-${timestamp}`;
+    this._id = `solve-${puzzleIdClean}-${category}-${timestamp.getTime()}`;
     this._rev = '';
 
     this.puzzleId = puzzleId;
     this.category = category;
     this.time = time;
-    this.timestamp = timestamp;
+    this.timestamp = timestamp.toJSON();
     this.scramble = scramble;
   }
 }
