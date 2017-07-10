@@ -1,6 +1,6 @@
 import * as React from 'react';
+
 import Button from 'material-ui/Button';
-import List, { ListItem, ListItemText } from 'material-ui/List';
 import Menu, { MenuList, MenuItem } from 'material-ui/Menu';
 
 export interface Props {
@@ -19,6 +19,20 @@ class Selector extends React.Component<Props, State> {
     anchorEl: undefined,
     open: false,
     selectedIndex: 0
+  };
+
+  private menuStyle = {
+    maxHeight: 'calc(100vh - 96px)'
+  };
+
+  private menuAnchorOrigin = {
+    vertical: 'top',
+    horizontal: 'center'
+  };
+
+  private menuTransformOrigin = {
+    vertical: 'top',
+    horizontal: 'center'
   };
 
   handleClick = (event: Event) => {
@@ -42,15 +56,10 @@ class Selector extends React.Component<Props, State> {
         </Button>
 
         <Menu
+          style={this.menuStyle}
           anchorEl={this.state.anchorEl}
-          anchorOrigin={{
-            vertical: 'top',
-            horizontal: 'center'
-          }}
-          transformOrigin={{
-            vertical: 'top',
-            horizontal: 'center'
-          }}
+          anchorOrigin={this.menuAnchorOrigin}
+          transformOrigin={this.menuTransformOrigin}
           open={this.state.open}
           onRequestClose={this.handleRequestClose}
         >

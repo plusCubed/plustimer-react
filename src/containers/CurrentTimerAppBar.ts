@@ -7,10 +7,12 @@ import { Action, StoreState } from '../reducers/index';
 import { login } from '../reducers/account';
 
 import noProfileImg from '../assets/temp_avatar.png';
+import { getPuzzleNames } from '../reducers/solves';
 
 const mapStateToProps = (state: StoreState): StoreStateProps => {
   return {
     loggedIn: !!state.account.session,
+    puzzles: getPuzzleNames(state),
     avatarAltName: !!state.account.session
       ? state.account.session.profile.displayName
       : undefined,

@@ -1,4 +1,4 @@
-import { Config, Doc, Solve } from '../services/solves-service';
+import { Config, Doc, Puzzle, Solve } from '../services/solves-service';
 import { Action, StoreState } from './index';
 import { createSelector } from 'reselect';
 
@@ -26,6 +26,15 @@ const getDocs = (state: StoreState) => state.docs;
 const getConfig = createSelector(
   getDocs,
   docs => docs.find(doc => doc._id === 'config') as Config
+);
+
+export const getPuzzles = createSelector(
+  getDocs,
+  docs => docs.filter(doc => doc._id.startsWith('puzzle')) as Puzzle[]
+);
+
+export const getPuzzleNames = createSelector(getPuzzles, puzzles =>
+  puzzles.map(puzzle => puzzle.name)
 );
 
 const getSolves = createSelector(
