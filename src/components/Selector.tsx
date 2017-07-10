@@ -4,21 +4,20 @@ import Button from 'material-ui/Button';
 import Menu, { MenuList, MenuItem } from 'material-ui/Menu';
 
 export interface Props {
-  readonly options: any[];
+  readonly options: string[];
   readonly handleSelect: (index: number) => void;
+  readonly selectedIndex: number;
 }
 
 interface State {
   readonly anchorEl?: EventTarget;
   readonly open: boolean;
-  readonly selectedIndex: number;
 }
 
 class Selector extends React.Component<Props, State> {
   state = {
     anchorEl: undefined,
-    open: false,
-    selectedIndex: 0
+    open: false
   };
 
   private menuStyle = {
@@ -40,7 +39,7 @@ class Selector extends React.Component<Props, State> {
   };
 
   handleMenuItemClick = (event: Event, index: number) => {
-    this.setState({ selectedIndex: index, open: false });
+    this.setState({ open: false });
     this.props.handleSelect(index);
   };
 
@@ -52,7 +51,7 @@ class Selector extends React.Component<Props, State> {
     return (
       <div>
         <Button onClick={this.handleClick} color="inherit">
-          {this.props.options[this.state.selectedIndex]}
+          {this.props.options[this.props.selectedIndex]}
         </Button>
 
         <Menu
@@ -67,7 +66,7 @@ class Selector extends React.Component<Props, State> {
             <SelectorItem
               option={option}
               index={index}
-              selectedIndex={this.state.selectedIndex}
+              selectedIndex={this.props.selectedIndex}
               handleMenuItemClick={this.handleMenuItemClick}
             />
           )}

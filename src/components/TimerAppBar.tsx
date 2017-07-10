@@ -13,6 +13,9 @@ export interface StoreStateProps {
   readonly avatarAltName?: string;
   readonly avatarImg?: string;
   readonly puzzles: string[];
+  readonly categories: string[];
+  readonly selectedPuzzle: number;
+  readonly selectedCategory: number;
 }
 
 export interface DispatchProps {
@@ -27,6 +30,9 @@ const TimerAppBar = ({
   avatarAltName,
   avatarImg,
   puzzles,
+  categories,
+  selectedPuzzle,
+  selectedCategory,
   handleAvatarClick,
   handleLoginClick
 }: Props) => {
@@ -37,7 +43,17 @@ const TimerAppBar = ({
           plusTimer
         </Typography>
 
-        <Selector options={puzzles} handleSelect={() => {}} />
+        <Selector
+          options={puzzles}
+          handleSelect={() => {}}
+          selectedIndex={selectedPuzzle}
+        />
+
+        <Selector
+          options={categories}
+          handleSelect={() => {}}
+          selectedIndex={selectedCategory}
+        />
 
         <div className="app-bar-spacer" />
 

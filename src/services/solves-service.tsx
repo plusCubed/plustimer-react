@@ -141,7 +141,6 @@ export class SolvesService {
       this.db.get('config')
     ).catch((err: PouchDB.Core.Error) => {
       if (err.status === 404) {
-        console.log('Initialized config');
         const defaultConfig: Config = new Config('puzzle-333', 'Normal');
         return Observable.fromPromise(this.db.put(defaultConfig));
       } else {
@@ -156,7 +155,6 @@ export class SolvesService {
     ).catch((err: PouchDB.Core.Error) => {
       //333 doesn't exist, initialize database
       if (err.status === 404) {
-        console.log('Initialized puzzles');
         return this.initializePuzzles();
       } else {
         return Observable.of(err);

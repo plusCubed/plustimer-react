@@ -37,6 +37,29 @@ export const getPuzzleNames = createSelector(getPuzzles, puzzles =>
   puzzles.map(puzzle => puzzle.name)
 );
 
+export const getCategories = createSelector(
+  [getPuzzles, getConfig],
+  (puzzles: Puzzle[], config: Config) => {
+    const puzzle = puzzles.find(
+      puzzle => puzzle._id === config.currentPuzzleId
+    );
+    if (puzzle) return puzzle.categories;
+    else return [];
+  }
+);
+
+export const getCurrentPuzzleIndex = createSelector(
+  [getPuzzles, getConfig],
+  (puzzles: Puzzle[], config: Config) =>
+    puzzles.findIndex(puzzle => puzzle._id === config.currentPuzzleId)
+);
+
+export const getCurrentCategoryIndex = createSelector(
+  [getCategories, getConfig],
+  (categories: string[], config: Config) =>
+    categories.findIndex(category => category === config.currentCategory)
+);
+
 const getSolves = createSelector(
   getDocs,
   docs => docs.filter(doc => doc._id.startsWith('solve')) as Solve[]
