@@ -6,6 +6,7 @@ import AppBar from 'material-ui/AppBar';
 import Toolbar from 'material-ui/Toolbar';
 import Typography from 'material-ui/Typography';
 import Button from 'material-ui/Button';
+import Selector from './Selector';
 
 export interface StoreStateProps {
   readonly loggedIn: boolean;
@@ -30,9 +31,16 @@ const TimerAppBar = ({
   return (
     <AppBar>
       <Toolbar>
-        <Typography className="app-bar-text" type="title" color="inherit">
+        <Typography type="title" color="inherit">
           plusTimer
         </Typography>
+
+        <Selector
+          options={['3x3x3', '4x4x4', '5x5x5', '6x6x6']}
+          handleSelect={() => {}}
+        />
+
+        <div className="app-bar-spacer" />
 
         {loggedIn
           ? <img
