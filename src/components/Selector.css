@@ -1,0 +1,18 @@
+.selector {
+  height: 100%;
+}
+
+.selector-menu {
+  max-height: calc(100vh - 96px);
+}
+
+.selector-button {
+  font-size: 18px;
+  font-weight: 500;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  line-height: 1;
+  padding: 0 0 0 12px;
+  border-radius: 0;
+  height: 100%;
+  text-transform: none;
+}

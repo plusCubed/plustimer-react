@@ -43,10 +43,6 @@ const TimerAppBar = ({
   return (
     <AppBar>
       <Toolbar>
-        <Typography type="title" color="inherit">
-          plusTimer
-        </Typography>
-
         <Selector
           options={puzzles}
           handleSelect={handlePuzzleSelected}

@@ -1,7 +1,10 @@
 import * as React from 'react';
 
+import './Selector.css';
+
 import Button from 'material-ui/Button';
 import Menu, { MenuList, MenuItem } from 'material-ui/Menu';
+import ArrowDropDown from 'material-ui-icons/ArrowDropDown';
 
 export interface Props {
   readonly options: string[];
@@ -20,16 +23,12 @@ class Selector extends React.Component<Props, State> {
     open: false
   };
 
-  private menuStyle = {
-    maxHeight: 'calc(100vh - 96px)'
-  };
-
-  private menuAnchorOrigin = {
+  private static menuAnchorOrigin = {
     vertical: 'top',
     horizontal: 'center'
   };
 
-  private menuTransformOrigin = {
+  private static menuTransformOrigin = {
     vertical: 'top',
     horizontal: 'center'
   };
@@ -48,17 +47,23 @@ class Selector extends React.Component<Props, State> {
   };
 
   render() {
+    // Styles don't override material-ui in development due to head css order
     return (
-      <div>
-        <Button onClick={this.handleClick} color="inherit">
+      <div className="selector">
+        <Button
+          className="selector-button"
+          onClick={this.handleClick}
+          color="inherit"
+        >
           {this.props.options[this.props.selectedIndex]}
+          <ArrowDropDown />
         </Button>
 
         <Menu
-          style={this.menuStyle}
+          className="selector-menu"
           anchorEl={this.state.anchorEl}
-          anchorOrigin={this.menuAnchorOrigin}
-          transformOrigin={this.menuTransformOrigin}
+          anchorOrigin={Selector.menuAnchorOrigin}
+          transformOrigin={Selector.menuTransformOrigin}
           open={this.state.open}
           onRequestClose={this.handleRequestClose}
         >
