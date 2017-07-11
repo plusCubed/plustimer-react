@@ -174,56 +174,56 @@ export class SolvesService {
       {
         _id: 'puzzle-333',
         _rev: '',
-        name: '3x3x3',
+        name: '3×3×3',
         scrambler: '333',
         categories: ['Normal', 'OH', 'Feet']
       },
       {
         _id: 'puzzle-444',
         _rev: '',
-        name: '4x4x4',
+        name: '4×4×4',
         scrambler: '444',
         categories: ['Normal']
       },
       {
         _id: 'puzzle-555',
         _rev: '',
-        name: '5x5x5',
+        name: '5×5×5',
         scrambler: '555',
         categories: ['Normal']
       },
       {
         _id: 'puzzle-222',
         _rev: '',
-        name: '2x2x2',
+        name: '2×2×2',
         scrambler: '222',
         categories: ['Normal']
       },
       {
         _id: 'puzzle-333bf',
         _rev: '',
-        name: '3x3x3 BLD',
+        name: '3×3×3 BLD',
         scrambler: '333bf',
         categories: ['Normal']
       },
       {
         _id: 'puzzle-333fm',
         _rev: '',
-        name: '3x3x3 FMC',
+        name: '3×3×3 FMC',
         scrambler: '333fm',
         categories: ['Normal']
       },
       {
-        _id: 'puzzle-minx',
+        _id: 'puzzle-min×',
         _rev: '',
-        name: 'Megaminx',
-        scrambler: 'minx',
+        name: 'Megamin×',
+        scrambler: 'min×',
         categories: ['Normal']
       },
       {
         _id: 'puzzle-pyram',
         _rev: '',
-        name: 'Pyraminx',
+        name: 'Pyramin×',
         scrambler: 'pyram',
         categories: ['Normal']
       },
@@ -251,35 +251,35 @@ export class SolvesService {
       {
         _id: 'puzzle-666',
         _rev: '',
-        name: '6x6x6',
+        name: '6×6×6',
         scrambler: '666',
         categories: ['Normal']
       },
       {
         _id: 'puzzle-777',
         _rev: '',
-        name: '7x7x7',
+        name: '7×7×7',
         scrambler: '777',
         categories: ['Normal']
       },
       {
         _id: 'puzzle-444bf',
         _rev: '',
-        name: '4x4x4 BLD',
+        name: '4×4×4 BLD',
         scrambler: '333',
         categories: ['Normal']
       },
       {
         _id: 'puzzle-555bf',
         _rev: '',
-        name: '5x5x5 BLD',
+        name: '5×5×5 BLD',
         scrambler: '555bf',
         categories: ['Normal']
       },
       {
         _id: 'puzzle-333mbf',
         _rev: '',
-        name: '3x3x3 MBLD',
+        name: '3×3×3 MBLD',
         scrambler: '333mbf',
         categories: ['Normal']
       }
