@@ -214,10 +214,10 @@ export class SolvesService {
         categories: ['Normal']
       },
       {
-        _id: 'puzzle-min×',
+        _id: 'puzzle-minx',
         _rev: '',
         name: 'Megaminx',
-        scrambler: 'min×',
+        scrambler: 'minx',
         categories: ['Normal']
       },
       {
@@ -245,7 +245,7 @@ export class SolvesService {
         _id: 'puzzle-skewb',
         _rev: '',
         name: 'Skewb',
-        scrambler: 'skweb',
+        scrambler: 'skewb',
         categories: ['Normal']
       },
       {
@@ -266,7 +266,7 @@ export class SolvesService {
         _id: 'puzzle-444bf',
         _rev: '',
         name: '4×4×4 BLD',
-        scrambler: '333',
+        scrambler: '444bf',
         categories: ['Normal']
       },
       {
