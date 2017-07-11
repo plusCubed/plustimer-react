@@ -6,7 +6,9 @@ export const FETCH_DOCS_SUCCESS = 'SOLVES/FETCH_SOLVES_SUCCESS';
 export const ADD_UPDATE_DOC = 'SOLVES/ADD_UPDATE_SOLVE';
 export const DELETE_DOC = 'SOLVES/DELETE_SOLVE';
 export const SELECT_PUZZLE = 'SOLVES/SELECT_PUZZLE';
+export const PUZZLE_SELECTED = 'SOLVES/PUZZLE_SELECTED';
 export const SELECT_CATEGORY = 'SOLVES/SELECT_CATEGORY';
+export const CATEGORY_SELECTED = 'SOLVES/CATEGORY_SELECTED';
 
 export const fetchDocsSuccess = (docs: Doc[]): Action => ({
   type: FETCH_DOCS_SUCCESS,
@@ -31,6 +33,15 @@ export const selectPuzzle = (index: number): Action => ({
 export const selectCategory = (index: number): Action => ({
   type: SELECT_CATEGORY,
   payload: index
+});
+
+export const puzzleSelected = (puzzle: Puzzle): Action => ({
+  type: PUZZLE_SELECTED,
+  payload: puzzle
+});
+
+export const categorySelected = (): Action => ({
+  type: CATEGORY_SELECTED
 });
 
 const getDocs = (state: StoreState) => state.docs;

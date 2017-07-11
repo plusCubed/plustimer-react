@@ -8,7 +8,7 @@ import {
   stopTimer,
   tickTimer
 } from '../reducers/timerTime';
-import { Solve, SolvesService } from '../services/solves-service';
+import { Puzzle, Solve, SolvesService } from '../services/solves-service';
 import { ScrambleService } from '../services/scramble-service';
 import {
   advanceScramble,
@@ -23,7 +23,6 @@ import 'rxjs/add/observable/of';
 import 'rxjs/add/observable/merge';
 import 'rxjs/add/observable/empty';
 import 'rxjs/add/observable/zip';
-import 'rxjs/add/operator/onErrorResumeNext';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/repeat';
@@ -33,7 +32,13 @@ import 'rxjs/add/operator/startWith';
 import 'rxjs/add/operator/let';
 import { catchEmitError } from './errorHandling';
 import { Action } from '../reducers/index';
-import { getConfig, getCurrentPuzzle } from '../reducers/solves';
+import {
+  CATEGORY_SELECTED,
+  getConfig,
+  getCurrentPuzzle,
+  PUZZLE_SELECTED,
+  FETCH_DOCS_SUCCESS
+} from '../reducers/solves';
 
 // The new mode & which action it corresponds to
 export const transitionTimeMap = {
@@ -116,18 +121,36 @@ export const fetchScrambleEpic = (
   store: any,
   { scrambleService }: { scrambleService: ScrambleService }
 ): Observable<Action> => {
-  const triggerFetchScramble$ = action$
-    .ofType(UP)
-    .filter(action => store.getState().timer.mode === 'running')
-    .startWith({ type: 'SCRAMBLE_ON_START' } as Action);
+  const docsFetchedAction$ = action$.ofType(FETCH_DOCS_SUCCESS);
 
-  return triggerFetchScramble$
-    .flatMap(action =>
-      scrambleService
-        .getScramble()
+  const timerRunningAction$ = action$
+    .ofType(UP)
+    .filter(action => store.getState().timer.mode === 'running');
+
+  const puzzleChangedAction$ = Observable.merge(
+    action$.ofType(PUZZLE_SELECTED),
+    action$.ofType(CATEGORY_SELECTED)
+  );
+
+  const triggleFetchScramble$ = Observable.merge(
+    docsFetchedAction$,
+    timerRunningAction$,
+    puzzleChangedAction$
+  );
+
+  return triggleFetchScramble$
+    .flatMap(action => {
+      //PUZZLE_SELECTED has new puzzle as payload
+      const scrambler =
+        action.payload && action.payload.scrambler
+          ? action.payload.scrambler
+          : getCurrentPuzzle(store.getState())!.scrambler;
+
+      return scrambleService
+        .getScramble(scrambler)
         .map(scramble => fetchScrambleSuccess(scramble))
-        .startWith(fetchScrambleStart())
-    )
+        .startWith(fetchScrambleStart());
+    })
     .let(catchEmitError);
 };
 
@@ -135,11 +158,22 @@ export const advanceScrambleEpic = (
   action$: ActionsObservable<Action>,
   store: any
 ): Observable<Action> => {
-  const triggerAdvanceScramble$ = action$
+  const timerReadyAction$ = action$
     .ofType(UP)
     .filter(action => store.getState().timer.mode === 'ready')
     .startWith({ type: 'ADVANCE_ON_START' } as Action);
+
+  const puzzleChangedAction$ = Observable.merge(
+    action$.ofType(PUZZLE_SELECTED),
+    action$.ofType(CATEGORY_SELECTED)
+  );
+
   const fetchScrambleSuccess$ = action$.ofType(FETCH_SCRAMBLE_SUCCESS);
+
+  const triggerAdvanceScramble$ = Observable.merge(
+    timerReadyAction$,
+    puzzleChangedAction$
+  );
 
   return Observable.zip(fetchScrambleSuccess$, triggerAdvanceScramble$)
     .map(actions => {

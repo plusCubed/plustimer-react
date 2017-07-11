@@ -24,14 +24,14 @@ export class ScrambleService {
     );
   }
 
-  getScramble(): Observable<string> {
+  getScramble(scrambler: string): Observable<string> {
     const commandId = this.nextCommandId;
     this.nextCommandId++;
 
     this.worker.postMessage({
       command: 'getRandomScramble',
       commandId: commandId,
-      eventName: '333'
+      eventName: scrambler
     });
 
     return this.requestedScrambles$

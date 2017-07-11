@@ -8,7 +8,9 @@ import {
   SELECT_CATEGORY,
   getConfig,
   getPuzzles,
-  getCurrentPuzzle
+  getCurrentPuzzle,
+  puzzleSelected,
+  categorySelected
 } from '../reducers/solves';
 import { Puzzle, Solve, SolvesService } from '../services/solves-service';
 
@@ -80,14 +82,20 @@ const selectPuzzleEpic = (
     .flatMap((index: number) => {
       const currentConfig = getConfig(store.getState());
       const puzzles = getPuzzles(store.getState());
+      const currentPuzzle = getCurrentPuzzle(store.getState());
       const newPuzzle = puzzles[index];
-      const newConfig = {
-        ...currentConfig,
-        currentPuzzleId: newPuzzle._id,
-        currentCategory: newPuzzle.categories[0]
-      };
-      solvesService.setConfig(newConfig);
-      return Observable.empty();
+
+      if (currentPuzzle !== newPuzzle) {
+        const newConfig = {
+          ...currentConfig,
+          currentPuzzleId: newPuzzle._id,
+          currentCategory: newPuzzle.categories[0]
+        };
+        solvesService.setConfig(newConfig);
+        return Observable.of(puzzleSelected(newPuzzle));
+      } else {
+        return Observable.empty();
+      }
     });
 
   return Observable.merge(selectPuzzle$).let(catchEmitError);
@@ -103,13 +111,20 @@ const selectCategoryEpic = (
     .map(action => action.payload)
     .flatMap((index: number) => {
       const currentConfig = getConfig(store.getState());
-      const puzzle = getCurrentPuzzle(store.getState());
-      const newConfig = {
-        ...currentConfig,
-        currentCategory: puzzle!.categories[index]
-      };
-      solvesService.setConfig(newConfig);
-      return Observable.empty();
+      const puzzle: Puzzle = getCurrentPuzzle(store.getState())!;
+      const currentCategory = currentConfig.currentCategory;
+      const newCategory = puzzle.categories[index];
+
+      if (currentCategory !== newCategory) {
+        const newConfig = {
+          ...currentConfig,
+          currentCategory: newCategory
+        };
+        solvesService.setConfig(newConfig);
+        return Observable.of(categorySelected());
+      } else {
+        return Observable.empty();
+      }
     });
 
   return Observable.merge(selectCategory$).let(catchEmitError);
