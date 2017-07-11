@@ -1,7 +1,5 @@
 import * as React from 'react';
 
-import './Selector.css';
-
 import Button from 'material-ui/Button';
 import Menu, { MenuList, MenuItem } from 'material-ui/Menu';
 import ArrowDropDown from 'material-ui-icons/ArrowDropDown';
@@ -33,6 +31,25 @@ class Selector extends React.Component<Props, State> {
     horizontal: 'center'
   };
 
+  private static selectorStyle = {
+    height: '100%'
+  };
+
+  private static menuStyle = {
+    maxHeight: 'calc(100vh - 96px)'
+  };
+
+  private static buttonStyle = {
+    fontSize: 18,
+    fontWeight: 500,
+    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+    lineHeight: 1,
+    padding: '0 0 0 12px',
+    borderRadius: 0,
+    height: '100%',
+    textTransform: 'none'
+  };
+
   handleClick = (event: Event) => {
     this.setState({ open: true, anchorEl: event.currentTarget });
   };
@@ -47,11 +64,11 @@ class Selector extends React.Component<Props, State> {
   };
 
   render() {
-    // Styles don't override material-ui in development due to head css order
+    // TODO: Properly override material-ui styles
     return (
-      <div className="selector">
+      <div style={Selector.selectorStyle}>
         <Button
-          className="selector-button"
+          style={Selector.buttonStyle}
           onClick={this.handleClick}
           color="inherit"
         >
@@ -60,7 +77,7 @@ class Selector extends React.Component<Props, State> {
         </Button>
 
         <Menu
-          className="selector-menu"
+          style={Selector.menuStyle}
           anchorEl={this.state.anchorEl}
           anchorOrigin={Selector.menuAnchorOrigin}
           transformOrigin={Selector.menuTransformOrigin}

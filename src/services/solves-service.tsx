@@ -216,14 +216,14 @@ export class SolvesService {
       {
         _id: 'puzzle-min×',
         _rev: '',
-        name: 'Megamin×',
+        name: 'Megaminx',
         scrambler: 'min×',
         categories: ['Normal']
       },
       {
         _id: 'puzzle-pyram',
         _rev: '',
-        name: 'Pyramin×',
+        name: 'Pyraminx',
         scrambler: 'pyram',
         categories: ['Normal']
       },
