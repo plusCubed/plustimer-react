@@ -14,7 +14,8 @@ import {
   advanceScramble,
   FETCH_SCRAMBLE_SUCCESS,
   fetchScrambleStart,
-  fetchScrambleSuccess
+  fetchScrambleSuccess,
+  getCurrentScramble
 } from '../reducers/scramble';
 import { Observable } from 'rxjs/Observable';
 import { animationFrame } from 'rxjs/scheduler/animationFrame';
@@ -32,6 +33,7 @@ import 'rxjs/add/operator/startWith';
 import 'rxjs/add/operator/let';
 import { catchEmitError } from './errorHandling';
 import { Action } from '../reducers/index';
+import { getConfig, getCurrentPuzzle } from '../reducers/solves';
 
 // The new mode & which action it corresponds to
 export const transitionTimeMap = {
@@ -94,12 +96,13 @@ export const finishSolveEpic = (
     .filter(action => store.getState().timer.mode === 'ready')
     .flatMap(action => {
       const timerState = store.getState().timer;
+      const config = getConfig(store.getState());
       const solve = new Solve(
-        'puzzle-333',
-        'Normal',
+        config.currentPuzzleId,
+        config.currentCategory,
         timerState.time.elapsed,
         timerState.time.stoppedTimestamp,
-        ''
+        getCurrentScramble(store.getState())
       );
       solvesService.add(solve);
 

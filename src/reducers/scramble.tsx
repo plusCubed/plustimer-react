@@ -1,4 +1,4 @@
-import { Action } from './index';
+import { Action, StoreState } from './index';
 
 export const FETCH_SCRAMBLE_START = 'SCRAMBLE/FETCH_SCRAMBLE_START';
 export const FETCH_SCRAMBLE_SUCCESS = 'SCRAMBLE/FETCH_SCRAMBLE_SUCCESS';
@@ -16,6 +16,9 @@ export const fetchScrambleSuccess = (scramble: string): Action => ({
 export const advanceScramble = (): Action => ({
   type: ADVANCE_SCRAMBLE
 });
+
+export const getCurrentScramble = (state: StoreState) =>
+  state.scramble.currentScramble;
 
 export interface ScrambleStoreState {
   currentScramble: string;
