@@ -80,9 +80,11 @@ const selectPuzzleEpic = (
     .flatMap((index: number) => {
       const currentConfig = getConfig(store.getState());
       const puzzles = getPuzzles(store.getState());
+      const newPuzzle = puzzles[index];
       const newConfig = {
         ...currentConfig,
-        currentPuzzleId: puzzles[index]._id
+        currentPuzzleId: newPuzzle._id,
+        currentCategory: newPuzzle.categories[0]
       };
       solvesService.setConfig(newConfig);
       return Observable.empty();
