@@ -19,7 +19,7 @@
     "material-ui": "^1.0.0-alpha.21",
     "material-ui-icons": "^1.0.0-alpha.19",
     "pouchdb": "^6.2.0",
-    "preact": "^8.1.0",
+    "preact": "^8.2.0",
     "preact-compat": "^3.16.0",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",

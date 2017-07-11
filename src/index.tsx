@@ -7,21 +7,20 @@ import './index.css';
 import App from './App';
 import * as OfflinePluginRuntime from 'offline-plugin/runtime';
 
+import { applyMiddleware, createStore } from 'redux';
+import { Provider } from 'react-redux';
+
+import { createEpicMiddleware } from 'redux-observable';
+import { composeWithDevTools } from 'redux-devtools-extension';
+
 import rootEpic from './epics/index';
 import rootReducer from './reducers/index';
 import { SolvesService } from './services/solves-service';
-
-import { applyMiddleware, createStore } from 'redux';
-import { Provider } from 'react-redux';
-import { createEpicMiddleware } from 'redux-observable';
-
-import { composeWithDevTools } from 'redux-devtools-extension';
 import { ScrambleService } from './services/scramble-service';
+import { AccountService } from './services/account-service';
 
 import 'default-passive-events/default-passive-events';
-
 import 'preact/devtools';
-import { AccountService } from './services/account-service';
 
 const solvesService = new SolvesService();
 const scrambleService = new ScrambleService();
