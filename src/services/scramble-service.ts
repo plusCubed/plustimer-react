@@ -38,6 +38,9 @@ export class ScrambleService {
       .asObservable()
       .filter(e => e.data.commandId === commandId)
       .take(1)
-      .map(e => e.data.scramble.scrambleString);
+      .map(e => {
+        // Replace megaminx scrambles' <br> with newline
+        return e.data.scramble.scrambleString.replace(/<br>/g, '\n');
+      });
   }
 }
