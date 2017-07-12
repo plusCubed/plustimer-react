@@ -11,6 +11,7 @@ const OfflinePlugin = require('offline-plugin');
 const eslintFormatter = require('react-dev-utils/eslintFormatter');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+const ShakePlugin = require('webpack-common-shake').Plugin;
 
 const paths = require('./paths');
 const getClientEnvironment = require('./env');
@@ -349,6 +350,7 @@ module.exports = {
     new webpack.NamedChunksPlugin(),
     new webpack.NamedModulesPlugin(),
     new webpack.optimize.ModuleConcatenationPlugin(),
+    new ShakePlugin(),
     //Web interface for analyzing bundles
     new BundleAnalyzerPlugin()
   ],
