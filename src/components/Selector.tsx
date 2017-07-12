@@ -22,12 +22,12 @@ class Selector extends React.Component<Props, State> {
   };
 
   private static menuAnchorOrigin = {
-    vertical: 'top',
+    vertical: 'center',
     horizontal: 'center'
   };
 
   private static menuTransformOrigin = {
-    vertical: 'top',
+    vertical: 'center',
     horizontal: 'center'
   };
 
@@ -36,7 +36,7 @@ class Selector extends React.Component<Props, State> {
   };
 
   private static menuStyle = {
-    maxHeight: 'calc(100vh - 96px)'
+    maxHeight: 'calc(100vh - 16px)'
   };
 
   private static buttonStyle = {
@@ -85,12 +85,12 @@ class Selector extends React.Component<Props, State> {
           onRequestClose={this.handleRequestClose}
         >
           {this.props.options.map((option, index) =>
-            <SelectorItem
-              option={option}
-              index={index}
-              selectedIndex={this.props.selectedIndex}
-              handleMenuItemClick={this.handleMenuItemClick}
-            />
+            renderSelectorItem({
+              option: option,
+              index: index,
+              selected: index === this.props.selectedIndex,
+              handleMenuItemClick: this.handleMenuItemClick
+            })
           )}
         </Menu>
       </div>
@@ -98,27 +98,21 @@ class Selector extends React.Component<Props, State> {
   }
 }
 
-type SelectorItemProps = {
-  option: string;
-  index: number;
-  selectedIndex: number;
-  handleMenuItemClick: (event: Event, index: number) => void;
-};
-
-const SelectorItem = ({
+const renderSelectorItem = ({
   option,
   index,
-  selectedIndex,
+  selected,
   handleMenuItemClick
-}: SelectorItemProps) => {
+}: {
+  option: string;
+  index: number;
+  selected: boolean;
+  handleMenuItemClick: (event: Event, index: number) => void;
+}) => {
   const handleClick = (e: Event) => handleMenuItemClick(e, index);
 
   return (
-    <MenuItem
-      key={option}
-      selected={index === selectedIndex}
-      onClick={handleClick}
-    >
+    <MenuItem key={option} selected={selected} onClick={handleClick}>
       {option}
     </MenuItem>
   );
