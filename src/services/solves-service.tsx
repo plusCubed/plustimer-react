@@ -6,6 +6,7 @@ import 'rxjs/add/observable/of';
 import 'rxjs/add/observable/fromPromise';
 import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/map';
+import * as format from 'date-fns/format';
 
 export interface Doc {
   readonly _id: string;
@@ -37,7 +38,7 @@ export class Solve implements Doc {
     this.puzzleId = puzzleId;
     this.category = category;
     this.time = time;
-    this.timestamp = timestamp.toJSON();
+    this.timestamp = format(timestamp);
     this.scramble = scramble;
   }
 }
