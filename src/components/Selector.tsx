@@ -15,7 +15,7 @@ interface State {
   readonly open: boolean;
 }
 
-class Selector extends React.Component<Props, State> {
+class Selector extends React.PureComponent<Props, State> {
   state = {
     anchorEl: undefined,
     open: false
