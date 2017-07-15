@@ -13,33 +13,38 @@ export interface Doc {
   readonly _rev: string;
 }
 
+export type Penalty = 0 | 1 | 2;
+
 export class Solve implements Doc {
   readonly _id: string;
   readonly _rev: string;
   readonly type: string;
 
-  readonly puzzleId: string;
+  readonly puzzle: string;
   readonly category: string;
   readonly time: number;
   readonly timestamp: string;
   readonly scramble: string;
+  readonly penalty: Penalty;
 
   constructor(
-    puzzleId: string,
+    puzzle: string,
     category: string,
     time: number,
     timestamp: Date,
-    scramble: string
+    scramble: string,
+    penalty: Penalty
   ) {
-    const puzzleIdClean = puzzleId.replace('puzzle-', '');
+    const puzzleIdClean = puzzle.replace('puzzle-', '');
     this._id = `solve-${puzzleIdClean}-${category}-${timestamp.getTime()}`;
     this._rev = '';
 
-    this.puzzleId = puzzleId;
+    this.puzzle = puzzle;
     this.category = category;
     this.time = time;
     this.timestamp = format(timestamp);
     this.scramble = scramble;
+    this.penalty = penalty;
   }
 }
 
@@ -65,14 +70,14 @@ export class Config implements Doc {
   readonly _id: string;
   readonly _rev: string;
 
-  readonly currentPuzzleId: string;
+  readonly currentPuzzle: string;
   readonly currentCategory: string;
 
   constructor(currentPuzzle: string, currentCategory: string) {
     this._id = 'config';
     this._rev = '';
 
-    this.currentPuzzleId = currentPuzzle;
+    this.currentPuzzle = currentPuzzle;
     this.currentCategory = currentCategory;
   }
 }

@@ -88,7 +88,7 @@ const selectPuzzleEpic = (
       if (currentPuzzle !== newPuzzle) {
         const newConfig = {
           ...currentConfig,
-          currentPuzzleId: newPuzzle._id,
+          currentPuzzle: newPuzzle._id,
           currentCategory: newPuzzle.categories[0]
         };
         solvesService.setConfig(newConfig);

@@ -1,0 +1,17 @@
+.selector {
+  height: 100% !important;
+}
+
+.selector-menu {
+  top: 4px !important;
+  max-height: calc(100vh - 16px) !important;
+}
+
+.selector-button {
+  font-size: 18px !important;
+  line-height: 1 !important;
+  padding: 0 0 0 12px !important;
+  border-radius: 0 !important;
+  height: 100% !important;
+  text-transform: none !important;
+}

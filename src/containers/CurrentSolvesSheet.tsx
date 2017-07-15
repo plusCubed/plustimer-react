@@ -6,6 +6,8 @@ import SolvesSheet, {
   StoreStateProps
 } from '../components/SolvesSheet';
 import { getNewToOldSolves } from '../reducers/solves';
+import { openDialog } from '../reducers/solveDialog';
+import { Solve } from '../services/solves-service';
 
 const mapStateToProps = (state: StoreState): StoreStateProps => {
   return {
@@ -14,7 +16,11 @@ const mapStateToProps = (state: StoreState): StoreStateProps => {
 };
 
 const mapDispatchToProps = (dispatch: Dispatch<Action>): DispatchProps => {
-  return {};
+  return {
+    onCellClicked: (solve: Solve) => {
+      dispatch(openDialog(solve));
+    }
+  };
 };
 
 const CurrentSolvesSheet = connect(mapStateToProps, mapDispatchToProps)(

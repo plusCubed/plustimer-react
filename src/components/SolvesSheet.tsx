@@ -7,22 +7,21 @@ import CaretUp from 'material-ui-icons/KeyboardArrowUp';
 import CaretDown from 'material-ui-icons/KeyboardArrowDown';
 import { Solve } from '../services/solves-service';
 import { formatTime } from '../utils/Util';
-import SolveDialog from './SolveDialog';
 import Button from 'material-ui/Button';
 
 export interface StoreStateProps {
   readonly solves: Solve[];
 }
 
-export interface DispatchProps {}
+export interface DispatchProps {
+  readonly onCellClicked: (solve: Solve) => void;
+}
 
 export interface Props extends StoreStateProps, DispatchProps {}
 
 export interface State {
   readonly isExpanded: boolean;
   readonly isAnimating: boolean;
-  readonly selectedSolve?: Solve;
-  readonly isDialogOpen: boolean;
 }
 
 enum ScrollState {
@@ -37,7 +36,9 @@ const cellButtonStyle = {
   width: '100%',
   borderRadius: 0,
   fontSize: 16,
-  padding: 0
+  padding: 0,
+  fontWeight: 700,
+  color: '#3F51B5'
 };
 
 class SolvesSheet extends React.PureComponent<Props, State> {
@@ -69,8 +70,7 @@ class SolvesSheet extends React.PureComponent<Props, State> {
     super(props);
     this.state = {
       isExpanded: false,
-      isAnimating: false,
-      isDialogOpen: false
+      isAnimating: false
     };
 
     this.solvesSheetRef = (solvesSheet: HTMLElement) =>
@@ -237,16 +237,9 @@ class SolvesSheet extends React.PureComponent<Props, State> {
     this.solvesSheet.style.transform = this.getTransformStyle();
   }
 
-  handleItemClick = (item: Solve) => {
-    this.setState({
-      selectedSolve: item,
-      isDialogOpen: true
-    });
-  };
-
   renderCell = ({ item }: { item: Solve }) => {
     const handleItemClick = () => {
-      this.handleItemClick(item);
+      this.props.onCellClicked(item);
     };
     return (
       <Button
@@ -257,12 +250,6 @@ class SolvesSheet extends React.PureComponent<Props, State> {
         {formatTime(item.time)}
       </Button>
     );
-  };
-
-  handleDialogClose = () => {
-    this.setState({
-      isDialogOpen: false
-    });
   };
 
   render() {
@@ -296,12 +283,6 @@ class SolvesSheet extends React.PureComponent<Props, State> {
             />
           </div>
         </div>
-
-        <SolveDialog
-          open={this.state.isDialogOpen}
-          onRequestClose={this.handleDialogClose}
-          solve={this.state.selectedSolve!}
-        />
       </div>
     );
   }

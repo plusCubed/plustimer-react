@@ -63,9 +63,7 @@ export const getPuzzleNames = createSelector(getPuzzles, puzzles =>
 export const getCategories = createSelector(
   [getPuzzles, getConfig],
   (puzzles: Puzzle[], config: Config) => {
-    const puzzle = puzzles.find(
-      puzzle => puzzle._id === config.currentPuzzleId
-    );
+    const puzzle = puzzles.find(puzzle => puzzle._id === config.currentPuzzle);
     if (puzzle) return puzzle.categories;
     else return [];
   }
@@ -74,13 +72,13 @@ export const getCategories = createSelector(
 export const getCurrentPuzzle = createSelector(
   [getPuzzles, getConfig],
   (puzzles: Puzzle[], config: Config) =>
-    puzzles.find(puzzle => puzzle._id === config.currentPuzzleId)
+    puzzles.find(puzzle => puzzle._id === config.currentPuzzle)
 );
 
 export const getCurrentPuzzleIndex = createSelector(
   [getPuzzles, getConfig],
   (puzzles: Puzzle[], config: Config) =>
-    puzzles.findIndex(puzzle => puzzle._id === config.currentPuzzleId)
+    puzzles.findIndex(puzzle => puzzle._id === config.currentPuzzle)
 );
 
 export const getCurrentCategoryIndex = createSelector(
@@ -99,7 +97,7 @@ export const getCurrentSolves = createSelector(
   (solves, config) =>
     solves.filter(
       solve =>
-        solve.puzzleId === config.currentPuzzleId &&
+        solve.puzzle === config.currentPuzzle &&
         solve.category === config.currentCategory
     )
 );

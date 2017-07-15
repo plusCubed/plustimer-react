@@ -4,6 +4,8 @@ import Button from 'material-ui/Button';
 import Menu, { MenuList, MenuItem } from 'material-ui/Menu';
 import ArrowDropDown from 'material-ui-icons/ArrowDropDown';
 
+import './Selector.css';
+
 export interface Props {
   readonly options: string[];
   readonly handleSelect: (index: number) => void;
@@ -31,25 +33,6 @@ class Selector extends React.PureComponent<Props, State> {
     horizontal: 'center'
   };
 
-  private static selectorStyle = {
-    height: '100%'
-  };
-
-  private static menuStyle = {
-    maxHeight: 'calc(100vh - 16px)'
-  };
-
-  private static buttonStyle = {
-    fontSize: 18,
-    fontWeight: 500,
-    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-    lineHeight: 1,
-    padding: '0 0 0 12px',
-    borderRadius: 0,
-    height: '100%',
-    textTransform: 'none'
-  };
-
   handleClick = (event: Event) => {
     this.setState({ open: true, anchorEl: event.currentTarget });
   };
@@ -64,11 +47,10 @@ class Selector extends React.PureComponent<Props, State> {
   };
 
   render() {
-    // TODO: Properly override material-ui styles
     return (
-      <div style={Selector.selectorStyle}>
+      <div className="selector">
         <Button
-          style={Selector.buttonStyle}
+          className="selector-button"
           onClick={this.handleClick}
           color="inherit"
         >
@@ -77,7 +59,7 @@ class Selector extends React.PureComponent<Props, State> {
         </Button>
 
         <Menu
-          style={Selector.menuStyle}
+          className="selector-menu"
           anchorEl={this.state.anchorEl}
           anchorOrigin={Selector.menuAnchorOrigin}
           transformOrigin={Selector.menuTransformOrigin}

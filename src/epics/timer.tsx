@@ -103,11 +103,12 @@ export const finishSolveEpic = (
       const timerState = store.getState().timer;
       const config = getConfig(store.getState());
       const solve = new Solve(
-        config.currentPuzzleId,
+        config.currentPuzzle,
         config.currentCategory,
         timerState.time.elapsed,
         timerState.time.stoppedTimestamp,
-        getCurrentScramble(store.getState())
+        getCurrentScramble(store.getState()),
+        0
       );
       solvesService.add(solve);
 
