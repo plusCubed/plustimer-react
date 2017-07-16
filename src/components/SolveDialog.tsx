@@ -17,6 +17,7 @@ import './SolveDialog.css';
 
 export interface DispatchProps {
   onRequestClose: () => void;
+  onDeleteClicked: (solve: Solve) => void;
 }
 
 export interface StoreStateProps {
@@ -33,6 +34,11 @@ const DiceIcon = (props: any) =>
 
 export class SolveDialog extends React.PureComponent<Props, {}> {
   handleRequestClose = () => {
+    this.props.onRequestClose();
+  };
+
+  handleDeleteClicked = () => {
+    this.props.onDeleteClicked(this.props.solve!);
     this.props.onRequestClose();
   };
 
@@ -67,7 +73,7 @@ export class SolveDialog extends React.PureComponent<Props, {}> {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={this.handleRequestClose} color="primary">
+          <Button onClick={this.handleDeleteClicked} color="primary">
             <Delete />
           </Button>
           <Button onClick={this.handleRequestClose} color="primary">

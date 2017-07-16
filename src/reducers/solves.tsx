@@ -2,27 +2,35 @@ import { Config, Doc, Puzzle, Solve } from '../services/solves-service';
 import { Action, StoreState } from './index';
 import { createSelector } from 'reselect';
 
-export const FETCH_DOCS_SUCCESS = 'SOLVES/FETCH_SOLVES_SUCCESS';
-export const ADD_UPDATE_DOC = 'SOLVES/ADD_UPDATE_SOLVE';
-export const DELETE_DOC = 'SOLVES/DELETE_SOLVE';
+export const DB_DOCS_FETCHED = 'SOLVES/DB_DOCS_FETCHED';
+export const DB_DOC_ADD_UPDATED = 'SOLVES/DB_DOC_ADD_UPDATED';
+export const DB_DOC_DELETED = 'SOLVES/DB_DOC_DELETED';
+
+export const DELETE_SOLVE = 'SOLVES/DELETE_SOLVE';
+
 export const SELECT_PUZZLE = 'SOLVES/SELECT_PUZZLE';
 export const PUZZLE_SELECTED = 'SOLVES/PUZZLE_SELECTED';
 export const SELECT_CATEGORY = 'SOLVES/SELECT_CATEGORY';
 export const CATEGORY_SELECTED = 'SOLVES/CATEGORY_SELECTED';
 
-export const fetchDocsSuccess = (docs: Doc[]): Action => ({
-  type: FETCH_DOCS_SUCCESS,
+export const dbDocsFetched = (docs: Doc[]): Action => ({
+  type: DB_DOCS_FETCHED,
   payload: docs
 });
 
-export const addUpdateDoc = (doc: Doc): Action => ({
-  type: ADD_UPDATE_DOC,
+export const dbDocAddUpdated = (doc: Doc): Action => ({
+  type: DB_DOC_ADD_UPDATED,
   payload: doc
 });
 
-export const deleteDoc = (id: string): Action => ({
-  type: DELETE_DOC,
+export const dbDocDeleted = (id: string): Action => ({
+  type: DB_DOC_DELETED,
   payload: id
+});
+
+export const deleteSolve = (solve: Solve): Action => ({
+  type: DELETE_SOLVE,
+  payload: solve
 });
 
 export const selectPuzzle = (index: number): Action => ({
@@ -116,9 +124,9 @@ export const getNewToOldSolves = createSelector(getCurrentSolves, solves =>
 
 export const solvesReducer = (state: Doc[] = [], action: Action) => {
   switch (action.type) {
-    case FETCH_DOCS_SUCCESS:
+    case DB_DOCS_FETCHED:
       return action.payload;
-    case ADD_UPDATE_DOC:
+    case DB_DOC_ADD_UPDATED:
       const exists = state.find(solve => solve._id === action.payload._id);
 
       if (exists) {
@@ -132,7 +140,7 @@ export const solvesReducer = (state: Doc[] = [], action: Action) => {
         // ADD
         return [...state, action.payload];
       }
-    case DELETE_DOC:
+    case DB_DOC_DELETED:
       return state.filter(solve => solve._id !== action.payload);
     default:
       return state;

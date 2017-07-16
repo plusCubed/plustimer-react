@@ -37,7 +37,7 @@ import {
   getConfig,
   getCurrentPuzzle,
   PUZZLE_SELECTED,
-  FETCH_DOCS_SUCCESS
+  DB_DOCS_FETCHED
 } from '../reducers/solves';
 
 // The new mode & which action it corresponds to
@@ -122,7 +122,7 @@ export const fetchScrambleEpic = (
   store: any,
   { scrambleService }: { scrambleService: ScrambleService }
 ): Observable<Action> => {
-  const docsFetchedAction$ = action$.ofType(FETCH_DOCS_SUCCESS);
+  const docsFetchedAction$ = action$.ofType(DB_DOCS_FETCHED);
 
   const timerRunningAction$ = action$
     .ofType(UP)

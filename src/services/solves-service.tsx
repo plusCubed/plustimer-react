@@ -111,7 +111,11 @@ export class SolvesService {
 
   //TODO: Call initDB first
   add(solve: Solve) {
-    return this.db.put(solve);
+    this.db.put(solve);
+  }
+
+  remove(solve: Solve) {
+    this.db.remove(solve);
   }
 
   setConfig(config: Config) {

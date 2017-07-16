@@ -1,16 +1,17 @@
 import * as PouchDB from 'pouchdb';
 import { ActionsObservable, combineEpics, Epic } from 'redux-observable';
 import {
-  addUpdateDoc,
-  deleteDoc,
-  fetchDocsSuccess,
+  dbDocAddUpdated,
+  dbDocDeleted,
+  dbDocsFetched,
   SELECT_PUZZLE,
   SELECT_CATEGORY,
   getConfig,
   getPuzzles,
   getCurrentPuzzle,
   puzzleSelected,
-  categorySelected
+  categorySelected,
+  DELETE_SOLVE
 } from '../reducers/solves';
 import { Puzzle, Solve, SolvesService } from '../services/solves-service';
 
@@ -37,7 +38,7 @@ const dbSolvesEpic = (
   const allSolves$ = solvesService
     .getAllDocs()
     .map((solves: Solve[]) => {
-      return fetchDocsSuccess(solves);
+      return dbDocsFetched(solves);
     })
     .let(catchEmitError);
 
@@ -45,9 +46,9 @@ const dbSolvesEpic = (
     .getChanges()
     .map((change: PouchDB.Core.ChangesResponseChange<Solve>) => {
       if (change.doc!._deleted) {
-        return deleteDoc(change.doc!._id);
+        return dbDocDeleted(change.doc!._id);
       } else {
-        return addUpdateDoc(change.doc!);
+        return dbDocAddUpdated(change.doc!);
       }
     });
 
@@ -130,8 +131,25 @@ const selectCategoryEpic = (
   return Observable.merge(selectCategory$).let(catchEmitError);
 };
 
+const deleteSolveEpic = (
+  action$: ActionsObservable<Action>,
+  store: LightStore,
+  { solvesService }: { solvesService: SolvesService }
+): Observable<Action> => {
+  const deleteSolve$ = action$
+    .ofType(DELETE_SOLVE)
+    .map(action => action.payload)
+    .flatMap((solve: Solve) => {
+      solvesService.remove(solve);
+      return Observable.empty();
+    });
+
+  return Observable.merge(deleteSolve$).let(catchEmitError);
+};
+
 export default combineEpics(
   dbSolvesEpic as Epic<Action, {}>,
+  deleteSolveEpic as Epic<Action, {}>,
   startSyncEpic as Epic<Action, {}>,
   selectPuzzleEpic as Epic<Action, {}>,
   selectCategoryEpic as Epic<Action, {}>

@@ -6,6 +6,8 @@ import {
 import { Action, StoreState } from '../reducers/index';
 import { connect, Dispatch } from 'react-redux';
 import { closeDialog } from '../reducers/solveDialog';
+import { deleteSolve } from '../reducers/solves';
+import { Solve } from '../services/solves-service';
 
 const mapStateToProps = (state: StoreState): StoreStateProps => {
   return {
@@ -18,6 +20,9 @@ const mapDispatchToProps = (dispatch: Dispatch<Action>): DispatchProps => {
   return {
     onRequestClose: () => {
       dispatch(closeDialog());
+    },
+    onDeleteClicked: (solve: Solve) => {
+      dispatch(deleteSolve(solve));
     }
   };
 };
