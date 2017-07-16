@@ -20,6 +20,7 @@ import { AccountService } from './services/account-service';
 
 import 'default-passive-events/default-passive-events';
 import 'preact/devtools';
+import * as ReactGA from 'react-ga';
 
 const solvesService = new SolvesService();
 const scrambleService = new ScrambleService();
@@ -55,3 +56,8 @@ OfflinePluginRuntime.install({
     window.location.reload();
   }
 });
+
+if (process.env.NODE_ENV === 'production') {
+  ReactGA.initialize('UA-65643346-2');
+  ReactGA.pageview('/');
+}
