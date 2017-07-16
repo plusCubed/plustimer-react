@@ -52,6 +52,8 @@ export const categorySelected = (): Action => ({
   type: CATEGORY_SELECTED
 });
 
+// SELECTORS
+
 const getDocs = (state: StoreState) => state.docs;
 
 export const getConfig = createSelector(
@@ -120,9 +122,9 @@ export const getNewToOldSolves = createSelector(getCurrentSolves, solves =>
     .reverse()
 );
 
-// ACTION CREATORS
+// REDUCER
 
-export const solvesReducer = (state: Doc[] = [], action: Action) => {
+export const docsReducer = (state: Doc[] = [], action: Action) => {
   switch (action.type) {
     case DB_DOCS_FETCHED:
       return action.payload;

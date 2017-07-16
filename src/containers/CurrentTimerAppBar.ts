@@ -14,7 +14,7 @@ import {
   getPuzzleNames,
   selectCategory,
   selectPuzzle
-} from '../reducers/solves';
+} from '../reducers/docs';
 
 const mapStateToProps = (state: StoreState): StoreStateProps => {
   return {

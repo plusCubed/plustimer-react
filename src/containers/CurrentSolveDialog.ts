@@ -6,7 +6,7 @@ import {
 import { Action, StoreState } from '../reducers/index';
 import { connect, Dispatch } from 'react-redux';
 import { closeDialog } from '../reducers/solveDialog';
-import { deleteSolve } from '../reducers/solves';
+import { deleteSolve } from '../reducers/docs';
 import { Solve } from '../services/solves-service';
 
 const mapStateToProps = (state: StoreState): StoreStateProps => {

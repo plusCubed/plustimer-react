@@ -1,7 +1,7 @@
 import { Action as ReduxAction, combineReducers } from 'redux';
 import { timerReducer, TimerStoreState } from './timer';
 import { Doc, Solve } from '../services/solves-service';
-import { solvesReducer } from './solves';
+import { docsReducer } from './docs';
 import { scrambleReducer, ScrambleStoreState } from './scramble';
 import { accountReducer, AccountStoreState } from './account';
 import { solveDialogReducer, SolveDialogState } from './solveDialog';
@@ -22,7 +22,7 @@ export interface StoreState {
 
 const rootReducer = combineReducers({
   timer: timerReducer,
-  docs: solvesReducer,
+  docs: docsReducer,
   scramble: scrambleReducer,
   account: accountReducer,
   dialog: solveDialogReducer

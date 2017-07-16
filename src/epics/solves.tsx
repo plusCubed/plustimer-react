@@ -12,7 +12,7 @@ import {
   puzzleSelected,
   categorySelected,
   DELETE_SOLVE
-} from '../reducers/solves';
+} from '../reducers/docs';
 import { Puzzle, Solve, SolvesService } from '../services/solves-service';
 
 import { Observable } from 'rxjs/Observable';

@@ -38,7 +38,7 @@ import {
   getCurrentPuzzle,
   PUZZLE_SELECTED,
   DB_DOCS_FETCHED
-} from '../reducers/solves';
+} from '../reducers/docs';
 
 // The new mode & which action it corresponds to
 export const transitionTimeMap = {
