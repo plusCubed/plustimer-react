@@ -19,22 +19,32 @@ class TimerDisplay extends React.PureComponent<Props, {}> {
   private keyPressed: boolean;
 
   componentDidMount(): void {
-    window.addEventListener('keydown', (e: KeyboardEvent) => {
-      if (!this.keyPressed) {
-        this.keyPressed = true;
-        if (e.key === ' ' || this.props.mode === TimerMode.Running) {
-          this.props.onDown();
+    (window as any).addEventListener(
+      'keydown',
+      (e: KeyboardEvent) => {
+        if (!this.keyPressed) {
+          this.keyPressed = true;
+          if (e.key === ' ' || this.props.mode === TimerMode.Running) {
+            e.preventDefault();
+            this.props.onDown();
+          }
         }
-      }
-    });
-    window.addEventListener('keyup', (e: KeyboardEvent) => {
-      if (this.keyPressed) {
-        this.keyPressed = false;
-        if (e.key === ' ' || this.props.mode === TimerMode.Stopped) {
-          this.props.onUp();
+      },
+      { passive: false }
+    );
+    (window as any).addEventListener(
+      'keyup',
+      (e: KeyboardEvent) => {
+        if (this.keyPressed) {
+          this.keyPressed = false;
+          if (e.key === ' ' || this.props.mode === TimerMode.Stopped) {
+            e.preventDefault();
+            this.props.onUp();
+          }
         }
-      }
-    });
+      },
+      { passive: false }
+    );
   }
 
   componentWillUnmount(): void {
