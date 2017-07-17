@@ -8,6 +8,7 @@ import CaretDown from 'material-ui-icons/KeyboardArrowDown';
 import { Solve } from '../services/solves-service';
 import { formatTime } from '../utils/Util';
 import Button from 'material-ui/Button';
+import IconButton from 'material-ui/IconButton';
 
 export interface StoreStateProps {
   readonly solves: Solve[];
@@ -29,17 +30,6 @@ enum ScrollState {
   PANNING,
   SCROLLING
 }
-
-const cellButtonStyle = {
-  height: 48,
-  minWidth: 64,
-  width: '100%',
-  borderRadius: 0,
-  fontSize: 16,
-  padding: 0,
-  fontWeight: 700,
-  color: '#3F51B5'
-};
 
 class SolvesSheet extends React.PureComponent<Props, State> {
   static collapsedY = '100% - 48px - 48px';
@@ -242,11 +232,7 @@ class SolvesSheet extends React.PureComponent<Props, State> {
       this.props.onCellClicked(item);
     };
     return (
-      <Button
-        className="cell"
-        onClick={handleItemClick}
-        style={cellButtonStyle}
-      >
+      <Button className="cell" onClick={handleItemClick}>
         {formatTime(item.time)}
       </Button>
     );
@@ -268,9 +254,9 @@ class SolvesSheet extends React.PureComponent<Props, State> {
         onAnimationEnd={this.handleAnimationEnd}
         style={style}
       >
-        <div className="caret-icon" onClick={this.handleCaretClick}>
+        <IconButton className="caret-icon" onClick={this.handleCaretClick}>
           {this.state.isExpanded ? <CaretDown /> : <CaretUp />}
-        </div>
+        </IconButton>
         <div className="container">
           <div className="solves-background">
             <VirtualizedItemGrid
