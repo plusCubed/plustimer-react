@@ -2,7 +2,8 @@
   margin-top: 72px;
   margin-left: 16px;
   margin-right: 16px;
-  font-size: 2vw;
+  margin-bottom: 16px;
+  height: 25vh;
   font-family: 'Roboto Mono', monospace;
   text-align: center;
   white-space: pre-line;
@@ -10,12 +11,10 @@
 
 @media (max-width: 600px) {
   .scramble {
-    font-size: 5vw;
   }
 }
 
 @media (max-width: 600px) and (orientation: landscape) {
   .scramble {
-    font-size: 3vw;
   }
 }
