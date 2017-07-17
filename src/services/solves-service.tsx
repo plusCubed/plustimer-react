@@ -1,4 +1,4 @@
-import * as PouchDB from 'pouchdb-browser';
+import PouchDB from 'pouchdb-browser';
 import { Observable } from 'rxjs/Observable';
 import { Subscriber } from 'rxjs/Subscriber';
 import { Observer } from 'rxjs/Observer';
@@ -91,7 +91,7 @@ export class SolvesService {
   initDB(): Observable<any> {
     return Observable.create((subscriber: Subscriber<PouchDB.Database>) => {
       if (!this.db) {
-        this.db = new (PouchDB as any)('solves.db');
+        this.db = new PouchDB('solves.db');
         (window as any).PouchDB = PouchDB;
       }
       subscriber.next(this.db);
