@@ -1,0 +1,24 @@
+.stats {
+  width: 100%;
+  height: calc(100% - 96px - 64px);
+  top: 64px;
+  bottom: 96px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  user-select: none;
+  cursor: default;
+  transition: color 0s;
+  position: fixed;
+}
+
+.stats td {
+  border: none;
+  text-align: right;
+  min-width: 72px;
+}
+
+.stats .type {
+  min-width: unset;
+}

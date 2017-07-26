@@ -23,8 +23,6 @@ const mapDispatchToProps = (dispatch: Dispatch<Action>): DispatchProps => {
   };
 };
 
-const CurrentSolvesSheet = connect(mapStateToProps, mapDispatchToProps)(
+export const CurrentSolvesSheet = connect(mapStateToProps, mapDispatchToProps)(
   SolvesSheet
 );
-
-export default CurrentSolvesSheet;

@@ -27,8 +27,6 @@ const mapDispatchToProps = (dispatch: Dispatch<Action>): DispatchProps => {
   };
 };
 
-const CurrentSolveDialog = connect(mapStateToProps, mapDispatchToProps)(
+export const CurrentSolveDialog = connect(mapStateToProps, mapDispatchToProps)(
   SolveDialog
 );
-
-export default CurrentSolveDialog;

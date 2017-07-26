@@ -21,6 +21,4 @@ const mapDispatchToProps = (dispatch: Dispatch<Action>): DispatchProps => {
   };
 };
 
-const CurrentTimer = connect(mapStateToProps, mapDispatchToProps)(Timer);
-
-export default CurrentTimer;
+export const CurrentTimer = connect(mapStateToProps, mapDispatchToProps)(Timer);

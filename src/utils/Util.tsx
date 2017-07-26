@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { NOT_ENOUGH_SOLVES } from '../reducers/docs';
 
 export interface TimeParts {
   secString: string;
@@ -42,10 +43,18 @@ export function timeParts(time: number): TimeParts {
 }
 
 export function formatTime(time: number): string {
-  if (time === null) {
-    return '---';
+  if (time === null || time === NOT_ENOUGH_SOLVES) {
+    return '--';
   }
 
   let parts = timeParts(time);
   return parts.secString + '.' + parts.decimals;
+}
+
+export function mean(arr: number[]): number {
+  let total = 0;
+  for (let i = 0; i < arr.length; i++) {
+    total += arr[i];
+  }
+  return total / arr.length;
 }

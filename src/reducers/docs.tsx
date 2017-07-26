@@ -1,6 +1,7 @@
 import { Config, Doc, Puzzle, Solve } from '../services/solves-service';
 import { Action, StoreState } from './index';
 import { createSelector } from 'reselect';
+import { mean } from '../utils/Util';
 
 export const DB_DOCS_FETCHED = 'SOLVES/DB_DOCS_FETCHED';
 export const DB_DOC_ADD_UPDATED = 'SOLVES/DB_DOC_ADD_UPDATED';
@@ -112,35 +113,76 @@ export const getCurrentSolves = createSelector(
     )
 );
 
-export const getNewToOldSolves = createSelector(getCurrentSolves, solves =>
-  //TODO: Use binary search instead of sorting every time
-  solves
-    .sort((a: Solve, b: Solve) => {
-      return a._id.localeCompare(b._id);
-    })
-    .slice()
-    .reverse()
+export const getNewToOldSolves = createSelector(
+  getCurrentSolves,
+  (solves: Solve[]) => solves.slice().reverse()
 );
+
+export const NOT_ENOUGH_SOLVES = -1;
+
+const getAverageFactory = (count: number) =>
+  createSelector(getCurrentSolves, (solves: Solve[]) => {
+    if (solves.length >= count) {
+      let lastNSolves = solves
+        .slice()
+        .slice(solves.length - count)
+        .map(solve => solve.time);
+      let min = Math.min(...lastNSolves);
+      let max = Math.max(...lastNSolves);
+      return mean(lastNSolves.filter(time => time != min && time != max));
+    } else {
+      return NOT_ENOUGH_SOLVES;
+    }
+  });
+
+const getBestAverageFactory = (count: number) =>
+  createSelector(getCurrentSolves, (solves: Solve[]) => {
+    if (solves.length >= count) {
+      let bestNSolves = solves
+        .slice()
+        .sort((a: Solve, b: Solve) => a.time - b.time)
+        .slice(0, count)
+        .map(solve => solve.time);
+      let min = Math.min(...bestNSolves);
+      let max = Math.max(...bestNSolves);
+      return mean(bestNSolves.filter(time => time != min && time != max));
+    } else {
+      return NOT_ENOUGH_SOLVES;
+    }
+  });
+
+export const getAo5 = getAverageFactory(5);
+export const getAo12 = getAverageFactory(12);
+export const getBestAo5 = getBestAverageFactory(5);
+export const getBestAo12 = getBestAverageFactory(12);
+
+const sortDocs = (docs: Doc[]) => {
+  return docs.sort((a: Doc, b: Doc) => {
+    return a._id.localeCompare(b._id);
+  });
+};
 
 // REDUCER
 
 export const docsReducer = (state: Doc[] = [], action: Action) => {
   switch (action.type) {
     case DB_DOCS_FETCHED:
-      return action.payload;
+      return sortDocs(action.payload);
     case DB_DOC_ADD_UPDATED:
       const exists = state.find(solve => solve._id === action.payload._id);
 
       if (exists) {
         // UPDATE
-        return state.map(solve => {
-          return solve._id === action.payload._id
-            ? { ...solve, ...action.payload }
-            : solve;
-        });
+        return sortDocs(
+          state.map(solve => {
+            return solve._id === action.payload._id
+              ? { ...solve, ...action.payload }
+              : solve;
+          })
+        );
       } else {
         // ADD
-        return [...state, action.payload];
+        return sortDocs([...state, action.payload]);
       }
     case DB_DOC_DELETED:
       return state.filter(solve => solve._id !== action.payload);
