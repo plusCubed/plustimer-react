@@ -19,7 +19,7 @@ import { ScrambleService } from './services/scramble-service';
 import { AccountService } from './services/account-service';
 
 import 'default-passive-events/default-passive-events';
-//import 'preact/devtools';
+import 'preact/devtools';
 import * as ReactGA from 'react-ga';
 
 const solvesService = new SolvesService();
