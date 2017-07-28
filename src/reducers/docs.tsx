@@ -1,6 +1,10 @@
 import { Config, Doc, Puzzle, Solve } from '../services/solves-service';
 import { Action, StoreState } from './index';
-import { createSelector } from 'reselect';
+import {
+  createSelector,
+  createSelectorCreator,
+  defaultMemoize
+} from 'reselect';
 import { mean } from '../utils/Util';
 
 export const DB_DOCS_FETCHED = 'SOLVES/DB_DOCS_FETCHED';
@@ -55,23 +59,39 @@ export const categorySelected = (): Action => ({
 
 // SELECTORS
 
+const createArrayEqualSelector = createSelectorCreator(
+  defaultMemoize,
+  (obj1: any, obj2: any) => {
+    if (!(obj1 instanceof Array && obj2 instanceof Array)) {
+      return obj1 === obj2;
+    } else {
+      return (
+        obj1.length == obj2.length &&
+        obj1.every((element, index) => {
+          return element === obj2[index];
+        })
+      );
+    }
+  }
+);
+
 const getDocs = (state: StoreState) => state.docs;
 
-export const getConfig = createSelector(
+export const getConfig = createArrayEqualSelector(
   getDocs,
   docs => docs.find(doc => doc._id === 'config') as Config
 );
 
-export const getPuzzles = createSelector(
+export const getPuzzles = createArrayEqualSelector(
   getDocs,
   docs => docs.filter(doc => doc._id.startsWith('puzzle')) as Puzzle[]
 );
 
-export const getPuzzleNames = createSelector(getPuzzles, puzzles =>
+export const getPuzzleNames = createArrayEqualSelector(getPuzzles, puzzles =>
   puzzles.map(puzzle => puzzle.name)
 );
 
-export const getCategories = createSelector(
+export const getCategories = createArrayEqualSelector(
   [getPuzzles, getConfig],
   (puzzles: Puzzle[], config: Config) => {
     const puzzle = puzzles.find(puzzle => puzzle._id === config.currentPuzzle);
@@ -80,30 +100,30 @@ export const getCategories = createSelector(
   }
 );
 
-export const getCurrentPuzzle = createSelector(
+export const getCurrentPuzzle = createArrayEqualSelector(
   [getPuzzles, getConfig],
   (puzzles: Puzzle[], config: Config) =>
     puzzles.find(puzzle => puzzle._id === config.currentPuzzle)
 );
 
-export const getCurrentPuzzleIndex = createSelector(
+export const getCurrentPuzzleIndex = createArrayEqualSelector(
   [getPuzzles, getConfig],
   (puzzles: Puzzle[], config: Config) =>
     puzzles.findIndex(puzzle => puzzle._id === config.currentPuzzle)
 );
 
-export const getCurrentCategoryIndex = createSelector(
+export const getCurrentCategoryIndex = createArrayEqualSelector(
   [getCategories, getConfig],
   (categories: string[], config: Config) =>
     categories.findIndex(category => category === config.currentCategory)
 );
 
-const getSolves = createSelector(
+const getSolves = createArrayEqualSelector(
   getDocs,
   docs => docs.filter(doc => doc._id.startsWith('solve')) as Solve[]
 );
 
-export const getCurrentSolves = createSelector(
+export const getCurrentSolves = createArrayEqualSelector(
   [getSolves, getConfig],
   (solves, config) =>
     solves.filter(
@@ -113,7 +133,7 @@ export const getCurrentSolves = createSelector(
     )
 );
 
-export const getNewToOldSolves = createSelector(
+export const getNewToOldSolves = createArrayEqualSelector(
   getCurrentSolves,
   (solves: Solve[]) => solves.slice().reverse()
 );
@@ -121,7 +141,7 @@ export const getNewToOldSolves = createSelector(
 export const NOT_ENOUGH_SOLVES = -1;
 
 const getAverageFactory = (count: number) =>
-  createSelector(getCurrentSolves, (solves: Solve[]) => {
+  createArrayEqualSelector(getCurrentSolves, (solves: Solve[]) => {
     if (solves.length >= count) {
       let lastNSolves = solves
         .slice()
@@ -136,7 +156,7 @@ const getAverageFactory = (count: number) =>
   });
 
 const getBestAverageFactory = (count: number) =>
-  createSelector(getCurrentSolves, (solves: Solve[]) => {
+  createArrayEqualSelector(getCurrentSolves, (solves: Solve[]) => {
     if (solves.length >= count) {
       let bestNSolves = solves
         .slice()
