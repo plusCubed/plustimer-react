@@ -36,15 +36,15 @@ const mapStateToProps = (state: StoreState): StoreStateProps => {
 
 const mapDispatchToProps = (dispatch: Dispatch<Action>): DispatchProps => {
   return {
-    handleLoginClick: () => {
+    onLoginClick: () => {
       dispatch(login());
     },
-    handleAvatarClick: () => {},
-    handlePuzzleSelected: index => {
-      dispatch(selectPuzzle(index));
+    onAvatarClick: () => {},
+    onPuzzleSelected: e => {
+      dispatch(selectPuzzle(e.selectedIndex));
     },
-    handleCategorySelected: index => {
-      dispatch(selectCategory(index));
+    onCategorySelected: e => {
+      dispatch(selectCategory(e.selectedIndex));
     }
   };
 };

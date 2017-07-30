@@ -6,3 +6,11 @@
   width: 24px;
   height: 24px;
 }
+
+.puzzle-select {
+  margin: 0 8px;
+}
+
+.category-select {
+  margin: 0 8px;
+}

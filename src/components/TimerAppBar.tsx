@@ -5,7 +5,11 @@ import './TimerAppBar.css';
 import AppBar from 'material-ui/AppBar';
 import Toolbar from 'material-ui/Toolbar';
 import Button from 'material-ui/Button';
-import Selector from './Selector';
+
+import Select from 'preact-material-components/Select';
+import 'preact-material-components/List/style.css';
+import 'preact-material-components/Menu/style.css';
+import 'preact-material-components/Select/style.css';
 
 export interface StoreStateProps {
   readonly loggedIn: boolean;
@@ -18,10 +22,10 @@ export interface StoreStateProps {
 }
 
 export interface DispatchProps {
-  readonly handleAvatarClick: () => void;
-  readonly handleLoginClick: () => void;
-  readonly handlePuzzleSelected: (index: number) => void;
-  readonly handleCategorySelected: (index: number) => void;
+  readonly onAvatarClick: () => void;
+  readonly onLoginClick: () => void;
+  readonly onPuzzleSelected: (e: any) => void;
+  readonly onCategorySelected: (e: any) => void;
 }
 
 export interface Props extends StoreStateProps, DispatchProps {}
@@ -34,25 +38,37 @@ const TimerAppBar = ({
   categories,
   selectedPuzzle,
   selectedCategory,
-  handleAvatarClick,
-  handleLoginClick,
-  handlePuzzleSelected,
-  handleCategorySelected
+  onAvatarClick,
+  onLoginClick,
+  onPuzzleSelected,
+  onCategorySelected
 }: Props) => {
   return (
     <AppBar>
-      <Toolbar>
-        <Selector
-          options={puzzles}
-          handleSelect={handlePuzzleSelected}
+      <Toolbar className="mdc-theme--dark">
+        <Select
+          className="puzzle-select"
+          onChange={onPuzzleSelected}
           selectedIndex={selectedPuzzle}
-        />
+        >
+          {puzzles.map((option, index) =>
+            <Select.Item key={option}>
+              {option}
+            </Select.Item>
+          )}
+        </Select>
 
-        <Selector
-          options={categories}
-          handleSelect={handleCategorySelected}
+        <Select
+          className="category-select"
+          onChange={onCategorySelected}
           selectedIndex={selectedCategory}
-        />
+        >
+          {categories.map((option, index) =>
+            <Select.Item key={option}>
+              {option}
+            </Select.Item>
+          )}
+        </Select>
 
         <div className="app-bar-spacer" />
 
@@ -61,9 +77,9 @@ const TimerAppBar = ({
               className="app-bar-avatar"
               alt={avatarAltName}
               src={avatarImg}
-              onClick={handleAvatarClick}
+              onClick={onAvatarClick}
             />
-          : <Button color="contrast" onClick={handleLoginClick}>
+          : <Button color="contrast" onClick={onLoginClick}>
               Login
             </Button>}
       </Toolbar>
