@@ -1,5 +1,5 @@
-.app-bar-spacer {
-  flex: 1;
+.app-bar {
+  padding: 0 16px;
 }
 
 .app-bar-avatar {
