@@ -7,7 +7,9 @@ import CaretUp from 'material-ui-icons/KeyboardArrowUp';
 import CaretDown from 'material-ui-icons/KeyboardArrowDown';
 import { Solve } from '../services/solves-service';
 import { formatTime } from '../utils/Util';
-import Button from 'material-ui/Button';
+
+import Button from 'preact-material-components/Button';
+import 'preact-material-components/Button/style.css';
 import IconButton from 'material-ui/IconButton';
 
 export interface StoreStateProps {
@@ -232,7 +234,7 @@ class SolvesSheet extends React.PureComponent<Props, State> {
       this.props.onCellClicked(item);
     };
     return (
-      <Button className="cell" onClick={handleItemClick}>
+      <Button className="cell" ripple={true} onClick={handleItemClick}>
         {formatTime(item.time)}
       </Button>
     );
