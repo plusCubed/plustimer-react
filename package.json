@@ -36,7 +36,6 @@
     "reselect": "^3.0.1",
     "rxjs": "^5.4.2",
     "textfit": "^2.3.1",
-    "typeface-roboto": "0.0.31",
     "uglifyjs-webpack-plugin": "^0.4.6"
   },
   "devDependencies": {

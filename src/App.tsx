@@ -8,8 +8,6 @@ import { CurrentTimerAppBar } from './containers/CurrentTimerAppBar';
 import { CurrentSolveDialog } from './containers/CurrentSolveDialog';
 import { CurrentStatistics } from './containers/CurrentStatistics';
 
-import 'typeface-roboto';
-
 const App = () => {
   return (
     <div className="App">

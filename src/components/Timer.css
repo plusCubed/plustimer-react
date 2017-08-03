@@ -1,6 +1,7 @@
 @font-face {
-  font-family: digital-7-mono;
+  font-family: digital-7-mono, monospace;
   src: url("../assets/digital-7-mono.woff2") format("woff2");
+  font-display: swap;
 }
 
 .timer {
