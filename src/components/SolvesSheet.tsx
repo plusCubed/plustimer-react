@@ -3,14 +3,15 @@ import './SolvesSheet.css';
 import VirtualizedItemGrid from './VirtualizedItemGrid';
 import { ScrollParams } from 'react-virtualized';
 import { animateSpringViaCss } from '../utils/spring';
-import CaretUp from 'material-ui-icons/KeyboardArrowUp';
-import CaretDown from 'material-ui-icons/KeyboardArrowDown';
 import { Solve } from '../services/solves-service';
 import { formatTime } from '../utils/Util';
 
+import IconToggle from 'preact-material-components/IconToggle';
 import Button from 'preact-material-components/Button';
+import 'preact-material-components/IconToggle/style.css';
 import 'preact-material-components/Button/style.css';
-import IconButton from 'material-ui/IconButton';
+
+import { Icon } from './Icon';
 
 export interface StoreStateProps {
   readonly solves: Solve[];
@@ -32,6 +33,16 @@ enum ScrollState {
   PANNING,
   SCROLLING
 }
+
+const CaretDownIcon = (props: any) =>
+  <Icon>
+    <path d="M7.41 7.84L12 12.42l4.59-4.58L18 9.25l-6 6-6-6z" />
+  </Icon>;
+
+const CaretUpIcon = (props: any) =>
+  <Icon>
+    <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z" />
+  </Icon>;
 
 class SolvesSheet extends React.PureComponent<Props, State> {
   static collapsedY = '100% - 48px - 48px';
@@ -256,9 +267,11 @@ class SolvesSheet extends React.PureComponent<Props, State> {
         onAnimationEnd={this.handleAnimationEnd}
         style={style}
       >
-        <IconButton className="caret-icon" onClick={this.handleCaretClick}>
-          {this.state.isExpanded ? <CaretDown /> : <CaretUp />}
-        </IconButton>
+        <div className="caret-icon">
+          <IconToggle onClick={this.handleCaretClick}>
+            {this.state.isExpanded ? <CaretDownIcon /> : <CaretUpIcon />}
+          </IconToggle>
+        </div>
         <div className="container">
           <div className="solves-background">
             <VirtualizedItemGrid
