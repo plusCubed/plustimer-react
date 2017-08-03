@@ -22,7 +22,7 @@ class DialogWrapper extends Dialog {
   }
 
   componentWillUnmount() {
-    this.MDComponent.unlisten('MDCIconToggle:cancel', this._onCancel);
+    this.MDComponent.unlisten('MDCDialog:cancel', this._onCancel);
 
     super.componentWillUnmount();
   }
