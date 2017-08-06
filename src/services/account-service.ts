@@ -21,7 +21,8 @@ export class AccountService {
       socialUrl: AccountService.ENDPOINT + '/auth',
       baseUrl: '/auth',
       storage: 'local',
-      providers: ['wca']
+      providers: ['wca'],
+      checkExpired: true
     };
     superlogin.configure(config);
 
@@ -43,6 +44,7 @@ export class AccountService {
           .replace('http', 'https')
           .replace('127.0.0.1:5984', 'timer-sync.pluscubed.com');
       }
+      superlogin.checkRefresh();
       return session;
     });
   }
