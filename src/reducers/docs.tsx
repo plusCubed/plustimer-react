@@ -114,7 +114,7 @@ export const getCurrentCategoryIndex = createArrayEqualSelector(
 
 const getSolves = (state: StoreState) => state.docs.solves;
 
-export const getCurrentSolves = createArrayEqualSelector(
+export const getCurrentPuzzleSolves = createArrayEqualSelector(
   [getSolves, getConfig],
   (solves, config) =>
     solves.filter(
@@ -124,9 +124,14 @@ export const getCurrentSolves = createArrayEqualSelector(
     )
 );
 
-export const getCurrentReversedSolves = createArrayEqualSelector(
-  getCurrentSolves,
-  (solves: Solve[]) => solves.slice().reverse()
+export const getCurrentSolves = createArrayEqualSelector(
+  getCurrentPuzzleSolves,
+  solves => filterCurrentSolves(solves)
+);
+
+export const getHistorySolves = createArrayEqualSelector(
+  getCurrentPuzzleSolves,
+  solves => filterCurrentSolves(solves, false)
 );
 
 export const NOT_ENOUGH_SOLVES = -1;
@@ -240,10 +245,7 @@ const TIME_BETWEEN_SESSIONS = 900000;
 const getTimestamp = (solve: Solve) => {
   return parse(solve.timestamp).getTime();
 };
-const createSolvesFilter = (current = true) => (
-  solves: Solve[],
-  puzzle: string
-) => {
+const filterCurrentSolves = (solves: Solve[], current = true) => {
   let divPoint = solves.length;
   for (let i = solves.length; i >= 1; i--) {
     let newSolveTimestamp;

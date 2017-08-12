@@ -3,7 +3,7 @@
   height: calc(100% - 64px);
   top: 64px;
   position: fixed;
-  transform: translate3d(0, calc(100% - 48px - 24px), 0);
+  transform: translate3d(0, calc(100% - 48px), 0);
   text-align: center;
 }
 
@@ -37,8 +37,6 @@
 
 .cell {
   height: 48px !important;
-  min-width: 64px !important;
-  width: 100% !important;
   border-radius: 0 !important;
   font-size: 16px !important;
   padding: 0 !important;
