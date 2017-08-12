@@ -3,7 +3,6 @@ import * as React from 'react';
 import DialogWrapper from './DialogWrapper';
 
 import Dialog from 'preact-material-components/Dialog';
-import Button from 'preact-material-components/Button';
 import 'preact-material-components/Button/style.css';
 import 'preact-material-components/Theme/style.css';
 import 'preact-material-components/Dialog/style.css';
@@ -82,13 +81,10 @@ export class SolveDialog extends React.PureComponent<Props, {}> {
           </div>
         </Dialog.Body>
         <Dialog.Footer>
-          <Dialog.FooterButton
-            onClick={this.handleDeleteClicked}
-            ripple={false}
-          >
+          <Dialog.FooterButton onClick={this.handleDeleteClicked}>
             <DeleteIcon />
           </Dialog.FooterButton>
-          <Dialog.FooterButton onClick={this.handleRequestClose} ripple={false}>
+          <Dialog.FooterButton onClick={this.handleRequestClose}>
             OK
           </Dialog.FooterButton>
         </Dialog.Footer>
