@@ -18,7 +18,6 @@ export type Penalty = 0 | 1 | 2;
 export class Solve implements Doc {
   readonly _id: string;
   readonly _rev: string;
-  readonly type: string;
 
   readonly puzzle: string;
   readonly category: string;

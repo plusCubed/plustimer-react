@@ -13,7 +13,13 @@ import {
   categorySelected,
   DELETE_SOLVE
 } from '../reducers/docs';
-import { Puzzle, Solve, SolvesService } from '../services/solves-service';
+import {
+  Config,
+  Doc,
+  Puzzle,
+  Solve,
+  SolvesService
+} from '../services/solves-service';
 
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/merge';
@@ -30,15 +36,15 @@ import { LightStore } from './index';
 
 const dbSolvesEpic = (
   action$: ActionsObservable<Action>,
-  store: any,
+  store: LightStore,
   { solvesService }: { solvesService: SolvesService }
 ): Observable<Action> => {
   // Doesn't actually care about actions. Grabs solves and starts observing updates to database
 
   const allSolves$ = solvesService
     .getAllDocs()
-    .map((solves: Solve[]) => {
-      return dbDocsFetched(solves);
+    .map((docs: Doc[]) => {
+      return dbDocsFetched(docs);
     })
     .let(catchEmitError);
 

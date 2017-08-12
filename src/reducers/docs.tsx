@@ -6,6 +6,8 @@ import {
   defaultMemoize
 } from 'reselect';
 import { mean } from '../utils/Util';
+import { combineReducers } from 'redux';
+import { parse } from 'date-fns';
 
 export const DB_DOCS_FETCHED = 'SOLVES/DB_DOCS_FETCHED';
 export const DB_DOC_ADD_UPDATED = 'SOLVES/DB_DOC_ADD_UPDATED';
@@ -75,17 +77,9 @@ const createArrayEqualSelector = createSelectorCreator(
   }
 );
 
-const getDocs = (state: StoreState) => state.docs;
+export const getConfig = (state: StoreState) => state.docs.config;
 
-export const getConfig = createArrayEqualSelector(
-  getDocs,
-  docs => docs.find(doc => doc._id === 'config') as Config
-);
-
-export const getPuzzles = createArrayEqualSelector(
-  getDocs,
-  docs => docs.filter(doc => doc._id.startsWith('puzzle')) as Puzzle[]
-);
+export const getPuzzles = (state: StoreState) => state.docs.puzzles;
 
 export const getPuzzleNames = createArrayEqualSelector(getPuzzles, puzzles =>
   puzzles.map(puzzle => puzzle.name)
@@ -118,10 +112,7 @@ export const getCurrentCategoryIndex = createArrayEqualSelector(
     categories.findIndex(category => category === config.currentCategory)
 );
 
-const getSolves = createArrayEqualSelector(
-  getDocs,
-  docs => docs.filter(doc => doc._id.startsWith('solve')) as Solve[]
-);
+const getSolves = (state: StoreState) => state.docs.solves;
 
 export const getCurrentSolves = createArrayEqualSelector(
   [getSolves, getConfig],
@@ -133,7 +124,7 @@ export const getCurrentSolves = createArrayEqualSelector(
     )
 );
 
-export const getNewToOldSolves = createArrayEqualSelector(
+export const getCurrentReversedSolves = createArrayEqualSelector(
   getCurrentSolves,
   (solves: Solve[]) => solves.slice().reverse()
 );
@@ -184,29 +175,108 @@ const sortDocs = (docs: Doc[]) => {
 
 // REDUCER
 
-export const docsReducer = (state: Doc[] = [], action: Action) => {
+const docIsType = (doc: Doc, type: string) => {
+  return doc._id.startsWith(type);
+};
+
+const createDocReducer = (type: string, initialDoc: Doc) => (
+  state: Doc = initialDoc,
+  action: Action
+) => {
   switch (action.type) {
     case DB_DOCS_FETCHED:
-      return sortDocs(action.payload);
+      return action.payload.find((doc: Doc) => docIsType(doc, type));
     case DB_DOC_ADD_UPDATED:
-      const exists = state.find(solve => solve._id === action.payload._id);
-
-      if (exists) {
-        // UPDATE
-        return sortDocs(
-          state.map(solve => {
-            return solve._id === action.payload._id
-              ? { ...solve, ...action.payload }
-              : solve;
-          })
-        );
+      if (docIsType(action.payload, type)) {
+        return action.payload;
       } else {
-        // ADD
-        return sortDocs([...state, action.payload]);
+        return state;
       }
-    case DB_DOC_DELETED:
-      return state.filter(solve => solve._id !== action.payload);
     default:
       return state;
   }
 };
+
+const createDocsReducer = (
+  type: string,
+  solvesFilter?: (docs: Doc[], puzzle: string) => Doc[]
+) => (state: Doc[] = [], action: Action) => {
+  let newState = state;
+  switch (action.type) {
+    case DB_DOCS_FETCHED:
+      newState = action.payload.filter((doc: Doc) => docIsType(doc, type));
+      break;
+    case DB_DOC_ADD_UPDATED:
+      if (!docIsType(action.payload, type)) {
+        break;
+      }
+
+      const exists = state.find(solve => solve._id === action.payload._id);
+
+      if (exists) {
+        // UPDATE
+        newState = state.map(solve => {
+          return solve._id === action.payload._id
+            ? { ...solve, ...action.payload }
+            : solve;
+        });
+      } else {
+        // ADD
+        newState = [...state, action.payload];
+      }
+      break;
+    case DB_DOC_DELETED:
+      newState = state.filter(solve => solve._id !== action.payload);
+      break;
+    default:
+      return state;
+  }
+
+  newState = sortDocs(newState);
+  return newState;
+};
+
+const TIME_BETWEEN_SESSIONS = 900000;
+const getTimestamp = (solve: Solve) => {
+  return parse(solve.timestamp).getTime();
+};
+const createSolvesFilter = (current = true) => (
+  solves: Solve[],
+  puzzle: string
+) => {
+  let divPoint = solves.length;
+  for (let i = solves.length; i >= 1; i--) {
+    let newSolveTimestamp;
+    if (i === solves.length) {
+      newSolveTimestamp = Math.floor(Date.now() / 1000);
+    } else {
+      const newSolve = solves[i];
+      newSolveTimestamp = getTimestamp(newSolve);
+    }
+
+    const solve = solves[i - 1];
+    const solveTimstamp = getTimestamp(solve);
+
+    //If the solve is 15 minutes later than the last one, count as new session
+    if (newSolveTimestamp - solveTimstamp > TIME_BETWEEN_SESSIONS) {
+      divPoint = i;
+      break;
+    }
+  }
+
+  return current ? solves.slice(divPoint) : solves.slice(0, divPoint);
+};
+
+export interface DocsStoreState {
+  config: Config;
+  puzzles: Puzzle[];
+  solves: Solve[];
+}
+
+const initialConfig = new Config('', '');
+
+export const docsReducer = combineReducers({
+  config: createDocReducer('config', initialConfig),
+  puzzles: createDocsReducer('puzzle'),
+  solves: createDocsReducer('solve')
+});
