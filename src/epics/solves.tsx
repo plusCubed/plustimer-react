@@ -1,4 +1,4 @@
-import PouchDB from 'pouchdb-browser';
+import PouchDB from 'pouchdb';
 import { ActionsObservable, combineEpics, Epic } from 'redux-observable';
 import {
   dbDocAddUpdated,

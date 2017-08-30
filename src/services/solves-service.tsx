@@ -1,4 +1,4 @@
-import PouchDB from 'pouchdb-browser';
+import PouchDB from 'pouchdb';
 import { Observable } from 'rxjs/Observable';
 import { Subscriber } from 'rxjs/Subscriber';
 import { Observer } from 'rxjs/Observer';

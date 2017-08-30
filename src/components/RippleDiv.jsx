@@ -12,9 +12,7 @@ export default class RippleDiv extends React.Component {
   }
   render() {
     return (
-      <div ref={control => (this.control = control)}>
-        {this.props.children}
-      </div>
+      <div ref={control => (this.control = control)}>{this.props.children}</div>
     );
   }
 }

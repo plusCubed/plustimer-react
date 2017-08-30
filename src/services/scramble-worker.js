@@ -2135,7 +2135,7 @@ scramblers['333'] = (function() {
           m_0 =
             merge[~~(a / 6)][~~(b / 6)] * 4032 +
             a * 12 +
-            b % 6 * 2 +
+            (b % 6) * 2 +
             get8Parity(idx);
           MtoEPerm[m_0] = (count << 4) | s;
           EPermR2S[idx] = (count << 4) | s;
@@ -2283,7 +2283,7 @@ scramblers['333'] = (function() {
     ex =
       merge[~~(obj.e1[obj.length1] / 6)][~~(obj.e2[obj.length1] / 6)] * 4032 +
       obj.e1[obj.length1] * 12 +
-      obj.e2[obj.length1] % 6 * 2 +
+      (obj.e2[obj.length1] % 6) * 2 +
       (((CParity[cornx >>> 3] >>> (cornx & 7)) & 1) ^ parity4[mid]);
     edge = MtoEPerm[ex];
     esym = edge & 15;
@@ -5013,8 +5013,8 @@ scramblers['minx'] = (function() {
               } while (ax === la && axsl[sl] != 0); // loop until have found an unused movetype
             } while (
               ax === la && // loop while move is reducible: reductions only if on same axis as previous moves
-            !mult && // multislice moves have no reductions so always ok
-            tl === size && // only even-sized cubes have reductions (odds have middle layer as reference)
+              !mult && // multislice moves have no reductions so always ok
+              tl === size && // only even-sized cubes have reductions (odds have middle layer as reference)
               (2 * axam[0] === tl || // reduction if already have half the slices move in same direction
                 2 * axam[1] === tl ||
                 2 * axam[2] === tl ||
@@ -6391,17 +6391,17 @@ scramblers['sq1'] = (function() {
   function FullCube_getSquare(obj, sq) {
     var a, b;
     for (a = 0; a < 8; ++a) {
-      obj.prm[a] = ~~(~~FullCube_pieceAt(obj, a * 3 + 1) >> 1 << 24) >> 24;
+      obj.prm[a] = ~~((~~FullCube_pieceAt(obj, a * 3 + 1) >> 1) << 24) >> 24;
     }
     sq.cornperm = get8Perm(obj.prm);
     sq.topEdgeFirst = FullCube_pieceAt(obj, 0) == FullCube_pieceAt(obj, 1);
     a = sq.topEdgeFirst ? 2 : 0;
     for (b = 0; b < 4; a += 3, ++b)
-      obj.prm[b] = ~~(~~FullCube_pieceAt(obj, a) >> 1 << 24) >> 24;
+      obj.prm[b] = ~~((~~FullCube_pieceAt(obj, a) >> 1) << 24) >> 24;
     sq.botEdgeFirst = FullCube_pieceAt(obj, 12) == FullCube_pieceAt(obj, 13);
     a = sq.botEdgeFirst ? 14 : 12;
     for (; b < 8; a += 3, ++b)
-      obj.prm[b] = ~~(~~FullCube_pieceAt(obj, a) >> 1 << 24) >> 24;
+      obj.prm[b] = ~~((~~FullCube_pieceAt(obj, a) >> 1) << 24) >> 24;
     sq.edgeperm = get8Perm(obj.prm);
     sq.ml = obj.ml;
   }
@@ -7827,8 +7827,10 @@ scramblers['skewb'] = (function() {
       e = 0;
       s = 5517840;
       for (u = 0; 4 > u; u++)
-        (f = i[u] << 2), (e *= 6 - u), (e += (s >> f) & 15), (s -=
-          1118480 << f);
+        (f = i[u] << 2),
+          (e *= 6 - u),
+          (e += (s >> f) & 15),
+          (s -= 1118480 << f);
       return e * 12 + p[r][n];
     }
 
