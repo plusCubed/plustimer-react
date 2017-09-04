@@ -1,27 +1,27 @@
 import * as React from 'react';
 import './App.css';
 
-import { CurrentTimer } from './containers/CurrentTimer';
-import { CurrentSolvesSheet } from './containers/CurrentSolvesSheet';
-import { CurrentScramble } from './containers/CurrentScramble';
-import { CurrentTimerAppBar } from './containers/CurrentTimerAppBar';
-import { CurrentSolveDialog } from './containers/CurrentSolveDialog';
-import { CurrentStatistics } from './containers/CurrentStatistics';
+import { TimerContainer } from './containers/TimerContainer';
+import { SolvesSheetContainer } from './containers/SolvesSheetContainer';
+import { ScrambleContainer } from './containers/ScrambleContainer';
+import { TimerAppBarContainer } from './containers/TimerAppBarContainer';
+import { SolveDialogContainer } from './containers/SolveDialogContainer';
+import { StatisticsContainer } from './containers/StatisticsContainer';
 
 const App = () => {
   return (
     <div className="App">
-      <CurrentTimerAppBar />
+      <TimerAppBarContainer />
 
-      <CurrentScramble />
+      <ScrambleContainer />
 
-      <CurrentStatistics />
+      <StatisticsContainer />
 
-      <CurrentTimer />
+      <TimerContainer />
 
-      <CurrentSolvesSheet />
+      <SolvesSheetContainer />
 
-      <CurrentSolveDialog />
+      <SolveDialogContainer />
     </div>
   );
 };

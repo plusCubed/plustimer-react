@@ -52,11 +52,9 @@ const TimerAppBar = ({
             onChange={onPuzzleSelected}
             selectedIndex={selectedPuzzle}
           >
-            {puzzles.map((option, index) =>
-              <Select.Item key={option}>
-                {option}
-              </Select.Item>
-            )}
+            {puzzles.map((option, index) => (
+              <Select.Item key={option}>{option}</Select.Item>
+            ))}
           </Select>
 
           <Select
@@ -64,25 +62,25 @@ const TimerAppBar = ({
             onChange={onCategorySelected}
             selectedIndex={selectedCategory}
           >
-            {categories.map((option, index) =>
-              <Select.Item key={option}>
-                {option}
-              </Select.Item>
-            )}
+            {categories.map((option, index) => (
+              <Select.Item key={option}>{option}</Select.Item>
+            ))}
           </Select>
         </Toolbar.Section>
 
         <Toolbar.Section align-end={true}>
-          {loggedIn
-            ? <img
-                className="app-bar-avatar"
-                alt={avatarAltName}
-                src={avatarImg}
-                onClick={onAvatarClick}
-              />
-            : <Button ripple={true} onClick={onLoginClick}>
-                Login
-              </Button>}
+          {loggedIn ? (
+            <img
+              className="app-bar-avatar"
+              alt={avatarAltName}
+              src={avatarImg}
+              onClick={onAvatarClick}
+            />
+          ) : (
+            <Button ripple={true} onClick={onLoginClick}>
+              Login
+            </Button>
+          )}
         </Toolbar.Section>
       </Toolbar.Row>
     </Toolbar>

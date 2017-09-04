@@ -1,5 +1,4 @@
-import * as React from 'react';
-import { NOT_ENOUGH_SOLVES } from '../reducers/docs';
+import { NOT_ENOUGH_SOLVES } from '../reducers/docsReducer';
 
 export interface TimeParts {
   secString: string;
@@ -34,7 +33,7 @@ export function timeParts(time: number): TimeParts {
     secString = '' + seconds;
   }
 
-  let centiseconds: number = Math.floor(time % 1000 / 10);
+  let centiseconds: number = Math.floor((time % 1000) / 10);
 
   return {
     secString: secString,

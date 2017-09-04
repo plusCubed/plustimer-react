@@ -2,8 +2,8 @@ import * as React from 'react';
 
 import './SolvesSheet.css';
 
-import { Solve } from '../services/solves-service';
-import { formatTime } from '../utils/Util';
+import { Solve } from '../services/solvesService';
+import { formatTime } from '../utils/util';
 import { AutoSizer } from 'react-virtualized/dist/es/AutoSizer';
 import { Grid } from 'react-virtualized/dist/es/Grid';
 
@@ -30,15 +30,17 @@ export interface State {
   readonly isAnimating: boolean;
 }
 
-const CaretDownIcon = (props: any) =>
+const CaretDownIcon = (props: any) => (
   <Icon>
     <path d="M7.41 7.84L12 12.42l4.59-4.58L18 9.25l-6 6-6-6z" />
-  </Icon>;
+  </Icon>
+);
 
-const CaretUpIcon = (props: any) =>
+const CaretUpIcon = (props: any) => (
   <Icon>
     <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z" />
-  </Icon>;
+  </Icon>
+);
 
 class SolvesSheet extends React.PureComponent<Props, State> {
   constructor(props: Props) {
@@ -81,7 +83,7 @@ class SolvesSheet extends React.PureComponent<Props, State> {
         <div className="container">
           <div className="solves-background">
             <AutoSizer>
-              {({ width, height }) =>
+              {({ width, height }) => (
                 <Grid
                   cellRenderer={this.renderCell}
                   scrollToColumn={solves.length - 1}
@@ -91,7 +93,8 @@ class SolvesSheet extends React.PureComponent<Props, State> {
                   rowCount={1}
                   rowHeight={48}
                   width={width}
-                />}
+                />
+              )}
             </AutoSizer>
           </div>
         </div>

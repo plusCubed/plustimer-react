@@ -1,4 +1,4 @@
-import { ProfileSession } from '../services/account-service';
+import { ProfileSession } from '../services/accountService';
 import { Action } from './index';
 
 export const LOGIN = 'ACCOUNT/LOGIN';

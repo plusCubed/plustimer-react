@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { formatTime } from '../utils/Util';
+import { formatTime } from '../utils/util';
 import './Timer.css';
-import { TimerMode } from '../reducers/timerMode';
+import { TimerMode } from '../reducers/timerModeReducer';
 
 export interface StoreStateProps {
   readonly displayTime: number;

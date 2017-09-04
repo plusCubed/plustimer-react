@@ -1,11 +1,11 @@
-import { Config, Doc, Puzzle, Solve } from '../services/solves-service';
+import { Config, Doc, Puzzle, Solve } from '../services/solvesService';
 import { Action, StoreState } from './index';
 import {
   createSelector,
   createSelectorCreator,
   defaultMemoize
 } from 'reselect';
-import { mean } from '../utils/Util';
+import { mean } from '../utils/util';
 import { combineReducers } from 'redux';
 import { parse } from 'date-fns';
 

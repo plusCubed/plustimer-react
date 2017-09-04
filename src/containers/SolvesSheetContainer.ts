@@ -5,9 +5,9 @@ import SolvesSheet, {
   DispatchProps,
   StoreStateProps
 } from '../components/SolvesSheet';
-import { getCurrentSolves } from '../reducers/docs';
-import { openDialog } from '../reducers/solveDialog';
-import { Solve } from '../services/solves-service';
+import { getCurrentSolves } from '../reducers/docsReducer';
+import { openDialog } from '../reducers/solveDialogReducer';
+import { Solve } from '../services/solvesService';
 
 const mapStateToProps = (state: StoreState): StoreStateProps => {
   return {
@@ -23,6 +23,7 @@ const mapDispatchToProps = (dispatch: Dispatch<Action>): DispatchProps => {
   };
 };
 
-export const CurrentSolvesSheet = connect(mapStateToProps, mapDispatchToProps)(
-  SolvesSheet
-);
+export const SolvesSheetContainer = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(SolvesSheet);

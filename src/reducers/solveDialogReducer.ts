@@ -1,4 +1,4 @@
-import { Solve } from '../services/solves-service';
+import { Solve } from '../services/solvesService';
 import { Action } from './index';
 
 export const OPEN_DIALOG = 'SOLVE_DIALOG/OPEN_DIALOG';

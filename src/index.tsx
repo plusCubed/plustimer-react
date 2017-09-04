@@ -14,9 +14,9 @@ import { composeWithDevTools } from 'redux-devtools-extension';
 
 import rootEpic from './epics/index';
 import rootReducer from './reducers/index';
-import { SolvesService } from './services/solves-service';
-import { ScrambleService } from './services/scramble-service';
-import { AccountService } from './services/account-service';
+import { SolvesService } from './services/solvesService';
+import { ScrambleService } from './services/scrambleService';
+import { AccountService } from './services/accountService';
 
 import 'default-passive-events/default-passive-events';
 import 'preact/debug';

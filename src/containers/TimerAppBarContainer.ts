@@ -4,7 +4,7 @@ import TimerAppBar, {
   StoreStateProps
 } from '../components/TimerAppBar';
 import { Action, StoreState } from '../reducers/index';
-import { login } from '../reducers/account';
+import { login } from '../reducers/accountReducer';
 
 import noProfileImg from '../assets/temp_avatar.png';
 import {
@@ -14,7 +14,7 @@ import {
   getPuzzleNames,
   selectCategory,
   selectPuzzle
-} from '../reducers/docs';
+} from '../reducers/docsReducer';
 
 const mapStateToProps = (state: StoreState): StoreStateProps => {
   return {
@@ -49,6 +49,7 @@ const mapDispatchToProps = (dispatch: Dispatch<Action>): DispatchProps => {
   };
 };
 
-export const CurrentTimerAppBar = connect(mapStateToProps, mapDispatchToProps)(
-  TimerAppBar
-);
+export const TimerAppBarContainer = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(TimerAppBar);

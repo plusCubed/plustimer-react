@@ -14,7 +14,9 @@ function roundTo(num: number, decimals: number) {
 }
 
 function id() {
-  return Math.random().toString(16).substring(2, 10);
+  return Math.random()
+    .toString(16)
+    .substring(2, 10);
 }
 
 function dampenedHookeForce(

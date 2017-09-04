@@ -1,7 +1,7 @@
 // TIMER MODE ACTIONS
 import { combineReducers } from 'redux';
-import { timerTimeReducer, TimeStoreState } from './timerTime';
-import { timerModeReducer } from './timerMode';
+import { timerTimeReducer, TimeStoreState } from './timerTimeReducer';
+import { timerModeReducer } from './timerModeReducer';
 
 // TIMER REDUCER
 

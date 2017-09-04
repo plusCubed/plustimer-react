@@ -4,12 +4,13 @@ import 'rxjs/add/observable/merge';
 import 'rxjs/add/observable/empty';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/let';
-import { catchEmitError } from './errorHandling';
-import { AccountService } from '../services/account-service';
-import { LOGIN, loginSuccess } from '../reducers/account';
+import { catchEmitError } from '../utils/errorHandling';
+import { AccountService } from '../services/accountService';
+import { LOGIN, loginSuccess } from '../reducers/accountReducer';
 import { Action } from '../reducers/index';
+import { Dependencies } from './index';
 
-const signInEpic = (
+const signInEpic: Epic<Action, any, Dependencies> = (
   action$: ActionsObservable<Action>,
   store: any,
   { accountService }: { accountService: AccountService }
@@ -25,4 +26,4 @@ const signInEpic = (
   return Observable.merge(loginSuccess$, login$).let(catchEmitError);
 };
 
-export default combineEpics(signInEpic as Epic<Action, {}>);
+export default combineEpics(signInEpic);

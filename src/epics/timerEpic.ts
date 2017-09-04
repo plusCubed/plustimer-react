@@ -1,5 +1,5 @@
 import { ActionsObservable, combineEpics, Epic } from 'redux-observable';
-import { CANCEL, DOWN, UP } from '../reducers/timerMode';
+import { CANCEL, DOWN, UP } from '../reducers/timerModeReducer';
 import {
   resetTimer,
   START_TIMER,
@@ -7,16 +7,17 @@ import {
   STOP_TIMER,
   stopTimer,
   tickTimer
-} from '../reducers/timerTime';
-import { Puzzle, Solve, SolvesService } from '../services/solves-service';
-import { ScrambleService } from '../services/scramble-service';
+} from '../reducers/timerTimeReducer';
+import { Puzzle, Solve, SolvesService } from '../services/solvesService';
+import { ScrambleService } from '../services/scrambleService';
 import {
   advanceScramble,
   FETCH_SCRAMBLE_SUCCESS,
   fetchScrambleStart,
   fetchScrambleSuccess,
   getCurrentScramble
-} from '../reducers/scramble';
+} from '../reducers/scrambleReducer';
+
 import { Observable } from 'rxjs/Observable';
 import { animationFrame } from 'rxjs/scheduler/animationFrame';
 import 'rxjs/add/observable/of';
@@ -30,15 +31,17 @@ import 'rxjs/add/operator/takeUntil';
 import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/startWith';
 import 'rxjs/add/operator/let';
-import { catchEmitError } from './errorHandling';
+
+import { catchEmitError } from '../utils/errorHandling';
 import { Action } from '../reducers/index';
 import {
+  DB_DOCS_FETCHED,
   CATEGORY_SELECTED,
-  getConfig,
   getCurrentPuzzle,
   PUZZLE_SELECTED,
-  DB_DOCS_FETCHED
-} from '../reducers/docs';
+  getConfig
+} from '../reducers/docsReducer';
+import { Dependencies } from './index';
 
 // The new mode & which action it corresponds to
 export const transitionTimeMap = {
@@ -117,7 +120,7 @@ export const finishSolveEpic = (
     .let(catchEmitError);
 };
 
-export const fetchScrambleEpic = (
+export const fetchScrambleEpic: Epic<Action, any, Dependencies> = (
   action$: ActionsObservable<Action>,
   store: any,
   { scrambleService }: { scrambleService: ScrambleService }
@@ -186,7 +189,7 @@ export const advanceScrambleEpic = (
 export default combineEpics(
   modeToTimeEpic,
   timeToTickEpic,
-  finishSolveEpic as Epic<Action, {}>,
-  fetchScrambleEpic as Epic<Action, {}>,
+  finishSolveEpic,
+  fetchScrambleEpic,
   advanceScrambleEpic
 );

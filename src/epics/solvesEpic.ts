@@ -1,25 +1,13 @@
 import PouchDB from 'pouchdb';
 import { ActionsObservable, combineEpics, Epic } from 'redux-observable';
-import {
-  dbDocAddUpdated,
-  dbDocDeleted,
-  dbDocsFetched,
-  SELECT_PUZZLE,
-  SELECT_CATEGORY,
-  getConfig,
-  getPuzzles,
-  getCurrentPuzzle,
-  puzzleSelected,
-  categorySelected,
-  DELETE_SOLVE
-} from '../reducers/docs';
+
 import {
   Config,
   Doc,
   Puzzle,
   Solve,
   SolvesService
-} from '../services/solves-service';
+} from '../services/solvesService';
 
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/merge';
@@ -28,11 +16,27 @@ import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/let';
 
-import { catchEmitError } from './errorHandling';
-import { LOGIN_SUCCESS } from '../reducers/account';
+import { catchEmitError } from '../utils/errorHandling';
+
 import { Session } from '@pluscubed/superlogin-client';
-import { Action } from '../reducers/index';
+
 import { LightStore } from './index';
+
+import { Action } from '../reducers/index';
+import { LOGIN_SUCCESS } from '../reducers/accountReducer';
+import {
+  dbDocAddUpdated,
+  dbDocDeleted,
+  dbDocsFetched,
+  DELETE_SOLVE,
+  getConfig,
+  categorySelected,
+  puzzleSelected,
+  getPuzzles,
+  getCurrentPuzzle,
+  SELECT_CATEGORY,
+  SELECT_PUZZLE
+} from '../reducers/docsReducer';
 
 const dbSolvesEpic = (
   action$: ActionsObservable<Action>,
@@ -154,9 +158,9 @@ const deleteSolveEpic = (
 };
 
 export default combineEpics(
-  dbSolvesEpic as Epic<Action, {}>,
-  deleteSolveEpic as Epic<Action, {}>,
-  startSyncEpic as Epic<Action, {}>,
-  selectPuzzleEpic as Epic<Action, {}>,
-  selectCategoryEpic as Epic<Action, {}>
+  dbSolvesEpic,
+  deleteSolveEpic,
+  startSyncEpic,
+  selectPuzzleEpic,
+  selectCategoryEpic
 );

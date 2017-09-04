@@ -5,9 +5,9 @@ import {
 } from '../components/SolveDialog';
 import { Action, StoreState } from '../reducers/index';
 import { connect, Dispatch } from 'react-redux';
-import { closeDialog } from '../reducers/solveDialog';
-import { deleteSolve } from '../reducers/docs';
-import { Solve } from '../services/solves-service';
+import { closeDialog } from '../reducers/solveDialogReducer';
+import { deleteSolve } from '../reducers/docsReducer';
+import { Solve } from '../services/solvesService';
 
 const mapStateToProps = (state: StoreState): StoreStateProps => {
   return {
@@ -27,6 +27,7 @@ const mapDispatchToProps = (dispatch: Dispatch<Action>): DispatchProps => {
   };
 };
 
-export const CurrentSolveDialog = connect(mapStateToProps, mapDispatchToProps)(
-  SolveDialog
-);
+export const SolveDialogContainer = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(SolveDialog);
