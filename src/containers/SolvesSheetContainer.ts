@@ -5,13 +5,13 @@ import SolvesSheet, {
   DispatchProps,
   StoreStateProps
 } from '../components/SolvesSheet';
-import { getCurrentSolves } from '../reducers/docsReducer';
+import { getCurrentPuzzleSolves } from '../reducers/docsReducer';
 import { openDialog } from '../reducers/solveDialogReducer';
 import { Solve } from '../services/solvesService';
 
 const mapStateToProps = (state: StoreState): StoreStateProps => {
   return {
-    solves: getCurrentSolves(state)
+    solves: getCurrentPuzzleSolves(state)
   };
 };
 
