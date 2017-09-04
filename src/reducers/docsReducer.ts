@@ -9,17 +9,25 @@ import { mean } from '../utils/util';
 import { combineReducers } from 'redux';
 import { parse } from 'date-fns';
 
+// ----------- ACTIONS -----------
+
+// Database
 export const DB_DOCS_FETCHED = 'SOLVES/DB_DOCS_FETCHED';
 export const DB_DOC_ADD_UPDATED = 'SOLVES/DB_DOC_ADD_UPDATED';
 export const DB_DOC_DELETED = 'SOLVES/DB_DOC_DELETED';
 
+// Solves
 export const DELETE_SOLVE = 'SOLVES/DELETE_SOLVE';
 
+// Puzzles
 export const SELECT_PUZZLE = 'SOLVES/SELECT_PUZZLE';
 export const PUZZLE_SELECTED = 'SOLVES/PUZZLE_SELECTED';
 export const SELECT_CATEGORY = 'SOLVES/SELECT_CATEGORY';
 export const CATEGORY_SELECTED = 'SOLVES/CATEGORY_SELECTED';
 
+// ----------- ACTION CREATORS -----------
+
+// Database
 export const dbDocsFetched = (docs: Doc[]): Action => ({
   type: DB_DOCS_FETCHED,
   payload: docs
@@ -35,11 +43,13 @@ export const dbDocDeleted = (id: string): Action => ({
   payload: id
 });
 
+// Solves
 export const deleteSolve = (solve: Solve): Action => ({
   type: DELETE_SOLVE,
   payload: solve
 });
 
+// Puzzles
 export const selectPuzzle = (index: number): Action => ({
   type: SELECT_PUZZLE,
   payload: index
@@ -59,7 +69,7 @@ export const categorySelected = (): Action => ({
   type: CATEGORY_SELECTED
 });
 
-// SELECTORS
+// ----------- SELECTORS -----------
 
 const createArrayEqualSelector = createSelectorCreator(
   defaultMemoize,
@@ -77,8 +87,10 @@ const createArrayEqualSelector = createSelectorCreator(
   }
 );
 
+// Config
 export const getConfig = (state: StoreState) => state.docs.config;
 
+// Puzzles
 export const getPuzzles = (state: StoreState) => state.docs.puzzles;
 
 export const getPuzzleNames = createArrayEqualSelector(getPuzzles, puzzles =>
@@ -112,6 +124,7 @@ export const getCurrentCategoryIndex = createArrayEqualSelector(
     categories.findIndex(category => category === config.currentCategory)
 );
 
+// Solves
 const getSolves = (state: StoreState) => state.docs.solves;
 
 export const getCurrentPuzzleSolves = createArrayEqualSelector(
@@ -133,6 +146,36 @@ export const getHistorySolves = createArrayEqualSelector(
   getCurrentPuzzleSolves,
   solves => filterCurrentSolves(solves, false)
 );
+
+const TIME_BETWEEN_SESSIONS = 900000;
+const getTimestamp = (solve: Solve) => {
+  return parse(solve.timestamp).getTime();
+};
+const filterCurrentSolves = (solves: Solve[], current = true) => {
+  let divPoint = solves.length;
+  for (let i = solves.length; i >= 1; i--) {
+    let newSolveTimestamp;
+    if (i === solves.length) {
+      newSolveTimestamp = Math.floor(Date.now() / 1000);
+    } else {
+      const newSolve = solves[i];
+      newSolveTimestamp = getTimestamp(newSolve);
+    }
+
+    const solve = solves[i - 1];
+    const solveTimstamp = getTimestamp(solve);
+
+    //If the solve is 15 minutes later than the last one, count as new session
+    if (newSolveTimestamp - solveTimstamp > TIME_BETWEEN_SESSIONS) {
+      divPoint = i;
+      break;
+    }
+  }
+
+  return current ? solves.slice(divPoint) : solves.slice(0, divPoint);
+};
+
+// Solve Statistics
 
 export const NOT_ENOUGH_SOLVES = -1;
 
@@ -172,13 +215,14 @@ export const getAo12 = getAverageFactory(12);
 export const getBestAo5 = getBestAverageFactory(5);
 export const getBestAo12 = getBestAverageFactory(12);
 
+// ----------- REDUCER -----------
+
+// Utilities
 const sortDocs = (docs: Doc[]) => {
   return docs.sort((a: Doc, b: Doc) => {
     return a._id.localeCompare(b._id);
   });
 };
-
-// REDUCER
 
 const docIsType = (doc: Doc, type: string) => {
   return doc._id.startsWith(type);
@@ -241,33 +285,7 @@ const createDocsReducer = (
   return newState;
 };
 
-const TIME_BETWEEN_SESSIONS = 900000;
-const getTimestamp = (solve: Solve) => {
-  return parse(solve.timestamp).getTime();
-};
-const filterCurrentSolves = (solves: Solve[], current = true) => {
-  let divPoint = solves.length;
-  for (let i = solves.length; i >= 1; i--) {
-    let newSolveTimestamp;
-    if (i === solves.length) {
-      newSolveTimestamp = Math.floor(Date.now() / 1000);
-    } else {
-      const newSolve = solves[i];
-      newSolveTimestamp = getTimestamp(newSolve);
-    }
-
-    const solve = solves[i - 1];
-    const solveTimstamp = getTimestamp(solve);
-
-    //If the solve is 15 minutes later than the last one, count as new session
-    if (newSolveTimestamp - solveTimstamp > TIME_BETWEEN_SESSIONS) {
-      divPoint = i;
-      break;
-    }
-  }
-
-  return current ? solves.slice(divPoint) : solves.slice(0, divPoint);
-};
+// Reducer
 
 export interface DocsStoreState {
   config: Config;
