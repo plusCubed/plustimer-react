@@ -17,20 +17,32 @@ import {
 } from '../reducers/docsReducer';
 
 const mapStateToProps = (state: StoreState): StoreStateProps => {
+  let avatarAltName = undefined;
+  let avatarImg = undefined;
+
+  const loggedIn = !!state.account.session;
+
+  if (state.account.session) {
+    avatarAltName = state.account.session.profile.displayName;
+
+    if (state.account.session.profile.photos) {
+      avatarImg = state.account.session.profile.photos[0].value;
+    } else {
+      avatarImg = noProfileImg;
+    }
+  } else {
+    avatarImg = undefined;
+    avatarAltName = undefined;
+  }
+
   return {
-    loggedIn: !!state.account.session,
+    loggedIn: loggedIn,
     puzzles: getPuzzleNames(state),
     categories: getCategories(state),
     selectedPuzzle: getCurrentPuzzleIndex(state),
     selectedCategory: getCurrentCategoryIndex(state),
-    avatarAltName: !!state.account.session
-      ? state.account.session.profile.displayName
-      : undefined,
-    avatarImg: !!state.account.session
-      ? state.account.session.profile.photos
-        ? state.account.session.profile.photos[0].value
-        : noProfileImg
-      : undefined
+    avatarAltName: avatarAltName,
+    avatarImg: avatarImg
   };
 };
 
