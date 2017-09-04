@@ -30,8 +30,13 @@
   height: calc(100% - 48px);
 }
 
+.solves-hlist {
+  outline: 0 solid transparent;
+  overflow-y: hidden !important;
+}
+
 .solves-grid {
-  outline: 0px solid transparent;
+  outline: 0 solid transparent;
   overflow-x: hidden;
 }
 

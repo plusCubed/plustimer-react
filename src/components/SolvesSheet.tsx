@@ -85,6 +85,7 @@ class SolvesSheet extends React.PureComponent<Props, State> {
             <AutoSizer>
               {({ width, height }) => (
                 <Grid
+                  className="solves-hlist"
                   cellRenderer={this.renderCell}
                   scrollToColumn={solves.length - 1}
                   columnCount={solves.length}
