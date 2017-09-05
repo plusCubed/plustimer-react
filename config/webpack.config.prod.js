@@ -7,12 +7,15 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const ManifestPlugin = require('webpack-manifest-plugin');
 const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
-const OfflinePlugin = require('offline-plugin');
-/*const SWPrecacheWebpackPlugin = require('sw-precache-webpack-plugin');*/
+const SWPrecacheWebpackPlugin = require('sw-precache-webpack-plugin');
 const eslintFormatter = require('react-dev-utils/eslintFormatter');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
+
+const OfflinePlugin = require('offline-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const ShakePlugin = require('webpack-common-shake').Plugin;
+const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin');
+const PreloadWebpackPlugin = require('preload-webpack-plugin');
 
 const paths = require('./paths');
 const getClientEnvironment = require('./env');
@@ -60,7 +63,15 @@ module.exports = {
   // You can exclude the *.map files from the build during deployment.
   devtool: shouldUseSourceMap ? 'source-map' : false,
   // In production, we only want to load the polyfills and the app code.
-  entry: [require.resolve('./polyfills'), paths.appIndexJs],
+  entry: {
+    main: paths.appIndexJs,
+    vendor: [
+      require.resolve('./polyfills'),
+      'preact',
+      'preact-compat',
+      'pouchdb'
+    ]
+  },
   output: {
     // The build folder.
     path: paths.appBuild,
@@ -92,7 +103,7 @@ module.exports = {
     // https://github.com/facebookincubator/create-react-app/issues/290
     // `web` extension prefixes have been added for better support
     // for React Native Web.
-    extensions: ['.web.js', '.js', '.json', '.web.jsx', '.jsx'],
+    extensions: ['.web.js', '.js', '.json', '.web.jsx', '.jsx', '.ts', '.tsx'],
     alias: {
       // Support React Native Web
       // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
@@ -295,6 +306,7 @@ module.exports = {
     // Note: this won't work without ExtractTextPlugin.extract(..) in `loaders`.
     new ExtractTextPlugin({
       filename: cssFilename,
+      allChunks: true
     }),
     // Generate a manifest file which contains a mapping of all asset filenames
     // to their corresponding output file so that tools can pick it up without
@@ -302,7 +314,7 @@ module.exports = {
     new ManifestPlugin({
       fileName: 'asset-manifest.json',
     }),
-    /*// Generate a service worker script that will precache, and keep up to date,
+    // Generate a service worker script that will precache, and keep up to date,
     // the HTML & assets that are part of the Webpack build.
     new SWPrecacheWebpackPlugin({
       // By default, a cache-busting query parameter is appended to requests
@@ -328,10 +340,10 @@ module.exports = {
       navigateFallback: publicUrl + '/index.html',
       // Ignores URLs starting from /__ (useful for Firebase):
       // https://github.com/facebookincubator/create-react-app/issues/2237#issuecomment-302693219
-      navigateFallbackWhitelist: [/^(?!\/__).*!/],
+      navigateFallbackWhitelist: [/^(?!\/__).*/],
       // Don't precache sourcemaps (they're large) and build asset manifest:
-      staticFileGlobsIgnorePatterns: [/\.map$/, /asset-manifest\.json$/],
-    }),*/
+      staticFileGlobsIgnorePatterns: [/\.map$/, /asset-manifest\.json$/, /appcache/],
+    }),
     // Moment.js is an extremely popular library that bundles large locale files
     // by default due to how Webpack interprets its code. This is a practical
     // solution that requires the user to opt into importing specific locales.
@@ -340,38 +352,39 @@ module.exports = {
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
 
     //CUSTOM------------------------------------------------------------------------------
-
-    // Generate a service worker script that will precache, and keep up to date,
-    // the HTML & assets that are part of the Webpack build.
+    new PreloadWebpackPlugin({
+      rel: 'preload',
+      include: ['runtime', 'vendor', 'main']
+    }),
     new OfflinePlugin({
       excludes: ['**/.*', '**/*.map', 'asset-manifest.json'],
       externals: [
         '/manifest.json',
-        '/icons/android-chrome-192x192.png',
-        '/icons/android-chrome-512x512.png'
+        '/icons/apple-touch-icon.png'
       ],
       AppCache: {
-        FALLBACK: { '/': '/' }
+        FALLBACK: {'/': '/'}
       },
-      ServiceWorker: {
-        output: 'service-worker.js',
-        navigateFallbackURL: '/',
-        events: true
-      }
+      ServiceWorker: false
     }),
+    //Code split with vendor chunk
     //Code split with vendor chunk
     new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor',
-      minChunks: function(module) {
-        // this assumes your vendor imports exist in the node_modules directory
-        return module.context && module.context.indexOf('node_modules') !== -1;
-      }
+      minChunks: Infinity
     }),
     new webpack.optimize.CommonsChunkPlugin({
-      name: 'manifest'
+      async: false,
+      children: true,
+      minChunks: 3
     }),
-    new webpack.NamedChunksPlugin(),
-    new webpack.NamedModulesPlugin(),
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'runtime'
+    }),
+    new ScriptExtHtmlWebpackPlugin({
+      defaultAttribute: 'defer'
+    }),
+    new webpack.HashedModuleIdsPlugin(),
     new webpack.optimize.ModuleConcatenationPlugin(),
     new ShakePlugin(),
     //Web interface for analyzing bundles

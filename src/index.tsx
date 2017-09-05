@@ -21,6 +21,7 @@ import { AccountService } from './services/accountService';
 import 'default-passive-events/default-passive-events';
 import 'preact/debug';
 import * as ReactGA from 'react-ga';
+import registerServiceWorker from './registerServiceWorker';
 
 const solvesService = new SolvesService();
 const scrambleService = new ScrambleService();
@@ -45,17 +46,8 @@ ReactDOM.render(
   document.getElementById('root') as HTMLElement
 );
 
-OfflinePluginRuntime.install({
-  onUpdateReady: () => {
-    console.log('SW Event:', 'onUpdateReady');
-    OfflinePluginRuntime.applyUpdate();
-  },
-  onUpdated: () => {
-    console.log('SW Event:', 'onUpdated');
-    // TODO: Use snackbar for proper updating
-    window.location.reload();
-  }
-});
+registerServiceWorker();
+if (!('serviceWorker' in navigator)) OfflinePluginRuntime.install();
 
 if (process.env.NODE_ENV === 'production') {
   ReactGA.initialize('UA-65643346-2');
