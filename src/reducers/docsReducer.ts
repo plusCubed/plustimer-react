@@ -180,7 +180,7 @@ const filterCurrentSolves = (solves: Solve[], current = true) => {
 export const NOT_ENOUGH_SOLVES = -1;
 
 const getAverageFactory = (count: number) =>
-  createArrayEqualSelector(getCurrentSolves, (solves: Solve[]) => {
+  createArrayEqualSelector(getCurrentPuzzleSolves, (solves: Solve[]) => {
     if (solves.length >= count) {
       let lastNSolves = solves
         .slice()
@@ -195,7 +195,7 @@ const getAverageFactory = (count: number) =>
   });
 
 const getBestAverageFactory = (count: number) =>
-  createArrayEqualSelector(getCurrentSolves, (solves: Solve[]) => {
+  createArrayEqualSelector(getCurrentPuzzleSolves, (solves: Solve[]) => {
     if (solves.length >= count) {
       let bestNSolves = solves
         .slice()
