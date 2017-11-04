@@ -25,10 +25,7 @@ export interface DispatchProps {
 
 export interface Props extends StoreStateProps, DispatchProps {}
 
-export interface State {
-  readonly isExpanded: boolean;
-  readonly isAnimating: boolean;
-}
+export interface State {}
 
 const CaretDownIcon = (props: any) => (
   <Icon>
@@ -45,10 +42,6 @@ const CaretUpIcon = (props: any) => (
 class SolvesSheet extends React.PureComponent<Props, State> {
   constructor(props: Props) {
     super(props);
-    this.state = {
-      isExpanded: false,
-      isAnimating: false
-    };
   }
 
   renderCell = ({ columnIndex, key, style }: GridCellProps) => {
@@ -75,11 +68,6 @@ class SolvesSheet extends React.PureComponent<Props, State> {
 
     return (
       <div className="solves-sheet">
-        {/*<div className="caret-icon">
-          <IconToggle>
-            {this.state.isExpanded ? <CaretDownIcon /> : <CaretUpIcon />}
-          </IconToggle>
-        </div>*/}
         <div className="container">
           <div className="solves-background">
             <AutoSizer>
