@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "devDependencies": {
+    "babel-cli": "^6.26.0",
     "babel-eslint": "^8.0.1",
     "eslint": "^4.10.0",
     "eslint-config-airbnb": "^16.1.0",
@@ -28,10 +29,9 @@
     "serve": "firebase serve",
     "predeploy": "yarn run build",
     "deploy": "firebase deploy",
-    "prebuild": "rimraf \"dist/functions\"",
     "build": "npm run build-app && yarn run build-functions",
     "build-app": "cd \"src/app\" && yarn run build",
-    "build-functions": "babel \"src/functions\" --out-dir \"dist/functions\" --copy-files --ignore \"node_modules\""
+    "build-functions": "rimraf \"dist/functions\" && babel \"src/functions\" --out-dir \"dist/functions\" --copy-files --ignore \"node_modules\" && cd \"dist/functions\" && yarn"
   },
   "workspaces": [
     "src/*"
