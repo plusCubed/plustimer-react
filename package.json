@@ -24,13 +24,13 @@
     ]
   },
   "scripts": {
-    "next": "cd \"src/app\" && yarn run dev",
-    "preserve": "yarn run build",
+    "next": "cd \"src/app\" && yarn dev",
+    "preserve": "yarn build",
     "serve": "firebase serve",
-    "predeploy": "yarn run build",
+    "predeploy": "yarn build",
     "deploy": "firebase deploy",
-    "build": "npm run build-app && yarn run build-functions",
-    "build-app": "cd \"src/app\" && yarn run build",
+    "build": "yarn build-functions && yarn build-app",
+    "build-app": "cd \"src/app\" && yarn build",
     "build-functions": "rimraf \"dist/functions\" && babel \"src/functions\" --out-dir \"dist/functions\" --copy-files --ignore \"node_modules\" && cd \"dist/functions\" && yarn"
   },
   "workspaces": [
