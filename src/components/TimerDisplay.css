@@ -1,0 +1,29 @@
+@font-face {
+  font-family: digital-7-mono;
+  src: url('../assets/digital-7-mono.woff2') format('woff2');
+  font-display: swap;
+}
+
+.timer {
+  font-size: 15vw;
+  font-family: digital-7-mono, monospace;
+  font-feature-settings: 'tnum';
+  user-select: none;
+  cursor: default;
+  transition: color 0s;
+  grid-area: timer;
+  justify-self: center;
+  align-self: center;
+}
+
+.ready {
+  transition: color 0.5s;
+}
+
+.stopped {
+  color: #f44336;
+}
+
+.handOnTimer {
+  color: #4caf50;
+}
