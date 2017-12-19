@@ -3,6 +3,9 @@
 import * as React from 'react';
 
 import TimerDisplay, { TimerMode } from '../components/TimerDisplay';
+import firebase from '../utils/firebase';
+
+import { Penalty } from '../components/SolvesList';
 
 export const TimerModeAction = {
   Down: 'down',
@@ -79,6 +82,25 @@ class TimerDisplayContainer extends React.PureComponent<void, State> {
         this.startTimer();
         break;
       case TimerMode.Stopped:
+        const firestore = firebase.firestore();
+        const ref = firestore
+          .collection('users')
+          .doc('user1')
+          .collection('puzzles')
+          .doc('333')
+          .collection('categories')
+          .doc('normal')
+          .collection('solves');
+        ref
+          .add({
+            time: Math.trunc(performance.now() - this.state.startTime),
+            timestamp: new Date(),
+            scramble: '',
+            penalty: Penalty.NORMAL
+          })
+          .then(docRef => {
+            console.log('Document written with ID: ', docRef.id);
+          });
         this.stopTimer();
         break;
       default:

@@ -1,5 +1,7 @@
 .idea/
 
+build/
+
 # Logs
 logs
 *.log
@@ -64,3 +66,6 @@ typings/
 # lock files
 yarn.lock
 package-lock.json
+
+# API files
+firebaseConfig.js

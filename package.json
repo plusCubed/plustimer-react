@@ -56,6 +56,8 @@
     "prettier": "^1.9.2"
   },
   "dependencies": {
+    "date-fns": "^1.29.0",
+    "firebase": "^4.8.1",
     "preact": "^8.2.1",
     "preact-compat": "^3.17.0",
     "preact-router": "^2.5.5",
