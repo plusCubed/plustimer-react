@@ -4,14 +4,14 @@ import * as React from 'react';
 
 import style from './App.css';
 
-import AppBar from './AppBar';
+import AppBarContainer from '../containers/AppBarContainer';
 import TimerDisplayContainer from '../containers/TimerDisplayContainer';
 import SolvesListContainer from '../containers/SolvesListContainer';
 
 const App = () => {
   return (
     <div className={style.app}>
-      <AppBar />
+      <AppBarContainer />
       <TimerDisplayContainer />
       <SolvesListContainer />
     </div>

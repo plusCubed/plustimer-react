@@ -3,11 +3,16 @@
   "name": "plustimer-pwa",
   "version": "0.0.0",
   "scripts": {
-    "start": "if-env NODE_ENV=production && npm run -s serve || npm run -s dev",
-    "build": "preact build",
-    "build-firebase": "preact build && preact serve --server config",
-    "serve": "preact build && preact serve",
-    "dev": "preact watch",
+    "app:start": "if-env NODE_ENV=production && npm run -s serve || npm run -s dev",
+    "app:build": "preact build",
+    "app:build-config": "preact serve --server config",
+    "app:serve": "yarn build && preact serve",
+    "app:dev": "preact watch",
+    "functions:build": "babel \"functions/*.es7\" --out-dir .",
+    "functions:serve": "yarn functions:build && firebase serve --only functions",
+    "all:build": "yarn app:build && yarn functions:build",
+    "all:serve": "yarn all:build && yarn all:serve-only",
+    "all:serve-only": "firebase serve --only functions,hosting",
     "lint": "eslint src",
     "precommit": "lint-staged"
   },
@@ -23,8 +28,9 @@
       "react/sort-comp": "off",
       "lines-around-comment": "off",
       "react/prefer-stateless-function": "off",
-      "linebreak-style": 0,
-      "react/jsx-filename-extension": 0
+      "linebreak-style": "off",
+      "react/jsx-filename-extension": "off",
+      "object-shorthand": "off"
     }
   },
   "lint-staged": {
@@ -40,6 +46,9 @@
     "single-quote": true
   },
   "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-plugin-async-to-promises": "^1.0.5",
+    "copy-webpack-plugin": "^4.3.0",
     "eslint": "^4.5.0",
     "eslint-config-airbnb": "^16.1.0",
     "eslint-config-prettier": "^2.9.0",
@@ -53,7 +62,8 @@
     "lint-staged": "^6.0.0",
     "preact-cli": "^2.0.0",
     "preact-cli-plugin-flow": "^0.2.0",
-    "prettier": "^1.9.2"
+    "prettier": "^1.9.2",
+    "rimraf": "^2.6.2"
   },
   "dependencies": {
     "date-fns": "^1.29.0",

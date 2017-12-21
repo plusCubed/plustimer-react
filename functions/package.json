@@ -1,0 +1,12 @@
+{
+  "name": "timer-auth",
+  "description": "Timer authentication",
+  "dependencies": {
+    "cookie-parser": "^1.4.3",
+    "firebase-admin": "^5.5.0",
+    "firebase-functions": "^0.7.5",
+    "request": "^2.74.0",
+    "request-promise-native": "^1.0.3",
+    "simple-oauth2": "^1.0.0"
+  }
+}

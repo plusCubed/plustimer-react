@@ -1,0 +1,183 @@
+const functions = require('firebase-functions');
+const cookieParser = require('cookie-parser');
+const crypto = require('crypto');
+const simpleOAuth = require('simple-oauth2');
+const rpn = require('request-promise-native');
+
+const clientCreds = require('./client-credentials.json');
+
+// Firebase Setup
+const admin = require('firebase-admin');
+const serviceAccount = require('./service-account.json');
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: `https://${process.env.GCLOUD_PROJECT}.firebaseio.com`
+});
+
+const DEBUG = true;
+
+const OAUTH_REDIRECT_URI = DEBUG ?
+  `http://localhost:5000/popup.html`:
+  `https://${process.env.GCLOUD_PROJECT}.firebaseapp.com/popup.html`;
+const OAUTH_SCOPES = 'public email';
+
+/**
+ * Creates a configured simple-oauth2 client for WCA
+ */
+function wcaOAuth2Client() {
+  const credentials = {
+    client: {
+      id: clientCreds.id,
+      secret: clientCreds.secret
+    },
+    auth: {
+      tokenHost: 'https://www.worldcubeassociation.org'
+    }
+  };
+  return simpleOAuth.create(credentials);
+}
+
+/**
+ * Redirects the User to the WCA authentication consent screen. Also the 'state' cookie is set for later state
+ * verification.
+ */
+exports.redirect = functions.https.onRequest((req, res) => {
+  const oauth2 = wcaOAuth2Client();
+
+  cookieParser()(req, res, () => {
+    const state = req.cookies.state || crypto.randomBytes(20).toString('hex');
+    console.log('Setting verification state:', state);
+    res.cookie('state', state.toString(), {maxAge: 3600000, secure: !DEBUG, httpOnly: true});
+    const redirectUri = oauth2.authorizationCode.authorizeURL({
+      redirect_uri: OAUTH_REDIRECT_URI,
+      scope: OAUTH_SCOPES,
+      state
+    });
+    console.log('Redirecting to:', redirectUri);
+    res.redirect(redirectUri);
+  });
+});
+
+/**
+ * Creates a Firebase account with the given user profile and returns a custom auth token allowing
+ * signing-in this account.
+ *
+ * @returns {Promise<string>} The Firebase custom auth token in a promise.
+ */
+function createFirebaseAccount(wcaProfile, accessToken) {
+  // The UID we'll assign to the user.
+  const uid = `wca:${wcaProfile.id}`;
+
+  // Save the access token to the Firebase Database.
+  const databaseTask = admin.firestore()
+    .collection('users').doc(uid)
+    .set({
+      wca: wcaProfile
+    }, { merge: true })
+    .catch(error => {
+      throw error;
+    });
+
+  // Create or update the user account.
+  const userCreationTask = admin.auth().updateUser(uid, {
+    email: wcaProfile.email
+  }).catch(error => {
+    // If user does not exists we create it.
+    if (error.code === 'auth/user-not-found') {
+      return admin.auth().createUser({
+        uid: uid,
+        email: wcaProfile.email
+      });
+    }
+    throw error;
+  });
+
+  // Wait for all async task to complete then generate and return a custom auth token.
+  return Promise.all([userCreationTask, databaseTask]).then(() =>
+    // Create a Firebase custom auth token.
+    admin.auth().createCustomToken(uid).then((token) => {
+      console.log('Created Custom token for UID "', uid, '" Token:', token);
+      return token;
+    })
+  );
+}
+
+/**
+ * Exchanges a given WCA auth code passed in the 'code' URL query parameter for a Firebase auth token.
+ * The request also needs to specify a 'state' query parameter which will be checked against the 'state' cookie.
+ * The Firebase custom auth token is sent back in a JSONP callback function with function name defined by the
+ * 'callback' query parameter.
+ */
+exports.token = functions.https.onRequest((req, res) => {
+  const oauth2 = wcaOAuth2Client();
+
+  cookieParser()(req, res, async () => {
+    try {
+      console.log('Received verification state:', req.cookies.state);
+      console.log('Received state:', req.query.state);
+
+      if (!req.cookies.state) {
+        throw new Error('State cookie not set or expired. Maybe you took too long to authorize. Please try again.');
+      } else if (req.cookies.state !== req.query.state) {
+        throw new Error('State validation failed');
+      }
+
+      console.log('Received auth code:', req.query.code);
+
+      const results = await oauth2.authorizationCode.getToken({
+        code: req.query.code,
+        redirect_uri: OAUTH_REDIRECT_URI
+      });
+
+      console.log('Auth code exchange result received:', results);
+
+      // We have an WCA access token now.
+      const accessToken = results.access_token;
+
+      const options = {
+        uri: 'https://www.worldcubeassociation.org/api/v0/me',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
+        },
+        json: true // Automatically parses the JSON string in the response
+      };
+
+      const wcaResponse = await rpn(options);
+
+      console.log('Profile received: ', wcaResponse.me.id);
+
+      /* Example:
+      {
+        class: 'user',
+        url: 'https://www.worldcubeassociation.org/persons/2013CIAO01',
+        id: 5320,
+        wca_id: '2013CIAO01',
+        name: 'Daniel Ciao',
+        gender: 'm',
+        country_iso2: 'US',
+        delegate_status: null,
+        created_at: '2015-09-04T00:59:45.000Z',
+        updated_at: '2017-12-19T20:36:57.000Z',
+        teams: [],
+        avatar:
+         { url: 'https://www.worldcubeassociation.org/assets/missing_avatar_thumb-f0ea801c804765a22892b57636af829edbef25260a65d90aaffbd7873bde74fc.png',
+           thumb_url: 'https://www.worldcubeassociation.org/assets/missing_avatar_thumb-f0ea801c804765a22892b57636af829edbef25260a65d90aaffbd7873bde74fc.png',
+           is_default: true },
+        email: 'pluscubed@gmail.com'
+      }
+      */
+
+      // Create a Firebase account and get the Custom Auth Token.
+      const firebaseToken = await createFirebaseAccount(wcaResponse.me, accessToken);
+
+      // Serve an HTML page that signs the user in and updates the user profile.
+      res.jsonp({token: firebaseToken});
+    } catch (error) {
+      console.error(error);
+      res.jsonp({error: error.toString()});
+    }
+  });
+
+});
+
