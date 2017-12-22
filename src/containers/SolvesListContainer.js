@@ -12,24 +12,35 @@ class SolvesListContainer extends React.PureComponent<void, State> {
   state = {
     solves: []
   };
+  unsubscribe = null;
 
-  componentDidMount() {
-    const firestore = firebase.firestore();
-    const ref = firestore
-      .collection('users')
-      .doc('user1')
-      .collection('puzzles')
-      .doc('333')
-      .collection('categories')
-      .doc('normal')
-      .collection('solves');
-    this.unsubscribe = ref
-      .orderBy('timestamp', 'desc')
-      .onSnapshot(this.onCollectionUpdate);
+  async componentDidMount() {
+    const auth = await firebase.auth();
+
+    auth.onAuthStateChanged(async user => {
+      if (user) {
+        // User is signed in.
+        const firestore = await firebase.firestore();
+        const ref = firestore
+          .collection('users')
+          .doc(user.uid)
+          .collection('puzzles')
+          .doc('333')
+          .collection('categories')
+          .doc('normal')
+          .collection('solves');
+        this.unsubscribe = ref
+          .orderBy('timestamp', 'desc')
+          .onSnapshot(this.onCollectionUpdate);
+      } else {
+      }
+    });
   }
 
   componentWillUnmount() {
-    this.unsubscribe();
+    if (this.unsubscribe) {
+      this.unsubscribe();
+    }
   }
 
   onCollectionUpdate = querySnapshot => {

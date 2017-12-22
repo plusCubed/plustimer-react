@@ -43,15 +43,18 @@
         "headers": [
           {
             "key": "Link",
-            "value": "</bundle.a9040.js>; rel=preload; as=script, </style.920b5.css>; rel=preload; as=style"
+            "value": "</bundle.131b8.js>; rel=preload; as=script, </style.63f36.css>; rel=preload; as=style"
           }
         ]
       }
     ],
-    "ignore": ["firebase.json", "**/ssr-build/**", "push-manifest.json"],
     "public": "build"
   },
   "functions": {
     "source": "functions"
+  },
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
   }
 }

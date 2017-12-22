@@ -1,0 +1,11 @@
+{
+  "presets": ["preact-cli/babel"],
+  "plugins": [
+    "transform-regenerator",
+    ["transform-runtime", {
+      "helpers": false,
+      "polyfill": false,
+      "regenerator": true
+    }]
+  ]
+}

@@ -60,63 +60,79 @@ class TimerDisplayContainer extends React.PureComponent<void, State> {
     this.stopTimer();
   }
 
-  handleDown = () => {
+  handleDown = async () => {
     const currentMode = this.state.mode;
     const newMode = transitionMode(TimerModeAction.Down, currentMode);
-    this.transitionNewMode(currentMode, newMode);
+    await this.transitionNewMode(currentMode, newMode);
   };
 
-  handleUp = () => {
+  handleUp = async () => {
     const currentMode = this.state.mode;
     const newMode = transitionMode(TimerModeAction.Up, currentMode);
-    this.transitionNewMode(currentMode, newMode);
+    await this.transitionNewMode(currentMode, newMode);
   };
 
-  transitionNewMode(oldMode, newMode) {
+  async transitionNewMode(oldMode, newMode) {
     if (oldMode === newMode) {
       return;
     }
 
+    const time = Math.trunc(performance.now());
+    this.setState({ mode: newMode });
+
     switch (newMode) {
-      case TimerMode.Running:
-        this.startTimer();
+      case TimerMode.HandOnTimer:
+        this.resetTimer();
         break;
-      case TimerMode.Stopped:
-        const firestore = firebase.firestore();
-        const ref = firestore
-          .collection('users')
-          .doc('user1')
-          .collection('puzzles')
-          .doc('333')
-          .collection('categories')
-          .doc('normal')
-          .collection('solves');
-        ref
-          .add({
-            time: Math.trunc(performance.now() - this.state.startTime),
+      case TimerMode.Running:
+        this.startTimer(time);
+        break;
+      case TimerMode.Stopped: {
+        this.stopTimer(time);
+
+        const auth = await firebase.auth();
+
+        if (auth.currentUser) {
+          console.log(auth.currentUser);
+
+          const firestore = await firebase.firestore();
+          const ref = firestore
+            .collection('users')
+            .doc(auth.currentUser.uid)
+            .collection('puzzles')
+            .doc('333')
+            .collection('categories')
+            .doc('normal')
+            .collection('solves');
+
+          const docRef = await ref.add({
+            time: Math.trunc(time - this.state.startTime),
             timestamp: new Date(),
             scramble: '',
             penalty: Penalty.NORMAL
-          })
-          .then(docRef => {
-            console.log('Document written with ID: ', docRef.id);
           });
-        this.stopTimer();
+          console.log('Document written with ID: ', docRef.id);
+        }
+
         break;
+      }
       default:
         break;
     }
-
-    this.setState({ mode: newMode });
   }
 
-  startTimer() {
-    this.setState({ startTime: Math.trunc(performance.now()) });
+  resetTimer() {
+    this.setState({ displayTime: 0 });
+  }
+
+  startTimer(time) {
+    this.setState({ startTime: time, displayTime: 0 });
     this.animationFrameId = window.requestAnimationFrame(this.timerLoop);
   }
 
-  stopTimer() {
+  stopTimer(time) {
     window.cancelAnimationFrame(this.animationFrameId);
+    this.setState({ displayTime: time });
   }
 
   timerLoop = () => {

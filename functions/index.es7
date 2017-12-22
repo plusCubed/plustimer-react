@@ -4,8 +4,6 @@ const crypto = require('crypto');
 const simpleOAuth = require('simple-oauth2');
 const rpn = require('request-promise-native');
 
-const clientCreds = require('./client-credentials.json');
-
 // Firebase Setup
 const admin = require('firebase-admin');
 const serviceAccount = require('./service-account.json');
@@ -15,12 +13,16 @@ admin.initializeApp({
   databaseURL: `https://${process.env.GCLOUD_PROJECT}.firebaseio.com`
 });
 
-const DEBUG = true;
+const DEBUG = process.env.FIREBASE_ENV === 'local';
 
-const OAUTH_REDIRECT_URI = DEBUG ?
-  `http://localhost:5000/popup.html`:
-  `https://${process.env.GCLOUD_PROJECT}.firebaseapp.com/popup.html`;
+const OAUTH_REDIRECT_URI = DEBUG
+  ? `http://localhost:5000/popup.html`
+  : `https://timer.pluscubed.com/popup.html`;
 const OAUTH_SCOPES = 'public email';
+
+const wcaOAuth = DEBUG
+  ? require('./wca-oauth-debug.json')
+  : require('./wca-oauth.json');
 
 /**
  * Creates a configured simple-oauth2 client for WCA
@@ -28,8 +30,8 @@ const OAUTH_SCOPES = 'public email';
 function wcaOAuth2Client() {
   const credentials = {
     client: {
-      id: clientCreds.id,
-      secret: clientCreds.secret
+      id: wcaOAuth.id,
+      secret: wcaOAuth.secret
     },
     auth: {
       tokenHost: 'https://www.worldcubeassociation.org'
@@ -48,7 +50,11 @@ exports.redirect = functions.https.onRequest((req, res) => {
   cookieParser()(req, res, () => {
     const state = req.cookies.state || crypto.randomBytes(20).toString('hex');
     console.log('Setting verification state:', state);
-    res.cookie('state', state.toString(), {maxAge: 3600000, secure: !DEBUG, httpOnly: true});
+    res.cookie('state', state.toString(), {
+      maxAge: 3600000,
+      secure: !DEBUG,
+      httpOnly: true
+    });
     const redirectUri = oauth2.authorizationCode.authorizeURL({
       redirect_uri: OAUTH_REDIRECT_URI,
       scope: OAUTH_SCOPES,
@@ -70,36 +76,47 @@ function createFirebaseAccount(wcaProfile, accessToken) {
   const uid = `wca:${wcaProfile.id}`;
 
   // Save the access token to the Firebase Database.
-  const databaseTask = admin.firestore()
-    .collection('users').doc(uid)
-    .set({
-      wca: wcaProfile
-    }, { merge: true })
+  const databaseTask = admin
+    .firestore()
+    .collection('users')
+    .doc(uid)
+    .set(
+      {
+        wca: wcaProfile
+      },
+      { merge: true }
+    )
     .catch(error => {
       throw error;
     });
 
   // Create or update the user account.
-  const userCreationTask = admin.auth().updateUser(uid, {
-    email: wcaProfile.email
-  }).catch(error => {
-    // If user does not exists we create it.
-    if (error.code === 'auth/user-not-found') {
-      return admin.auth().createUser({
-        uid: uid,
-        email: wcaProfile.email
-      });
-    }
-    throw error;
-  });
+  const userCreationTask = admin
+    .auth()
+    .updateUser(uid, {
+      email: wcaProfile.email
+    })
+    .catch(error => {
+      // If user does not exists we create it.
+      if (error.code === 'auth/user-not-found') {
+        return admin.auth().createUser({
+          uid: uid,
+          email: wcaProfile.email
+        });
+      }
+      throw error;
+    });
 
   // Wait for all async task to complete then generate and return a custom auth token.
   return Promise.all([userCreationTask, databaseTask]).then(() =>
     // Create a Firebase custom auth token.
-    admin.auth().createCustomToken(uid).then((token) => {
-      console.log('Created Custom token for UID "', uid, '" Token:', token);
-      return token;
-    })
+    admin
+      .auth()
+      .createCustomToken(uid)
+      .then(token => {
+        console.log(`Created Custom token for UID "${uid}" Token: ${token}`);
+        return token;
+      })
   );
 }
 
@@ -118,7 +135,9 @@ exports.token = functions.https.onRequest((req, res) => {
       console.log('Received state:', req.query.state);
 
       if (!req.cookies.state) {
-        throw new Error('State cookie not set or expired. Maybe you took too long to authorize. Please try again.');
+        throw new Error(
+          'State cookie not set or expired. Maybe you took too long to authorize. Please try again.'
+        );
       } else if (req.cookies.state !== req.query.state) {
         throw new Error('State validation failed');
       }
@@ -138,14 +157,14 @@ exports.token = functions.https.onRequest((req, res) => {
       const options = {
         uri: 'https://www.worldcubeassociation.org/api/v0/me',
         headers: {
-          'Authorization': `Bearer ${accessToken}`
+          Authorization: `Bearer ${accessToken}`
         },
         json: true // Automatically parses the JSON string in the response
       };
 
       const wcaResponse = await rpn(options);
 
-      console.log('Profile received: ', wcaResponse.me.id);
+      console.log('WCA Profile received: ', wcaResponse.me.id);
 
       /* Example:
       {
@@ -169,15 +188,16 @@ exports.token = functions.https.onRequest((req, res) => {
       */
 
       // Create a Firebase account and get the Custom Auth Token.
-      const firebaseToken = await createFirebaseAccount(wcaResponse.me, accessToken);
+      const firebaseToken = await createFirebaseAccount(
+        wcaResponse.me,
+        accessToken
+      );
 
       // Serve an HTML page that signs the user in and updates the user profile.
-      res.jsonp({token: firebaseToken});
+      res.jsonp({ token: firebaseToken });
     } catch (error) {
       console.error(error);
-      res.jsonp({error: error.toString()});
+      res.jsonp({ error: error.toString() });
     }
   });
-
 });
-

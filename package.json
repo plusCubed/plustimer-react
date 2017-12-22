@@ -4,15 +4,16 @@
   "version": "0.0.0",
   "scripts": {
     "app:start": "if-env NODE_ENV=production && npm run -s serve || npm run -s dev",
-    "app:build": "preact build",
-    "app:build-config": "preact serve --server config",
+    "app:build": "preact build && preact serve --server config --dest build",
     "app:serve": "yarn build && preact serve",
     "app:dev": "preact watch",
     "functions:build": "babel \"functions/*.es7\" --out-dir .",
-    "functions:serve": "yarn functions:build && firebase serve --only functions",
+    "functions:serve-local": "cross-env FIREBASE_ENV=local firebase serve --only functions",
+    "functions:deploy": "yarn functions:build && firebase deploy --only functions",
     "all:build": "yarn app:build && yarn functions:build",
-    "all:serve": "yarn all:build && yarn all:serve-only",
-    "all:serve-only": "firebase serve --only functions,hosting",
+    "all:build-local": "cross-env FIREBASE_ENV=local yarn all:build",
+    "all:serve-local": "cross-env FIREBASE_ENV=local firebase serve --only functions,hosting",
+    "all:deploy": "yarn all:build && firebase deploy",
     "lint": "eslint src",
     "precommit": "lint-staged"
   },
@@ -34,7 +35,7 @@
     }
   },
   "lint-staged": {
-    "src/**/*.{js,json,css,md}": [
+    "{src,functions}/**/*.{js,json,css,md,es7}": [
       "prettier --write",
       "git add"
     ]
@@ -48,7 +49,10 @@
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-plugin-async-to-promises": "^1.0.5",
+    "babel-plugin-transform-regenerator": "^6.26.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
     "copy-webpack-plugin": "^4.3.0",
+    "cross-env": "^5.1.2",
     "eslint": "^4.5.0",
     "eslint-config-airbnb": "^16.1.0",
     "eslint-config-prettier": "^2.9.0",
@@ -63,7 +67,8 @@
     "preact-cli": "^2.0.0",
     "preact-cli-plugin-flow": "^0.2.0",
     "prettier": "^1.9.2",
-    "rimraf": "^2.6.2"
+    "rimraf": "^2.6.2",
+    "webpack-bundle-analyzer": "^2.9.1"
   },
   "dependencies": {
     "date-fns": "^1.29.0",
