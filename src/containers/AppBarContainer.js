@@ -5,18 +5,21 @@ import * as React from 'react';
 import AppBar from '../components/AppBar';
 import firebase from '../utils/firebase';
 
-type State = {
+type Props = {
+  uid: string,
   wcaProfile: any
 };
 
-class AppBarContainer extends React.PureComponent<void, State> {
-  state = {
-    wcaProfile: null
-  };
-
-  handleLoginClick = () => {
+class AppBarContainer extends React.PureComponent<Props, void> {
+  handleLoginClick = async () => {
     if (process.env.NODE_ENV === 'production') {
-      window.open('popup.html', '_blank', 'height=585,width=400');
+      const auth = await firebase.auth();
+      const oldIdToken = await auth.currentUser.getIdToken(true);
+      window.open(
+        `popup.html?oldIdToken=${oldIdToken}`,
+        '_blank',
+        'height=585,width=400'
+      );
     } else {
       (async () => {
         const auth = await firebase.auth();
@@ -53,46 +56,27 @@ class AppBarContainer extends React.PureComponent<void, State> {
               email: 'pluscubed@gmail.com'
             }
           });
-      }).then();
+      })().then();
     }
   };
 
-  async componentDidMount() {
+  handleAvatarClick = async () => {
     const auth = await firebase.auth();
-    auth.onAuthStateChanged(async user => {
-      if (user) {
-        // User is signed in.
-        const { uid, email } = user;
-        const firestore = await firebase.firestore();
-        const userDoc = await firestore
-          .collection('users')
-          .doc(uid)
-          .get();
-
-        if (userDoc.exists) {
-          const wcaProfile = userDoc.data().wca;
-          this.setState({
-            wcaProfile: wcaProfile
-          });
-        }
-      } else {
-        // User is signed out.
-        this.setState({
-          wcaProfile: null
-        });
-      }
-    });
-  }
+    await auth.signOut();
+    // Sign in anonymously if not currently signed in
+    await auth.signInAnonymously();
+  };
 
   componentWillUnmount() {}
 
   render() {
     return (
       <AppBar
-        loggedIn={!!this.state.wcaProfile}
+        loggedIn={!!this.props.wcaProfile}
         avatarImg={
-          this.state.wcaProfile ? this.state.wcaProfile.avatar.thumb_url : ''
+          this.props.wcaProfile ? this.props.wcaProfile.avatar.thumb_url : ''
         }
+        onAvatarClick={this.handleAvatarClick}
         onLoginClick={this.handleLoginClick}
       />
     );

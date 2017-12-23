@@ -39,13 +39,17 @@ export const transitionMode = (action: string, timerMode: string): string => {
   return timerMode;
 };
 
+type Props = {
+  uid: string
+};
+
 type State = {
   startTime: number,
   displayTime: number,
   mode: string
 };
 
-class TimerDisplayContainer extends React.PureComponent<void, State> {
+class TimerDisplayContainer extends React.PureComponent<Props, State> {
   state = {
     startTime: -1,
     displayTime: 0,
@@ -87,35 +91,31 @@ class TimerDisplayContainer extends React.PureComponent<void, State> {
       case TimerMode.Running:
         this.startTimer(time);
         break;
-      case TimerMode.Stopped: {
-        this.stopTimer(time);
+      case TimerMode.Stopped:
+        {
+          this.stopTimer(time);
 
-        const auth = await firebase.auth();
+          if (this.props.uid) {
+            const firestore = await firebase.firestore();
+            const ref = firestore
+              .collection('users')
+              .doc(this.props.uid)
+              .collection('puzzles')
+              .doc('333')
+              .collection('categories')
+              .doc('normal')
+              .collection('solves');
 
-        if (auth.currentUser) {
-          console.log(auth.currentUser);
-
-          const firestore = await firebase.firestore();
-          const ref = firestore
-            .collection('users')
-            .doc(auth.currentUser.uid)
-            .collection('puzzles')
-            .doc('333')
-            .collection('categories')
-            .doc('normal')
-            .collection('solves');
-
-          const docRef = await ref.add({
-            time: Math.trunc(time - this.state.startTime),
-            timestamp: new Date(),
-            scramble: '',
-            penalty: Penalty.NORMAL
-          });
-          console.log('Document written with ID: ', docRef.id);
+            const docRef = await ref.add({
+              time: Math.floor(time - this.state.startTime),
+              timestamp: new Date(),
+              scramble: '',
+              penalty: Penalty.NORMAL
+            });
+            console.log('Document written with ID: ', docRef.id);
+          }
         }
-
         break;
-      }
       default:
         break;
     }
@@ -132,12 +132,12 @@ class TimerDisplayContainer extends React.PureComponent<void, State> {
 
   stopTimer(time) {
     window.cancelAnimationFrame(this.animationFrameId);
-    this.setState({ displayTime: time });
+    this.setState({ displayTime: Math.floor(time - this.state.startTime) });
   }
 
   timerLoop = () => {
     this.setState({
-      displayTime: Math.trunc(performance.now() - this.state.startTime)
+      displayTime: Math.floor(performance.now() - this.state.startTime)
     });
     this.animationFrameId = window.requestAnimationFrame(this.timerLoop);
   };

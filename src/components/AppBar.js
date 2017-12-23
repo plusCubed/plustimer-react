@@ -7,7 +7,8 @@ import style from './AppBar.css';
 type Props = {
   loggedIn: boolean,
   avatarImg: string,
-  onLoginClick: () => void
+  onLoginClick: () => void,
+  onAvatarClick: () => void
 };
 
 const AppBar = (props: Props) => {
@@ -19,6 +20,7 @@ const AppBar = (props: Props) => {
           className={style.toolbarAvatar}
           alt="User Avatar"
           src={props.avatarImg}
+          onClick={props.onAvatarClick}
         />
       ) : (
         <button className={style.toolbarButton} onClick={props.onLoginClick}>

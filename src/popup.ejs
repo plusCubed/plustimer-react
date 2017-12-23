@@ -53,11 +53,16 @@ Please wait...
   var code = getURLParameter('code');
   var state = getURLParameter('state');
   var error = getURLParameter('error');
+  var oldIdToken = getURLParameter('oldIdToken');
   if (error) {
     document.body.innerText = 'Error from the WCA auth page: ' + error;
   } else if(!code) {
     // Start the auth flow.
-    window.location.href  = functionsUrl + '/redirect';
+    var url = functionsUrl + '/redirect';
+    if(!oldIdToken){
+      url = url + '?oldIdToken=' + oldIdToken;
+    }
+    window.location.href  = url;
   } else {
     // Use JSONP to load the 'token' Firebase Function to exchange the auth code against a Firebase custom token.
     var script = document.createElement('script');

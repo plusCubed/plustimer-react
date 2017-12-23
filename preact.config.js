@@ -24,6 +24,23 @@ export default function (config, env, helpers) {
     })
   );
 
+  const { rule } = helpers.getLoadersByName(config, 'babel-loader')[0];
+  const babelConfig = rule.options;
+
+  // Remove stage-1 preset
+  babelConfig.presets.splice(1,1);
+  // Replace stage-1 with plugins
+  babelConfig.plugins.push(
+    require.resolve('babel-plugin-syntax-dynamic-import'),
+    require.resolve('babel-plugin-transform-class-properties'),
+    require.resolve('babel-plugin-transform-export-extensions'),
+    require.resolve('babel-plugin-transform-object-rest-spread'),
+    ['fast-async', {"spec":true}]
+  );
+
+  babelConfig.presets[0][1].exclude.push("transform-async-to-generator");
+
+
   if(!env.ssr && env.production){
     config.plugins.push(
       new BundleAnalyzerPlugin({

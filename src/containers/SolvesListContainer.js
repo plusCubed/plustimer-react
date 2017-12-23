@@ -4,6 +4,10 @@ import * as React from 'react';
 import SolvesList, { Solve } from '../components/SolvesList';
 import firebase from '../utils/firebase';
 
+type Props = {
+  uid: string
+};
+
 type State = {
   solves: Solve[]
 };
@@ -14,16 +18,14 @@ class SolvesListContainer extends React.PureComponent<void, State> {
   };
   unsubscribe = null;
 
-  async componentDidMount() {
-    const auth = await firebase.auth();
-
-    auth.onAuthStateChanged(async user => {
-      if (user) {
+  async componentDidUpdate(prevProps, prevState) {
+    if (this.props.uid !== prevProps.uid) {
+      if (this.props.uid) {
         // User is signed in.
         const firestore = await firebase.firestore();
         const ref = firestore
           .collection('users')
-          .doc(user.uid)
+          .doc(this.props.uid)
           .collection('puzzles')
           .doc('333')
           .collection('categories')
@@ -33,9 +35,19 @@ class SolvesListContainer extends React.PureComponent<void, State> {
           .orderBy('timestamp', 'desc')
           .onSnapshot(this.onCollectionUpdate);
       } else {
+        if (this.unsubscribe) {
+          this.unsubscribe();
+        }
+
+        // eslint-disable-next-line react/no-did-update-set-state
+        this.setState({
+          solves: []
+        });
       }
-    });
+    }
   }
+
+  async componentDidMount() {}
 
   componentWillUnmount() {
     if (this.unsubscribe) {
