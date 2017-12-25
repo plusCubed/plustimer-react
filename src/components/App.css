@@ -8,7 +8,7 @@
     'solves timer';
 }
 
-@media (max-width: 599px) {
+@media (max-width: 840px) {
   .app {
     grid-template-columns: 1fr;
     grid-template-rows: auto 1fr auto;

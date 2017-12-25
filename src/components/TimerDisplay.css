@@ -29,6 +29,18 @@
   transition: color 0s;
 }
 
+@media (max-width: 599px) {
+  .timerText {
+    font-size: 25vw;
+  }
+}
+
+@media (max-width: 599px) and (orientation: landscape) {
+  .timerText {
+    font-size: 20vh;
+  }
+}
+
 .ready {
   transition: color 0.5s;
 }
