@@ -52,12 +52,10 @@ class TimerDisplay extends React.PureComponent<Props, void> {
     const { onDown, onUp, displayTime, mode } = this.props;
 
     return (
-      <div
-        className={`${style.timer} ${style[mode]}`}
-        onTouchStart={onDown}
-        onTouchEnd={onUp}
-      >
-        {formatTime(displayTime)}
+      <div className={style.timer} onTouchStart={onDown} onTouchEnd={onUp}>
+        <div className={`${style.timerText} ${style[mode]}`}>
+          {formatTime(displayTime)}
+        </div>
       </div>
     );
   }
