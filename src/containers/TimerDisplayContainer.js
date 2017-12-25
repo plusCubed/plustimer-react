@@ -97,22 +97,34 @@ class TimerDisplayContainer extends React.PureComponent<Props, State> {
 
           if (this.props.uid) {
             const firestore = await firebase.firestore();
-            const ref = firestore
+
+            const puzzleRef = firestore
               .collection('users')
               .doc(this.props.uid)
               .collection('puzzles')
-              .doc('333')
+              .doc('333');
+            const categoryRef = puzzleRef
               .collection('categories')
-              .doc('normal')
-              .collection('solves');
+              .doc('normal');
+            const solvesRef = categoryRef.collection('solves');
 
-            const docRef = await ref.add({
+            const docRef = await solvesRef.add({
               time: Math.floor(time - this.state.startTime),
               timestamp: new Date(),
               scramble: '',
               penalty: Penalty.NORMAL
             });
             console.log('Document written with ID: ', docRef.id);
+
+            const puzzleDoc = await puzzleRef.get();
+            if (!puzzleDoc.exists) {
+              await puzzleDoc.ref.set({ name: '3×3×3' }, { merge: true });
+            }
+
+            const categoryDoc = await categoryRef.get();
+            if (!categoryDoc.exists) {
+              await categoryDoc.ref.set({ name: 'Normal' }, { merge: true });
+            }
           }
         }
         break;

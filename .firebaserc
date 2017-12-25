@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "project-7421630029255993947"
+    "default": "project-7421630029255993947",
+    "staging": "plustimer-staging"
   }
 }

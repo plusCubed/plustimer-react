@@ -27,6 +27,8 @@ export default function (config, env, helpers) {
   const { rule } = helpers.getLoadersByName(config, 'babel-loader')[0];
   const babelConfig = rule.options;
 
+  rule.exclude = [/node_modules/];
+
   // Remove stage-1 preset
   babelConfig.presets.splice(1,1);
   // Replace stage-1 with plugins

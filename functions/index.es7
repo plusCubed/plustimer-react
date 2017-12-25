@@ -1,3 +1,6 @@
+import { backupDocument, restoreDocument } from './firestore-backup';
+import { deleteDocumentRecursive } from './firestore-utils';
+
 const functions = require('firebase-functions');
 const cookieParser = require('cookie-parser');
 const crypto = require('crypto');
@@ -59,10 +62,12 @@ exports.redirect = functions.https.onRequest((req, res) => {
   const oauth2 = wcaOAuth2Client();
 
   cookieParser()(req, res, () => {
-    let state = req.cookies.state || crypto.randomBytes(20).toString('hex');
+    let state = crypto.randomBytes(20).toString('hex');
 
-    if (req.query.oldIdToken) {
-      state = `${req.query.oldIdToken}|${state}`;
+    const oldIdToken = req.query.oldIdToken;
+    if (oldIdToken) {
+      console.log('Old ID token saved to state', oldIdToken);
+      state = `${oldIdToken}|${state}`;
     }
 
     console.log('Setting verification state:', state);
@@ -74,7 +79,7 @@ exports.redirect = functions.https.onRequest((req, res) => {
     const redirectUri = oauth2.authorizationCode.authorizeURL({
       redirect_uri: OAUTH_REDIRECT_URI,
       scope: OAUTH_SCOPES,
-      state
+      state: encodeURI(state)
     });
     console.log('Redirecting to:', redirectUri);
     res.redirect(redirectUri);
@@ -82,50 +87,74 @@ exports.redirect = functions.https.onRequest((req, res) => {
 });
 
 /**
- * Creates a Firebase account with the given user profile and returns a custom auth token allowing
- * signing-in this account.
+ * Creates a Firebase account with the given user profile and returns a custom
+ * auth token allowing signing-in this account.
  *
  * @returns {Promise<string>} The Firebase custom auth token in a promise.
  */
 async function createFirebaseAccount(wcaProfile, accessToken, idToken) {
   // The UID we'll assign to the user.
-  const uid = `wca:${wcaProfile.id}`;
-  let firestoreUid = uid;
+  const wcaUid = `wca:${wcaProfile.id}`;
 
   if (idToken) {
+    console.log('Old ID token found in state', idToken);
+
     const decodedToken = await admin.auth().verifyIdToken(idToken);
     const anonUid = decodedToken.uid;
-    firestoreUid = anonUid;
+
+    const anonUserDocRef = await admin
+      .firestore()
+      .collection('users')
+      .doc(anonUid);
+
+    const backup = await backupDocument(anonUserDocRef, `users/${anonUid}`);
+
+    console.log('Backup Completed', JSON.stringify(backup));
+
+    const wcaUserDocRef = admin
+      .firestore()
+      .collection('users')
+      .doc(wcaUid);
+    const batch = admin.firestore().batch();
+    await restoreDocument(
+      wcaUserDocRef,
+      `users/${anonUid}`,
+      backup,
+      batch,
+      false
+    );
+
+    console.log('Backup Restored');
+
+    await deleteDocumentRecursive(anonUserDocRef, batch);
+
+    await batch.commit().catch(error => console.log(error));
+
+    // Save the profile
+    // Overwrite all (e.g. restored 'expires' field)
+    await wcaUserDocRef.set({ wca: wcaProfile });
     await admin.auth().deleteUser(anonUid);
   }
 
-  // Save the profile to the Firebase Database.
-  await admin
-    .firestore()
-    .collection('users')
-    .doc(firestoreUid)
-    .set({ wca: wcaProfile }, { merge: true });
-
   // Create or update the user account.
   try {
-    await admin.auth().updateUser(uid, {
+    await admin.auth().updateUser(wcaUid, {
       email: wcaProfile.email
     });
   } catch (error) {
     if (error.code === 'auth/user-not-found') {
       await admin.auth().createUser({
-        uid: uid,
+        uid: wcaUid,
         email: wcaProfile.email
       });
     }
   }
 
   // Create a Firebase custom auth token.
-  const token = await admin.auth().createCustomToken(uid);
+  const token = await admin.auth().createCustomToken(wcaUid);
 
-  console.log(`Created Custom token for UID "${uid}" Token: ${token}`);
+  console.log(`Created Custom token for UID "${wcaUid}" Token: ${token}`);
 
-  // Wait for all async task to complete then generate and return a custom auth token.
   return token;
 }
 
@@ -136,18 +165,21 @@ async function createFirebaseAccount(wcaProfile, accessToken, idToken) {
  * 'callback' query parameter.
  */
 exports.token = functions.https.onRequest((req, res) => {
+  console.log('DEBUG', DEBUG);
+
   const oauth2 = wcaOAuth2Client();
 
   cookieParser()(req, res, async () => {
     try {
       console.log('Received verification state:', req.cookies.state);
-      console.log('Received state:', req.query.state);
+      const queryState = decodeURI(req.query.state);
+      console.log('Received state:', queryState);
 
       if (!req.cookies.state) {
         throw new Error(
           'State cookie not set or expired. Maybe you took too long to authorize. Please try again.'
         );
-      } else if (req.cookies.state !== req.query.state) {
+      } else if (req.cookies.state !== queryState) {
         throw new Error('State validation failed');
       }
 
@@ -158,7 +190,10 @@ exports.token = functions.https.onRequest((req, res) => {
         redirect_uri: OAUTH_REDIRECT_URI
       });
 
-      console.log('Auth code exchange result received:', results);
+      console.log(
+        'Auth code exchange result received:',
+        JSON.stringify(results).replace('\n', '')
+      );
 
       // We have an WCA access token now.
       const accessToken = results.access_token;
@@ -197,8 +232,8 @@ exports.token = functions.https.onRequest((req, res) => {
       */
 
       let idToken;
-      if (req.query.state.includes('|')) {
-        idToken = req.query.state.split('|')[0];
+      if (queryState.includes('|')) {
+        idToken = queryState.split('|')[0];
       }
 
       // Create a Firebase account and get the Custom Auth Token.
@@ -229,7 +264,7 @@ async function getUsers(users = [], nextPageToken) {
   return users.concat(listUsersResult.users);
 }
 
-exports.accountcleanup = functions.https.onRequest((req, res) => {
+exports.accountcleanup = functions.https.onRequest(async (req, res) => {
   const key = req.query.key;
 
   // Exit if the keys don't match
@@ -248,83 +283,72 @@ exports.accountcleanup = functions.https.onRequest((req, res) => {
   }
 
   // Fetch all user details.
-  getUsers().then(users => {
-    let deleted = 0;
+  const users = await getUsers();
 
-    const usersToDelete = users.slice(0);
+  let deleted = 0;
 
-    // Use a pool so that we delete maximum `MAX_CONCURRENT` users in parallel.
-    const promisePool = new PromisePool(
-      (async () => {
-        if (usersToDelete.length > 0) {
-          const user = usersToDelete.pop();
+  const usersToDelete = users.slice(0);
 
-          console.log('Checking', user.uid);
+  // Use a pool so that we delete maximum `MAX_CONCURRENT` users in parallel.
+  const promiseProducer = async () => {
+    if (usersToDelete.length > 0) {
+      const user = usersToDelete.pop();
 
-          const userDoc = await admin
-            .firestore()
-            .collection('users')
-            .doc(user.uid)
-            .get()
-            .catch(error => console.error(error));
+      console.log('Checking', user.uid);
 
-          if (
-            !userDoc.exists ||
-            (userDoc.data().expires && userDoc.data().expires < Date.now())
-          ) {
-            // Delete the inactive user.
-            await admin
-              .auth()
-              .deleteUser(user.uid)
-              .catch(error => {
-                console.error(
-                  'Deletion of inactive user account',
-                  user.uid,
-                  'failed:',
-                  error
-                );
-              });
-            console.log(
-              'Deleted user account',
+      const userDocRef = admin
+        .firestore()
+        .collection('users')
+        .doc(user.uid);
+
+      const userDoc = await userDocRef
+        .get()
+        .catch(error => console.error(error));
+
+      if (
+        !userDoc.exists ||
+        (userDoc.data().expires && userDoc.data().expires < Date.now())
+      ) {
+        // Delete the inactive user.
+        await admin
+          .auth()
+          .deleteUser(user.uid)
+          .catch(error => {
+            console.error(
+              'Deletion of inactive user account',
               user.uid,
-              'because of inactivity'
+              'failed:',
+              error
             );
+          });
+        console.log('Deleted user account', user.uid, 'because of inactivity');
 
-            deleted += 1;
-          }
+        deleted += 1;
+      }
 
-          if (
-            userDoc.exists &&
-            (userDoc.data().expires && userDoc.data().expires < Date.now())
-          ) {
-            await admin
-              .firestore()
-              .collection('users')
-              .doc(user.uid)
-              .delete()
-              .catch(error => {
-                console.error(
-                  'Deletion of inactive user document',
-                  user.uid,
-                  'failed:',
-                  error
-                );
-              });
-            console.log(
-              'Deleted user document',
-              user.uid,
-              'because of inactivity'
-            );
-          }
-        }
-      })(),
-      MAX_CONCURRENT
-    );
+      if (
+        userDoc.exists &&
+        (userDoc.data().expires && userDoc.data().expires < Date.now())
+      ) {
+        const batch = admin.firestore().batch();
+        deleteDocumentRecursive(userDocRef, batch);
+        await batch.commit().catch(error => {
+          console.error(
+            'Deletion of inactive user document',
+            user.uid,
+            'failed:',
+            error
+          );
+        });
+        console.log('Deleted user document', user.uid, 'because of inactivity');
+      }
+    }
+  };
+  const promisePool = new PromisePool(promiseProducer, MAX_CONCURRENT);
 
-    promisePool.start().then(() => {
-      const message = `User cleanup finished, deleted ${deleted} users`;
-      console.log(message);
-      res.send(message);
-    });
+  promisePool.start().then(() => {
+    const message = `User cleanup finished, deleted ${deleted} users`;
+    console.log(message);
+    res.send(message);
   });
 });

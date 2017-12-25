@@ -43,34 +43,17 @@ class AppContainer extends React.PureComponent<void, State> {
             .doc(uid)
             .get();
 
-          if (userDoc.exists) {
-            // If mapped, grab the actual user doc & actual uid
-            if (userDoc.data().mapped) {
-              uid = userDoc.data().mapped;
-              userDoc = await firestore
-                .collection('users')
-                .doc(uid)
-                .get();
-            }
-
-            const wcaProfile = userDoc.data().wca;
-            this.setState({
-              wcaProfile: wcaProfile
-            });
-          }
+          const wcaProfile = userDoc.data().wca;
+          this.setState({ wcaProfile: wcaProfile });
         } else {
           // If anonymous, account expires in 30 days
           await firestore
             .collection('users')
             .doc(uid)
             .set(
-              {
-                expires: Math.floor(Date.now() + 30 * 24 * 60 * 60 * 1000)
-              },
+              { expires: Math.floor(Date.now() + 30 * 24 * 60 * 60 * 1000) },
               { merge: true }
             );
-
-          await firestore.INTERNAL.disableNetwork();
         }
 
         this.setState({ uid: uid });

@@ -21,6 +21,7 @@ class SolvesListContainer extends React.PureComponent<void, State> {
   async componentDidUpdate(prevProps, prevState) {
     if (this.props.uid !== prevProps.uid) {
       if (this.props.uid) {
+        this.unsubscribeSolves();
         // User is signed in.
         const firestore = await firebase.firestore();
         const ref = firestore
@@ -35,10 +36,7 @@ class SolvesListContainer extends React.PureComponent<void, State> {
           .orderBy('timestamp', 'desc')
           .onSnapshot(this.onCollectionUpdate);
       } else {
-        if (this.unsubscribe) {
-          this.unsubscribe();
-        }
-
+        this.unsubscribeSolves();
         // eslint-disable-next-line react/no-did-update-set-state
         this.setState({
           solves: []
@@ -50,6 +48,10 @@ class SolvesListContainer extends React.PureComponent<void, State> {
   async componentDidMount() {}
 
   componentWillUnmount() {
+    this.unsubscribeSolves();
+  }
+
+  unsubscribeSolves() {
     if (this.unsubscribe) {
       this.unsubscribe();
     }

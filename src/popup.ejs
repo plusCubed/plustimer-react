@@ -13,9 +13,21 @@ Please wait...
 <!-- Import and configure the Firebase SDK -->
 <!-- These scripts are made available when the app is served or deployed on Firebase Hosting -->
 <!-- If you do not serve/host your project using Firebase Hosting see https://firebase.google.com/docs/web/setup -->
-<script src="/__/firebase/4.8.1/firebase-app.js"></script>
-<script src="/__/firebase/4.8.1/firebase-auth.js"></script>
-<script src="/__/firebase/init.js"></script>
+
+<% if (process.env.NODE_ENV === 'production') { %>
+    <script src="/__/firebase/4.8.1/firebase-app.js"></script>
+    <script src="/__/firebase/4.8.1/firebase-auth.js"></script>
+    <script src="/__/firebase/4.8.1/firebase-firestore.js"></script>
+    <script src="/__/firebase/init.js"></script>
+<% } else { %>
+    <script src="https://www.gstatic.com/firebasejs/4.8.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.8.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.8.1/firebase-firestore.js"></script>
+    <script>
+      var config = <%= JSON.stringify(require('./utils/firebaseConfigDebug').default) %>;
+      firebase.initializeApp(config);
+    </script>
+<% } %>
 
 <script>
   /**
@@ -36,9 +48,22 @@ Please wait...
    */
   function tokenReceived(data) {
     if (data.token) {
-      firebase.auth().signInWithCustomToken(data.token).then(function() {
-        window.close();
-      });
+      firebase.auth()
+        .onAuthStateChanged(function (user) {
+          if (user && !user.isAnonymous) {
+            //window.close();
+          }
+        });
+
+      firebase.auth().signOut()
+        .catch(function (error) { console.log(error); })
+        .then(firebase.auth().signInWithCustomToken(data.token))
+        .catch(function (error) { console.log(error);})
+        .then(function () {
+          setTimeout(function(){
+            window.close();
+          }, 1000);
+        });
     } else {
       console.error(data);
       document.body.innerText = 'Error in the token function: ' + data.error;
@@ -59,7 +84,7 @@ Please wait...
   } else if(!code) {
     // Start the auth flow.
     var url = functionsUrl + '/redirect';
-    if(!oldIdToken){
+    if(oldIdToken){
       url = url + '?oldIdToken=' + oldIdToken;
     }
     window.location.href  = url;
