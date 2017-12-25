@@ -18,7 +18,7 @@ const cronKey = require('./cron-key.json');
 // Firebase Setup
 const admin = require('firebase-admin');
 
-const DEBUG = process.env.FIREBASE_ENV === 'local';
+const DEBUG = process.env.FIREBASE_ENV === 'development';
 
 const OAUTH_REDIRECT_URI = DEBUG
   ? `http://localhost:5000/popup.html`

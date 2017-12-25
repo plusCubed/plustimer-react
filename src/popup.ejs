@@ -70,7 +70,7 @@ Please wait...
     }
   }
 
-  var DEBUG = <%= process.env.FIREBASE_ENV === 'local' %>;
+  var DEBUG = <%= process.env.FIREBASE_ENV === 'development' %>;
   var functionsUrl =  DEBUG ?
     'http://localhost:5001/' + getFirebaseProjectId() + '/us-central1':
     'https://us-central1-' + getFirebaseProjectId() + '.cloudfunctions.net';

@@ -6,13 +6,14 @@
     "app:start": "if-env NODE_ENV=production && npm run -s serve || npm run -s dev",
     "app:build": "preact build && preact serve --server config --dest build",
     "app:serve": "yarn build && preact serve",
-    "app:dev": "cross-env FIREBASE_ENV=local preact watch --port 5000",
-    "functions:build": "babel \"functions/*.es7\" --out-dir .",
-    "functions:serve-local": "firebase use staging && cross-env FIREBASE_ENV=local firebase serve --only functions --port 5001",
+    "app:dev": "cross-env FIREBASE_ENV=development preact watch --port 5000",
+    "app:deploy": "firebase use default && yarn functions:build && firebase deploy --only functions",
+    "functions:build": "babel functions/*.es6 --out-dir .",
+    "functions:dev": "concurrently \"babel functions/*.es6 --watch --out-dir .\" \"yarn functions:dev-serve\"",
+    "functions:dev-serve": "firebase use staging && cross-env FIREBASE_ENV=development firebase serve --only functions --port 5001",
     "functions:deploy": "firebase use default && yarn functions:build && firebase deploy --only functions",
     "all:build": "yarn app:build && yarn functions:build",
-    "all:build-local": "cross-env FIREBASE_ENV=local yarn all:build",
-    "all:serve-local": "firebase use staging && cross-env FIREBASE_ENV=local firebase serve --only functions,hosting",
+    "all:dev": "concurrently \"yarn app:dev\" \"yarn functions:dev\"",
     "all:deploy": "firebase use default && yarn all:build && firebase deploy",
     "lint": "eslint src",
     "precommit": "lint-staged"
@@ -35,7 +36,7 @@
     }
   },
   "lint-staged": {
-    "{src,functions}/**/*.{js,json,css,md,es7}": [
+    "{src,functions}/**/*.{js,json,css,md,es6}": [
       "prettier --write",
       "git add"
     ]

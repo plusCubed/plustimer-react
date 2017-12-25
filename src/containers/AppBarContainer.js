@@ -28,9 +28,11 @@ class AppBarContainer extends React.PureComponent<Props, void> {
 
   handleAvatarClick = async () => {
     const auth = await firebase.auth();
-    await auth.signOut();
-    // Sign in anonymously if not currently signed in
-    await auth.signInAnonymously();
+    if (auth.currentUser && !auth.currentUser.isAnonymous) {
+      await auth.signOut();
+      // Sign in anonymously if not currently signed in
+      await auth.signInAnonymously();
+    }
   };
 
   componentWillUnmount() {}
