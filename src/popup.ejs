@@ -51,7 +51,7 @@ Please wait...
       firebase.auth()
         .onAuthStateChanged(function (user) {
           if (user && !user.isAnonymous) {
-            //window.close();
+            window.close();
           }
         });
 
@@ -83,11 +83,11 @@ Please wait...
     document.body.innerText = 'Error from the WCA auth page: ' + error;
   } else if(!code) {
     // Start the auth flow.
-    var url = functionsUrl + '/redirect';
     if(oldIdToken){
+      var url = functionsUrl + '/redirect';
       url = url + '?oldIdToken=' + oldIdToken;
+      window.location.href  = url;
     }
-    window.location.href  = url;
   } else {
     // Use JSONP to load the 'token' Firebase Function to exchange the auth code against a Firebase custom token.
     var script = document.createElement('script');

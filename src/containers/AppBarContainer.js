@@ -13,17 +13,14 @@ type Props = {
 class AppBarContainer extends React.PureComponent<Props, void> {
   handleLoginClick = async () => {
     const auth = await firebase.auth();
-    const unsubscribe = auth.onAuthStateChanged(async user => {
-      if (user.isAnonymous) {
-        const oldIdToken = await user.getIdToken(true);
-        window.open(
-          `popup.html?oldIdToken=${oldIdToken}`,
-          '_blank',
-          'height=585,width=400'
-        );
-        unsubscribe();
-      }
-    });
+    if (auth.currentUser && auth.currentUser.isAnonymous) {
+      const oldIdToken = await auth.currentUser.getIdToken(true);
+      window.open(
+        `popup.html?oldIdToken=${oldIdToken}`,
+        '_blank',
+        'height=585,width=400'
+      );
+    }
   };
 
   handleAvatarClick = async () => {

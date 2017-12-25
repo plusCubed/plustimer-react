@@ -2,9 +2,15 @@
 const flowPlugin = require('preact-cli-plugin-flow');
 const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const swPrecachePlugin = require('preact-cli-sw-precache');
 
 export default function (config, env, helpers) {
   flowPlugin(config);
+
+  const precacheConfig = {
+    navigateFallbackWhitelist: [/^(?!\/__)(?!\/popup).*/],
+  };
+  swPrecachePlugin(config, precacheConfig);
 
   config.plugins.push(
     new HtmlWebpackPlugin({
@@ -26,8 +32,6 @@ export default function (config, env, helpers) {
 
   const { rule } = helpers.getLoadersByName(config, 'babel-loader')[0];
   const babelConfig = rule.options;
-
-  rule.exclude = [/node_modules/];
 
   // Remove stage-1 preset
   babelConfig.presets.splice(1,1);

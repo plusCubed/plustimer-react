@@ -7,7 +7,7 @@
     "app:build": "preact build && preact serve --server config --dest build",
     "app:serve": "yarn build && preact serve",
     "app:dev": "cross-env FIREBASE_ENV=development preact watch --port 5000",
-    "app:deploy": "firebase use default && yarn functions:build && firebase deploy --only functions",
+    "app:deploy": "firebase use default && yarn app:build && firebase deploy --only hosting",
     "functions:build": "babel functions/*.es6 --out-dir .",
     "functions:dev": "concurrently \"babel functions/*.es6 --watch --out-dir .\" \"yarn functions:dev-serve\"",
     "functions:dev-serve": "firebase use staging && cross-env FIREBASE_ENV=development firebase serve --only functions --port 5001",
@@ -69,6 +69,7 @@
     "lint-staged": "^6.0.0",
     "preact-cli": "^2.0.0",
     "preact-cli-plugin-flow": "^0.2.0",
+    "preact-cli-sw-precache": "^1.0.3",
     "prettier": "^1.9.2",
     "rimraf": "^2.6.2",
     "webpack-bundle-analyzer": "^2.9.1"

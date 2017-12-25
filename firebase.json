@@ -37,15 +37,6 @@
             "value": "public, max-age=31536000"
           }
         ]
-      },
-      {
-        "source": "/",
-        "headers": [
-          {
-            "key": "Link",
-            "value": "</bundle.131b8.js>; rel=preload; as=script, </style.63f36.css>; rel=preload; as=style"
-          }
-        ]
       }
     ],
     "public": "build"
