@@ -7,3 +7,14 @@
     'appbar appbar'
     'solves timer';
 }
+
+@media (max-width: 599px) {
+  .app {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto;
+    grid-template-areas:
+      'appbar'
+      'timer'
+      'solves';
+  }
+}
