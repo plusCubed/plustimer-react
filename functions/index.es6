@@ -116,13 +116,7 @@ async function createFirebaseAccount(wcaProfile, accessToken, idToken) {
       .collection('users')
       .doc(wcaUid);
     const batch = admin.firestore().batch();
-    await restoreDocument(
-      wcaUserDocRef,
-      `users/${anonUid}`,
-      backup,
-      batch,
-      false
-    );
+    await restoreDocument(wcaUserDocRef, `users/${anonUid}`, backup, batch);
 
     console.log('Backup Restored');
 

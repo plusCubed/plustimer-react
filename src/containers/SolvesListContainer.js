@@ -2,7 +2,9 @@
 
 import * as React from 'react';
 import SolvesList, { Solve } from '../components/SolvesList';
+
 import firebase from '../utils/firebase';
+import { onPuzzleCategoryChanged } from '../utils/firebase-utils';
 
 type Props = {
   uid: string
@@ -16,27 +18,34 @@ class SolvesListContainer extends React.PureComponent<void, State> {
   state = {
     solves: []
   };
-  unsubscribe = null;
+  _unsubscribePuzzleCategory = null;
+  _unsubscribeSolves = null;
 
   async componentDidUpdate(prevProps, prevState) {
     if (this.props.uid !== prevProps.uid) {
       if (this.props.uid) {
-        this.unsubscribeSolves();
         // User is signed in.
-        const firestore = await firebase.firestore();
-        const ref = firestore
-          .collection('users')
-          .doc(this.props.uid)
-          .collection('puzzles')
-          .doc('333')
-          .collection('categories')
-          .doc('normal')
-          .collection('solves');
-        this.unsubscribe = ref
-          .orderBy('timestamp', 'desc')
-          .onSnapshot(this.onCollectionUpdate);
+        onPuzzleCategoryChanged(async (puzzle, category, unsubscribe) => {
+          this._unsubscribePuzzleCategory = unsubscribe;
+
+          const firestore = await firebase.firestore();
+          const ref = firestore
+            .collection('users')
+            .doc(this.props.uid)
+            .collection('puzzles')
+            .doc(puzzle)
+            .collection('categories')
+            .doc(category)
+            .collection('solves');
+
+          this.unsubscribeSolves();
+          this._unsubscribeSolves = ref
+            .orderBy('timestamp', 'desc')
+            .onSnapshot(this.onCollectionUpdate);
+        }, this.props.uid);
       } else {
-        this.unsubscribeSolves();
+        this._unsubscribePuzzleCategory();
+        this._unsubscribeSolves();
         // eslint-disable-next-line react/no-did-update-set-state
         this.setState({
           solves: []
@@ -48,12 +57,18 @@ class SolvesListContainer extends React.PureComponent<void, State> {
   async componentDidMount() {}
 
   componentWillUnmount() {
-    this.unsubscribeSolves();
+    this._unsubscribeSolves();
+  }
+
+  unsubscribePuzzleCategory() {
+    if (this._unsubscribePuzzleCategory) {
+      this._unsubscribePuzzleCategory();
+    }
   }
 
   unsubscribeSolves() {
-    if (this.unsubscribe) {
-      this.unsubscribe();
+    if (this._unsubscribeSolves) {
+      this._unsubscribeSolves();
     }
   }
 

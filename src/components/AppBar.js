@@ -2,31 +2,24 @@
 
 import * as React from 'react';
 
+import ProfileContainer from '../containers/ProfileContainer';
+import PuzzleSelect from '../containers/PuzzleSelect';
+
 import style from './AppBar.css';
 
 type Props = {
-  loggedIn: boolean,
-  avatarImg: string,
-  onLoginClick: () => void,
-  onAvatarClick: () => void
+  uid: string,
+  wcaProfile: any
 };
 
 const AppBar = (props: Props) => {
   return (
     <header className={style.toolbar}>
-      <div className={style.toolbarText}>plusTimer</div>
-      {props.loggedIn ? (
-        <img
-          className={style.toolbarAvatar}
-          alt="User Avatar"
-          src={props.avatarImg}
-          onClick={props.onAvatarClick}
-        />
-      ) : (
-        <button className={style.toolbarButton} onClick={props.onLoginClick}>
-          Login
-        </button>
-      )}
+      <PuzzleSelect uid={props.uid} />
+
+      <span className={style.toolbarSpacer} />
+
+      <ProfileContainer uid={props.uid} wcaProfile={props.wcaProfile} />
     </header>
   );
 };

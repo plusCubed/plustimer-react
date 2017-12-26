@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 
-import AppBar from '../components/AppBar';
+import Profile from '../components/Profile';
 import firebase from '../utils/firebase';
 
 type Props = {
@@ -10,7 +10,7 @@ type Props = {
   wcaProfile: any
 };
 
-class AppBarContainer extends React.PureComponent<Props, void> {
+class ProfileContainer extends React.PureComponent<Props, void> {
   handleLoginClick = async () => {
     const auth = await firebase.auth();
     if (auth.currentUser && auth.currentUser.isAnonymous) {
@@ -36,7 +36,7 @@ class AppBarContainer extends React.PureComponent<Props, void> {
 
   render() {
     return (
-      <AppBar
+      <Profile
         loggedIn={!!this.props.wcaProfile}
         avatarImg={
           this.props.wcaProfile ? this.props.wcaProfile.avatar.thumb_url : ''
@@ -48,4 +48,4 @@ class AppBarContainer extends React.PureComponent<Props, void> {
   }
 }
 
-export default AppBarContainer;
+export default ProfileContainer;

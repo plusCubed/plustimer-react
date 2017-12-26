@@ -3,7 +3,9 @@
 import * as React from 'react';
 
 import TimerDisplay, { TimerMode } from '../components/TimerDisplay';
+
 import firebase from '../utils/firebase';
+import { getCurrentPuzzleCategory } from '../utils/firebase-utils';
 
 import { Penalty } from '../components/SolvesList';
 
@@ -98,14 +100,18 @@ class TimerDisplayContainer extends React.PureComponent<Props, State> {
           if (this.props.uid) {
             const firestore = await firebase.firestore();
 
+            const [puzzle, category] = await getCurrentPuzzleCategory(
+              this.props.uid
+            );
+
             const puzzleRef = firestore
               .collection('users')
               .doc(this.props.uid)
               .collection('puzzles')
-              .doc('333');
+              .doc(puzzle);
             const categoryRef = puzzleRef
               .collection('categories')
-              .doc('normal');
+              .doc(category);
             const solvesRef = categoryRef.collection('solves');
 
             const docRef = await solvesRef.add({
@@ -116,7 +122,7 @@ class TimerDisplayContainer extends React.PureComponent<Props, State> {
             });
             console.log('Document written with ID: ', docRef.id);
 
-            const puzzleDoc = await puzzleRef.get();
+            /*const puzzleDoc = await puzzleRef.get();
             if (!puzzleDoc.exists) {
               await puzzleDoc.ref.set({ name: '3×3×3' }, { merge: true });
             }
@@ -124,7 +130,7 @@ class TimerDisplayContainer extends React.PureComponent<Props, State> {
             const categoryDoc = await categoryRef.get();
             if (!categoryDoc.exists) {
               await categoryDoc.ref.set({ name: 'Normal' }, { merge: true });
-            }
+            }*/
           }
         }
         break;

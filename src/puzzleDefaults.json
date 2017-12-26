@@ -1,0 +1,116 @@
+{
+  "333": {
+    "name": "3×3×3",
+    "scrambler": "333",
+    "categories": {
+      "normal": "Normal",
+      "oh": "OH",
+      "feet": "Feet"
+    }
+  },
+  "444": {
+    "name": "4×4×4",
+    "scrambler": "444",
+    "categories": {
+      "normal": "Normal"
+    }
+  },
+  "555": {
+    "name": "5×5×5",
+    "scrambler": "555",
+    "categories": {
+      "normal": "Normal"
+    }
+  },
+  "222": {
+    "name": "2×2×2",
+    "scrambler": "222",
+    "categories": {
+      "normal": "Normal"
+    }
+  },
+  "333bf": {
+    "name": "3×3×3 BLD",
+    "scrambler": "333bf",
+    "categories": {
+      "normal": "Normal"
+    }
+  },
+  "333fm": {
+    "name": "3×3×3 FMC",
+    "scrambler": "333fm",
+    "categories": {
+      "normal": "Normal"
+    }
+  },
+  "minx": {
+    "name": "Megaminx",
+    "scrambler": "minx",
+    "categories": {
+      "normal": "Normal"
+    }
+  },
+  "pyram": {
+    "name": "Pyraminx",
+    "scrambler": "pyram",
+    "categories": {
+      "normal": "Normal"
+    }
+  },
+  "sq1": {
+    "name": "Square-1",
+    "scrambler": "sq1",
+    "categories": {
+      "normal": "Normal"
+    }
+  },
+  "clock": {
+    "name": "Clock",
+    "scrambler": "clock",
+    "categories": {
+      "normal": "Normal"
+    }
+  },
+  "skewb": {
+    "name": "Skewb",
+    "scrambler": "skewb",
+    "categories": {
+      "normal": "Normal"
+    }
+  },
+  "666": {
+    "name": "6×6×6",
+    "scrambler": "666",
+    "categories": {
+      "normal": "Normal"
+    }
+  },
+  "777": {
+    "name": "7×7×7",
+    "scrambler": "777",
+    "categories": {
+      "normal": "Normal"
+    }
+  },
+  "444bf": {
+    "name": "4×4×4 BLD",
+    "scrambler": "444bf",
+    "categories": {
+      "normal": "Normal"
+    }
+  },
+  "555bf": {
+    "name": "5×5×5 BLD",
+    "scrambler": "555bf",
+    "categories": {
+      "normal": "Normal"
+    }
+  },
+  "333mbf": {
+    "name": "3×3×3 MBLD",
+    "scrambler": "333mbf",
+    "categories": {
+      "normal": "Normal"
+    }
+  }
+}

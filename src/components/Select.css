@@ -1,0 +1,12 @@
+.select {
+  border: none;
+  background: none;
+  color: #fff;
+  cursor: pointer;
+  height: 32px;
+  min-width: 64px;
+}
+
+.select > option {
+  color: #000;
+}

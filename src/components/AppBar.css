@@ -10,8 +10,7 @@
   padding: 0 16px;
 }
 
-.toolbarText {
-  color: #fff;
+.toolbarSpacer {
   flex: 1;
 }
 

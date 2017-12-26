@@ -81,13 +81,7 @@ export const backupCollection = async (collectionRef, path, backup = {}) => {
  * @param overwrite Overwrite/merge with existing documents
  * @returns {Promise<void>}
  */
-export const restoreDocument = async (
-  docRef,
-  path,
-  backup,
-  batch,
-  overwrite
-) => {
+export const restoreDocument = (docRef, path, backup, batch) => {
   // console.log(`Restoring Document '${path}'`);
 
   const docBackup = deep(backup, path);
@@ -97,17 +91,15 @@ export const restoreDocument = async (
   delete docBackup['_doc'];
   const collections = docBackup;
 
-  const docExists = (await docRef.get()).exists;
-  if (overwrite || !docExists) batch.set(docRef, docData, { merge: true });
+  batch.set(docRef, docData, { merge: true });
 
   for (const collectionId of Object.keys(collections)) {
     // eslint-disable-next-line no-use-before-define,no-await-in-loop
-    await restoreCollection(
+    restoreCollection(
       docRef.collection(collectionId),
       path + '/' + collectionId,
       backup,
-      batch,
-      overwrite
+      batch
     );
   }
 };
@@ -120,24 +112,17 @@ export const restoreDocument = async (
  * @param overwrite Overwrite/merge with existing documents
  * @returns {Promise<void>}
  */
-export const restoreCollection = async (
-  collectionRef,
-  path,
-  backup,
-  batch,
-  overwrite
-) => {
+export const restoreCollection = (collectionRef, path, backup, batch) => {
   // console.log(`Restoring Collection '${path}'`);
 
   const collection = deep(backup, path);
   for (const docId of Object.keys(collection)) {
     // eslint-disable-next-line no-await-in-loop
-    await restoreDocument(
+    restoreDocument(
       collectionRef.doc(docId),
       path + '/' + docId,
       backup,
-      batch,
-      overwrite
+      batch
     );
   }
 };

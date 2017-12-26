@@ -46,3 +46,11 @@ export function formatTime(time: number): string {
   const parts = timeParts(time);
   return `${parts.secString}.${parts.decimals}`;
 }
+
+export function buildMapFromObject(obj) {
+  const map = new Map();
+  Object.keys(obj).forEach(key => {
+    map.set(key, obj[key]);
+  });
+  return map;
+}
