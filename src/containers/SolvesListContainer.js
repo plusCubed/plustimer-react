@@ -14,7 +14,7 @@ type State = {
   solves: Solve[]
 };
 
-class SolvesListContainer extends React.PureComponent<void, State> {
+class SolvesListContainer extends React.PureComponent<Props, State> {
   state = {
     solves: []
   };
