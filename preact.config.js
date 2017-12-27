@@ -1,11 +1,16 @@
 /* eslint-disable import/no-extraneous-dependencies */
+const webpack = require('webpack');
+
 const flowPlugin = require('preact-cli-plugin-flow');
+const swPrecachePlugin = require('preact-cli-sw-precache');
+const fastAsyncPlugin = require('preact-cli-plugin-fast-async');
+
 const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const swPrecachePlugin = require('preact-cli-sw-precache');
 
 export default function (config, env, helpers) {
   flowPlugin(config);
+  fastAsyncPlugin(config);
 
   const precacheConfig = {
     navigateFallbackWhitelist: [/^(?!\/__)(?!\/popup).*/],
@@ -27,24 +32,11 @@ export default function (config, env, helpers) {
         removeComments: true
       },
       inject: false
+    }),
+    new webpack.DefinePlugin({
+      'process.env.FIREBASE_ENV': JSON.stringify(process.env.FIREBASE_ENV === 'development' ? 'production' : 'development')
     })
   );
-
-  const { rule } = helpers.getLoadersByName(config, 'babel-loader')[0];
-  const babelConfig = rule.options;
-
-  // Remove stage-1 preset
-  babelConfig.presets.splice(1,1);
-  // Replace stage-1 with plugins
-  babelConfig.plugins.push(
-    require.resolve('babel-plugin-syntax-dynamic-import'),
-    require.resolve('babel-plugin-transform-class-properties'),
-    require.resolve('babel-plugin-transform-export-extensions'),
-    require.resolve('babel-plugin-transform-object-rest-spread'),
-    ['fast-async', {"spec":true}]
-  );
-
-  babelConfig.presets[0][1].exclude.push("transform-async-to-generator");
 
 
   if(!env.ssr && env.production){

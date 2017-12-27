@@ -121,16 +121,6 @@ class TimerDisplayContainer extends React.PureComponent<Props, State> {
               penalty: Penalty.NORMAL
             });
             console.log('Document written with ID: ', docRef.id);
-
-            /*const puzzleDoc = await puzzleRef.get();
-            if (!puzzleDoc.exists) {
-              await puzzleDoc.ref.set({ name: '3×3×3' }, { merge: true });
-            }
-
-            const categoryDoc = await categoryRef.get();
-            if (!categoryDoc.exists) {
-              await categoryDoc.ref.set({ name: 'Normal' }, { merge: true });
-            }*/
           }
         }
         break;

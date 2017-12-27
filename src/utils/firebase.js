@@ -9,6 +9,9 @@ import debugConfig from './firebaseConfigDebug';
 if (process.env.NODE_ENV === 'production') firebase.initializeApp(config);
 else firebase.initializeApp(debugConfig);
 
+// May not be initialized
+const app = () => firebase.app();
+
 const firestoreAsync = async () => {
   await import('firebase/firestore');
   return firebase.firestore();
@@ -19,6 +22,7 @@ const authAsync = async () => {
 };
 
 export default {
+  app: app,
   auth: authAsync,
   firestore: firestoreAsync
 };

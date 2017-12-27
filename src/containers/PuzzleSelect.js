@@ -64,6 +64,8 @@ class PuzzleCategorySelect extends React.PureComponent<Props, State> {
       return;
     }
 
+    console.log('New puzzle', puzzle);
+
     const firestore = await firebase.firestore();
 
     // Set current puzzle in the user doc
@@ -91,6 +93,8 @@ class PuzzleCategorySelect extends React.PureComponent<Props, State> {
 
   handleCategoryChange = async (category, puzzle = this.state.puzzle) => {
     this.setState({ category: category });
+
+    console.log('New category', category, puzzle);
 
     if (!category) {
       return;

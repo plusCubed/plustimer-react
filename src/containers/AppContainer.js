@@ -30,42 +30,46 @@ class AppContainer extends React.PureComponent<void, State> {
       await auth.signInAnonymously();
     }
 
-    auth.onAuthStateChanged(async user => {
-      if (user) {
-        // User is signed in.
-        let { uid } = user;
-
-        console.log('Logged In', uid);
-
-        if (!user.isAnonymous) {
-          let userDoc = await firestore
-            .collection('users')
-            .doc(uid)
-            .get();
-
-          const wcaProfile = userDoc.data().wca;
-          this.setState({ wcaProfile: wcaProfile });
-        } else {
-          // If anonymous, account expires in 30 days
-          await firestore
-            .collection('users')
-            .doc(uid)
-            .set(
-              { expires: Math.floor(Date.now() + 30 * 24 * 60 * 60 * 1000) },
-              { merge: true }
-            );
-        }
-
-        this.setState({ uid: uid });
-      } else {
-        // Signed out
-        this.setState({
-          uid: '',
-          wcaProfile: null
-        });
-      }
-    });
+    auth.onAuthStateChanged(this.onAuthStateChanged);
   }
+
+  onAuthStateChanged = async user => {
+    if (user) {
+      // User is signed in.
+      let { uid } = user;
+
+      console.log('Logged In', uid);
+
+      const firestore = await firebase.firestore();
+
+      if (!user.isAnonymous) {
+        let userDoc = await firestore
+          .collection('users')
+          .doc(uid)
+          .get();
+
+        const wcaProfile = userDoc.data().wca;
+        this.setState({ wcaProfile: wcaProfile });
+      } else {
+        // If anonymous, account expires in 30 days
+        await firestore
+          .collection('users')
+          .doc(uid)
+          .set(
+            { expires: Math.floor(Date.now() + 30 * 24 * 60 * 60 * 1000) },
+            { merge: true }
+          );
+      }
+
+      this.setState({ uid: uid });
+    } else {
+      // Signed out
+      this.setState({
+        uid: '',
+        wcaProfile: null
+      });
+    }
+  };
 
   componentWillUnmount() {}
 
