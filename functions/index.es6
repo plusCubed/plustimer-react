@@ -102,12 +102,12 @@ async function createFirebaseAccount(wcaProfile, accessToken, idToken) {
     const decodedToken = await admin.auth().verifyIdToken(idToken);
     const anonUid = decodedToken.uid;
 
-    const anonUserDocRef = await admin
+    const anonUserDocRef = admin
       .firestore()
       .collection('users')
       .doc(anonUid);
 
-    const backup = await backupDocument(anonUserDocRef, `users/${anonUid}`);
+    const backup = await backupDocument(anonUserDocRef, anonUid);
 
     console.log('Backup Completed', JSON.stringify(backup));
 
@@ -116,7 +116,7 @@ async function createFirebaseAccount(wcaProfile, accessToken, idToken) {
       .collection('users')
       .doc(wcaUid);
     const batch = admin.firestore().batch();
-    await restoreDocument(wcaUserDocRef, `users/${anonUid}`, backup, batch);
+    await restoreDocument(wcaUserDocRef, anonUid, backup, batch);
 
     console.log('Backup Restored');
 
@@ -284,65 +284,103 @@ exports.accountcleanup = functions.https.onRequest(async (req, res) => {
   const usersToDelete = users.slice(0);
 
   // Use a pool so that we delete maximum `MAX_CONCURRENT` users in parallel.
-  const promiseProducer = async () => {
-    if (usersToDelete.length > 0) {
-      const user = usersToDelete.pop();
+  const deleteUserTask = async () => {
+    const user = usersToDelete.pop();
+    console.log('Checking', user.uid);
 
-      console.log('Checking', user.uid);
+    console.log(new Date(user.metadata.lastSignInTime).toLocaleString());
 
-      const userDocRef = admin
-        .firestore()
-        .collection('users')
-        .doc(user.uid);
-
-      const userDoc = await userDocRef
-        .get()
-        .catch(error => console.error(error));
-
-      if (
-        !userDoc.exists ||
-        (userDoc.data().expires && userDoc.data().expires < Date.now())
-      ) {
-        // Delete the inactive user.
-        await admin
-          .auth()
-          .deleteUser(user.uid)
-          .catch(error => {
-            console.error(
-              'Deletion of inactive user account',
-              user.uid,
-              'failed:',
-              error
-            );
-          });
-        console.log('Deleted user account', user.uid, 'because of inactivity');
-
-        deleted += 1;
-      }
-
-      if (
-        userDoc.exists &&
-        (userDoc.data().expires && userDoc.data().expires < Date.now())
-      ) {
-        const batch = admin.firestore().batch();
-        deleteDocumentRecursive(userDocRef, batch);
-        await batch.commit().catch(error => {
+    const userDocRef = admin
+      .firestore()
+      .collection('users')
+      .doc(user.uid);
+    const userDoc = await userDocRef.get().catch(error => console.error(error));
+    if (
+      !userDoc.exists ||
+      (userDoc.data().expires && userDoc.data().expires < Date.now())
+    ) {
+      // Delete the inactive user.
+      await admin
+        .auth()
+        .deleteUser(user.uid)
+        .catch(error => {
           console.error(
-            'Deletion of inactive user document',
+            'Deletion of inactive user account',
             user.uid,
             'failed:',
             error
           );
         });
-        console.log('Deleted user document', user.uid, 'because of inactivity');
-      }
+      console.log('Deleted user account', user.uid, 'because of inactivity');
+
+      deleted += 1;
     }
+    if (
+      userDoc.exists &&
+      (userDoc.data().expires && userDoc.data().expires < Date.now())
+    ) {
+      const batch = admin.firestore().batch();
+      deleteDocumentRecursive(userDocRef, batch);
+      await batch.commit().catch(error => {
+        console.error(
+          'Deletion of inactive user document',
+          user.uid,
+          'failed:',
+          error
+        );
+      });
+      console.log('Deleted user document', user.uid, 'because of inactivity');
+    }
+  };
+  const promiseProducer = () => {
+    if (usersToDelete.length <= 0) {
+      return null;
+    }
+    return deleteUserTask();
   };
   const promisePool = new PromisePool(promiseProducer, MAX_CONCURRENT);
 
-  promisePool.start().then(() => {
-    const message = `User cleanup finished, deleted ${deleted} users`;
-    console.log(message);
-    res.send(message);
-  });
+  await promisePool.start();
+
+  const message = `User cleanup finished, deleted ${deleted} users`;
+  console.log(message);
+  res.send(message);
+});
+
+exports.backup = functions.https.onRequest(async (req, res) => {
+  try {
+    const idToken = req.query.idToken;
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
+    const uid = decodedToken.uid;
+
+    const userRef = admin
+      .firestore()
+      .collection('users')
+      .doc(uid);
+
+    const backup = await backupDocument(userRef, 'backup');
+    res.json(backup);
+  } catch (error) {
+    res.status(500).json({ error: error });
+  }
+});
+
+exports.restore = functions.https.onRequest(async (req, res) => {
+  try {
+    const idToken = req.query.idToken;
+    const backup = req.body;
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
+    const uid = decodedToken.uid;
+
+    const userRef = admin
+      .firestore()
+      .collection('users')
+      .doc(uid);
+
+    const batch = admin.firestore().batch();
+    await restoreDocument(userRef, 'backup', backup, batch);
+    res.send('Success');
+  } catch (error) {
+    res.status(500).json({ error: error });
+  }
 });

@@ -2,6 +2,13 @@
 
 import firebase from './firebase';
 
+const DEBUG = process.env.FIREBASE_ENV === 'development';
+const functionsUrl = DEBUG
+  ? `http://localhost:5001/${firebase.app().options.projectId}/us-central1`
+  : `https://us-central1-${
+      firebase.app().options.projectId
+    }.cloudfunctions.net`;
+
 export const getCurrentPuzzleCategory = async uid => {
   const firestore = await firebase.firestore();
 
@@ -57,3 +64,12 @@ export const onPuzzleCategoryChanged = async (callback, uid) => {
       });
   })();
 };
+
+export const getBackup = () =>
+  fetch(`${functionsUrl}/backup`).then(r => r.json());
+
+export const restoreBackup = backup =>
+  fetch(`${functionsUrl}/restore`, {
+    method: 'POST',
+    body: backup
+  }).then(r => r.text());

@@ -78,7 +78,6 @@ export const backupCollection = async (collectionRef, path, backup = {}) => {
  * @param path Path in the backup
  * @param backup Backup data
  * @param batch Write batch
- * @param overwrite Overwrite/merge with existing documents
  * @returns {Promise<void>}
  */
 export const restoreDocument = (docRef, path, backup, batch) => {
@@ -109,7 +108,6 @@ export const restoreDocument = (docRef, path, backup, batch) => {
  * @param path Path in the backup
  * @param backup Backup data
  * @param batch Write batch
- * @param overwrite Overwrite/merge with existing documents
  * @returns {Promise<void>}
  */
 export const restoreCollection = (collectionRef, path, backup, batch) => {
