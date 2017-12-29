@@ -34,7 +34,7 @@ export default function (config, env, helpers) {
       inject: false
     }),
     new webpack.DefinePlugin({
-      'process.env.FIREBASE_ENV': JSON.stringify(process.env.FIREBASE_ENV === 'development' ? 'production' : 'development')
+      'process.env.FIREBASE_ENV': JSON.stringify(process.env.FIREBASE_ENV === 'development' ? 'development' : 'production')
     })
   );
 

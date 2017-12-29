@@ -14,7 +14,7 @@ Please wait...
 <!-- These scripts are made available when the app is served or deployed on Firebase Hosting -->
 <!-- If you do not serve/host your project using Firebase Hosting see https://firebase.google.com/docs/web/setup -->
 
-<% if (process.env.NODE_ENV === 'production') { %>
+<% if (process.env.FIREBASE_ENV !== 'development') { %>
     <script src="/__/firebase/4.8.1/firebase-app.js"></script>
     <script src="/__/firebase/4.8.1/firebase-auth.js"></script>
     <script src="/__/firebase/4.8.1/firebase-firestore.js"></script>
@@ -83,11 +83,7 @@ Please wait...
     document.body.innerText = 'Error from the WCA auth page: ' + error;
   } else if(!code) {
     // Start the auth flow.
-    if(oldIdToken){
-      var url = functionsUrl + '/redirect';
-      url = url + '?oldIdToken=' + oldIdToken;
-      window.location.href  = url;
-    }
+    window.location.href  = functionsUrl + '/redirect';
   } else {
     // Use JSONP to load the 'token' Firebase Function to exchange the auth code against a Firebase custom token.
     var script = document.createElement('script');

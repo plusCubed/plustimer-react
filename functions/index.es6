@@ -7,14 +7,6 @@ const crypto = require('crypto');
 const simpleOAuth = require('simple-oauth2');
 const rpn = require('request-promise-native');
 
-const safeCompare = require('safe-compare');
-const { PromisePool } = require('es6-promise-pool');
-// Maximum concurrent account deletions.
-const MAX_CONCURRENT = 3;
-
-// Cron key
-const cronKey = require('./cron-key.json');
-
 // Firebase Setup
 const admin = require('firebase-admin');
 
@@ -64,12 +56,6 @@ exports.redirect = functions.https.onRequest((req, res) => {
   cookieParser()(req, res, () => {
     let state = crypto.randomBytes(20).toString('hex');
 
-    const oldIdToken = req.query.oldIdToken;
-    if (oldIdToken) {
-      console.log('Old ID token saved to state', oldIdToken);
-      state = `${oldIdToken}|${state}`;
-    }
-
     console.log('Setting verification state:', state);
     res.cookie('state', state.toString(), {
       maxAge: 3600000,
@@ -96,39 +82,12 @@ async function createFirebaseAccount(wcaProfile, accessToken, idToken) {
   // The UID we'll assign to the user.
   const wcaUid = `wca:${wcaProfile.id}`;
 
-  if (idToken) {
-    console.log('Old ID token found in state', idToken);
+  const wcaUserDocRef = admin
+    .firestore()
+    .collection('users')
+    .doc(wcaUid);
 
-    const decodedToken = await admin.auth().verifyIdToken(idToken);
-    const anonUid = decodedToken.uid;
-
-    const anonUserDocRef = admin
-      .firestore()
-      .collection('users')
-      .doc(anonUid);
-
-    const backup = await backupDocument(anonUserDocRef, anonUid);
-
-    console.log('Backup Completed', JSON.stringify(backup));
-
-    const wcaUserDocRef = admin
-      .firestore()
-      .collection('users')
-      .doc(wcaUid);
-    const batch = admin.firestore().batch();
-    await restoreDocument(wcaUserDocRef, anonUid, backup, batch);
-
-    console.log('Backup Restored');
-
-    await deleteDocumentRecursive(anonUserDocRef, batch);
-
-    await batch.commit().catch(error => console.log(error));
-
-    // Save the profile
-    // Overwrite all (e.g. restored 'expires' field)
-    await wcaUserDocRef.set({ wca: wcaProfile });
-    await admin.auth().deleteUser(anonUid);
-  }
+  await wcaUserDocRef.set({ wca: wcaProfile });
 
   // Create or update the user account.
   try {
@@ -246,141 +205,52 @@ exports.token = functions.https.onRequest((req, res) => {
   });
 });
 
-async function getUsers(users = [], nextPageToken) {
-  const listUsersResult = await admin.auth().listUsers(1000, nextPageToken);
-  if (listUsersResult.pageToken) {
-    // List next batch of users.
-    return getUsers(
-      users.concat(listUsersResult.users),
-      listUsersResult.pageToken
-    );
-  }
-  return users.concat(listUsersResult.users);
-}
-
-exports.accountcleanup = functions.https.onRequest(async (req, res) => {
-  const key = req.query.key;
-
-  // Exit if the keys don't match
-  if (!safeCompare(key, cronKey)) {
-    console.log(
-      'The key provided in the request does not match the key set in the environment. Check that',
-      key,
-      'matches cron-key.json`'
-    );
-    res
-      .status(403)
-      .send(
-        'Security key does not match. Make sure your "key" URL query parameter matches cron-key.json'
-      );
-    return;
-  }
-
-  // Fetch all user details.
-  const users = await getUsers();
-
-  let deleted = 0;
-
-  const usersToDelete = users.slice(0);
-
-  // Use a pool so that we delete maximum `MAX_CONCURRENT` users in parallel.
-  const deleteUserTask = async () => {
-    const user = usersToDelete.pop();
-    console.log('Checking', user.uid);
-
-    console.log(new Date(user.metadata.lastSignInTime).toLocaleString());
-
-    const userDocRef = admin
-      .firestore()
-      .collection('users')
-      .doc(user.uid);
-    const userDoc = await userDocRef.get().catch(error => console.error(error));
-    if (
-      !userDoc.exists ||
-      (userDoc.data().expires && userDoc.data().expires < Date.now())
-    ) {
-      // Delete the inactive user.
-      await admin
-        .auth()
-        .deleteUser(user.uid)
-        .catch(error => {
-          console.error(
-            'Deletion of inactive user account',
-            user.uid,
-            'failed:',
-            error
-          );
-        });
-      console.log('Deleted user account', user.uid, 'because of inactivity');
-
-      deleted += 1;
-    }
-    if (
-      userDoc.exists &&
-      (userDoc.data().expires && userDoc.data().expires < Date.now())
-    ) {
-      const batch = admin.firestore().batch();
-      deleteDocumentRecursive(userDocRef, batch);
-      await batch.commit().catch(error => {
-        console.error(
-          'Deletion of inactive user document',
-          user.uid,
-          'failed:',
-          error
-        );
-      });
-      console.log('Deleted user document', user.uid, 'because of inactivity');
-    }
-  };
-  const promiseProducer = () => {
-    if (usersToDelete.length <= 0) {
-      return null;
-    }
-    return deleteUserTask();
-  };
-  const promisePool = new PromisePool(promiseProducer, MAX_CONCURRENT);
-
-  await promisePool.start();
-
-  const message = `User cleanup finished, deleted ${deleted} users`;
-  console.log(message);
-  res.send(message);
+const cors = require('cors')({
+  origin: DEBUG ? 'http://localhost:5000' : 'https://timer.pluscubed.com'
 });
 
 exports.backup = functions.https.onRequest(async (req, res) => {
-  try {
-    const idToken = req.query.idToken;
-    const decodedToken = await admin.auth().verifyIdToken(idToken);
-    const uid = decodedToken.uid;
+  cors(req, res, async () => {
+    try {
+      const idToken = req.query.idToken;
+      const decodedToken = await admin.auth().verifyIdToken(idToken);
+      const uid = decodedToken.uid;
 
-    const userRef = admin
-      .firestore()
-      .collection('users')
-      .doc(uid);
+      const userRef = admin
+        .firestore()
+        .collection('users')
+        .doc(uid);
 
-    const backup = await backupDocument(userRef, 'backup');
-    res.json(backup);
-  } catch (error) {
-    res.status(500).json({ error: error });
-  }
+      const backup = await backupDocument(userRef, 'backup');
+      res.json(backup);
+    } catch (error) {
+      res.status(500).json({ error: error });
+    }
+  });
 });
 
 exports.restore = functions.https.onRequest(async (req, res) => {
-  try {
-    const idToken = req.query.idToken;
-    const backup = req.body;
-    const decodedToken = await admin.auth().verifyIdToken(idToken);
-    const uid = decodedToken.uid;
+  cors(req, res, async () => {
+    try {
+      const idToken = req.query.idToken;
+      const backup = req.body;
+      const decodedToken = await admin.auth().verifyIdToken(idToken);
+      const uid = decodedToken.uid;
 
-    const userRef = admin
-      .firestore()
-      .collection('users')
-      .doc(uid);
+      const userRef = admin
+        .firestore()
+        .collection('users')
+        .doc(uid);
 
-    const batch = admin.firestore().batch();
-    await restoreDocument(userRef, 'backup', backup, batch);
-    res.send('Success');
-  } catch (error) {
-    res.status(500).json({ error: error });
-  }
+      console.log('Restore request', backup);
+
+      const batch = admin.firestore().batch();
+      restoreDocument(userRef, 'backup', backup, batch);
+      await batch.commit();
+      res.send('Success');
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ error: error.message });
+    }
+  });
 });

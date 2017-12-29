@@ -3,14 +3,13 @@
 import firebase from './firebase';
 
 const DEBUG = process.env.FIREBASE_ENV === 'development';
+const projectId = firebase.app().options.projectId;
 const functionsUrl = DEBUG
-  ? `http://localhost:5001/${firebase.app().options.projectId}/us-central1`
-  : `https://us-central1-${
-      firebase.app().options.projectId
-    }.cloudfunctions.net`;
+  ? `http://localhost:5001/${projectId}/us-central1`
+  : `https://us-central1-${projectId}.cloudfunctions.net`;
 
 export const getCurrentPuzzleCategory = async uid => {
-  const firestore = await firebase.firestore();
+  const firestore = await firebase.firestore(uid);
 
   const userDoc = await firestore
     .collection('users')
@@ -33,9 +32,9 @@ export const getCurrentPuzzleCategory = async uid => {
   return [currentPuzzle, currentCategory];
 };
 
-export const onPuzzleCategoryChanged = async (callback, uid) => {
+export const onPuzzleCategoryChanged = (uid, callback) => {
   (async () => {
-    const firestore = await firebase.firestore();
+    const firestore = await firebase.firestore(uid);
 
     const unsubscribeUser = firestore
       .collection('users')
@@ -65,11 +64,12 @@ export const onPuzzleCategoryChanged = async (callback, uid) => {
   })();
 };
 
-export const getBackup = () =>
-  fetch(`${functionsUrl}/backup`).then(r => r.json());
+export const getBackup = idToken =>
+  fetch(`${functionsUrl}/backup?idToken=${idToken}`).then(r => r.json());
 
-export const restoreBackup = backup =>
-  fetch(`${functionsUrl}/restore`, {
+export const restoreBackup = (idToken, backup) =>
+  fetch(`${functionsUrl}/restore?idToken=${idToken}`, {
+    headers: { 'Content-Type': 'application/json' },
     method: 'POST',
-    body: backup
+    body: JSON.stringify(backup)
   }).then(r => r.text());

@@ -12,24 +12,12 @@ type Props = {
 
 class ProfileContainer extends React.PureComponent<Props, void> {
   handleLoginClick = async () => {
-    const auth = await firebase.auth();
-    if (auth.currentUser && auth.currentUser.isAnonymous) {
-      const oldIdToken = await auth.currentUser.getIdToken(true);
-      window.open(
-        `popup.html?oldIdToken=${oldIdToken}`,
-        '_blank',
-        'height=585,width=400'
-      );
-    }
+    window.open('popup.html', '_blank', 'height=585,width=400');
   };
 
   handleAvatarClick = async () => {
     const auth = await firebase.auth();
-    if (auth.currentUser && !auth.currentUser.isAnonymous) {
-      await auth.signOut();
-      // Sign in anonymously if not currently signed in
-      await auth.signInAnonymously();
-    }
+    await auth.signOut();
   };
 
   componentWillUnmount() {}

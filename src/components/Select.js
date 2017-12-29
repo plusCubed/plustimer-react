@@ -1,3 +1,5 @@
+// @flow
+
 import * as React from 'react';
 
 import style from './Select.css';
@@ -6,6 +8,7 @@ import firebase from '../utils/firebase';
 
 type Props = {
   defaults: Map<string, string>,
+  uid: string,
   path: string,
   onChange: (value: string) => void,
   value: string
@@ -23,10 +26,11 @@ class Select extends React.PureComponent<Props, State> {
   async componentDidUpdate(prevProps, prevState) {
     // Check that the path changed and is valid
     if (
+      this.props.uid &&
       this.props.path !== prevProps.path &&
       !this.props.path.split('/').includes('')
     ) {
-      const firestore = await firebase.firestore();
+      const firestore = await firebase.firestore(this.props.uid);
       const collectionRef = firestore.collection(this.props.path);
       const querySnapshot = await collectionRef.get();
       const docSnapshots = querySnapshot.docs;
@@ -35,10 +39,9 @@ class Select extends React.PureComponent<Props, State> {
           options.set(doc.id, doc.data().name);
           return options;
         },
-        this.props.defaults
+        new Map(this.props.defaults)
       );
 
-      console.log('Select Options', this.props.path, options);
       this.setState({ options: options });
     }
   }

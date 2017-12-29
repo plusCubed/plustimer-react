@@ -1,3 +1,5 @@
+// @flow
+
 // OBJECT PATH ACCESS
 
 export function deep(obj, path, value) {

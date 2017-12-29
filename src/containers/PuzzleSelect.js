@@ -42,18 +42,20 @@ class PuzzleCategorySelect extends React.PureComponent<Props, State> {
   }
 
   async componentDidUpdate(prevProps, prevState) {
-    if (this.props.uid !== prevProps.uid && this.props.uid) {
-      const firestore = await firebase.firestore();
-      const userDoc = await firestore.doc(`users/${this.props.uid}`).get();
+    if (this.props.uid !== prevProps.uid) {
+      if (this.props.uid) {
+        const firestore = await firebase.firestore(this.props.uid);
+        const userDoc = await firestore.doc(`users/${this.props.uid}`).get();
 
-      let currentPuzzle;
-      if (userDoc.exists && userDoc.get('currentPuzzle')) {
-        currentPuzzle = userDoc.get('currentPuzzle');
-      } else {
-        currentPuzzle = '333';
+        let currentPuzzle;
+        if (userDoc.exists && userDoc.get('currentPuzzle')) {
+          currentPuzzle = userDoc.get('currentPuzzle');
+        } else {
+          currentPuzzle = '333';
+        }
+
+        await this.handlePuzzleChange(currentPuzzle);
       }
-
-      await this.handlePuzzleChange(currentPuzzle);
     }
   }
 
@@ -66,7 +68,7 @@ class PuzzleCategorySelect extends React.PureComponent<Props, State> {
 
     console.log('New puzzle', puzzle);
 
-    const firestore = await firebase.firestore();
+    const firestore = await firebase.firestore(this.props.uid);
 
     // Set current puzzle in the user doc
     const userRef = firestore.collection('users').doc(this.props.uid);
@@ -100,7 +102,7 @@ class PuzzleCategorySelect extends React.PureComponent<Props, State> {
       return;
     }
 
-    const firestore = await firebase.firestore();
+    const firestore = await firebase.firestore(this.props.uid);
 
     // Set current category in the puzzle doc
     const puzzleRef = firestore.doc(
@@ -113,7 +115,6 @@ class PuzzleCategorySelect extends React.PureComponent<Props, State> {
     const categoryDoc = await categoryRef.get();
     if (!categoryDoc.exists) {
       const name = puzzleDefaults[puzzle].categories[category];
-
       await categoryDoc.ref.set({ name: name }, { merge: true });
     }
   };
@@ -122,6 +123,7 @@ class PuzzleCategorySelect extends React.PureComponent<Props, State> {
     return (
       <span>
         <Select
+          uid={this.props.uid}
           value={this.state.puzzle}
           defaults={this.defaultPuzzles}
           path={`users/${this.props.uid}/puzzles`}
@@ -129,6 +131,7 @@ class PuzzleCategorySelect extends React.PureComponent<Props, State> {
         />
 
         <Select
+          uid={this.props.uid}
           value={this.state.category}
           defaults={this.defaultCategories.get(this.state.puzzle)}
           path={`users/${this.props.uid}/puzzles/${

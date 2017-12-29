@@ -4,6 +4,7 @@ import * as React from 'react';
 
 import firebase from '../utils/firebase';
 import App from '../components/App';
+import { restoreBackup } from '../utils/firebaseUtils';
 
 type State = {
   uid: string,
@@ -18,16 +19,11 @@ class AppContainer extends React.PureComponent<void, State> {
 
   async componentDidMount() {
     const auth = await firebase.auth();
-    const firestore = await firebase.firestore();
+    const firestore = await firebase.firestore(true);
     try {
       await firestore.enablePersistence();
     } catch (error) {
       console.log(error);
-    }
-
-    if (!auth.currentUser) {
-      // Sign in anonymously if not currently signed in
-      await auth.signInAnonymously();
     }
 
     auth.onAuthStateChanged(this.onAuthStateChanged);
@@ -36,36 +32,38 @@ class AppContainer extends React.PureComponent<void, State> {
   onAuthStateChanged = async user => {
     if (user) {
       // User is signed in.
-      let { uid } = user;
+      const { uid } = user;
 
       console.log('Logged In', uid);
 
-      const firestore = await firebase.firestore();
-
-      if (!user.isAnonymous) {
-        let userDoc = await firestore
-          .collection('users')
-          .doc(uid)
-          .get();
-
-        const wcaProfile = userDoc.data().wca;
-        this.setState({ wcaProfile: wcaProfile });
-      } else {
-        // If anonymous, account expires in 30 days
-        await firestore
-          .collection('users')
-          .doc(uid)
-          .set(
-            { expires: Math.floor(Date.now() + 30 * 24 * 60 * 60 * 1000) },
-            { merge: true }
-          );
+      const localFirestore = localStorage.getItem('localFirestore');
+      if (localFirestore) {
+        const auth = await firebase.auth();
+        const idToken = await auth.currentUser.getIdToken();
+        const backup = {
+          backup: JSON.parse(localFirestore).users.local
+        };
+        const result = await restoreBackup(idToken, backup);
+        console.log('Local -> Remote', result);
+        localStorage.removeItem('localFirestore');
       }
 
-      this.setState({ uid: uid });
+      const firestore = await firebase.firestore(true);
+
+      const userDoc = await firestore
+        .collection('users')
+        .doc(uid)
+        .get();
+
+      const wcaProfile = userDoc.data().wca;
+      this.setState({
+        uid: uid,
+        wcaProfile: wcaProfile
+      });
     } else {
       // Signed out
       this.setState({
-        uid: '',
+        uid: 'local',
         wcaProfile: null
       });
     }

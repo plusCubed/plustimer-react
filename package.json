@@ -4,15 +4,15 @@
   "version": "0.0.0",
   "scripts": {
     "app:start": "if-env NODE_ENV=production && npm run -s serve || npm run -s dev",
-    "app:build": "preact build && preact serve --server config --dest build",
+    "app:build": "firebase use default && preact build && preact serve --server config --dest build",
     "app:serve": "yarn build && preact serve",
     "app:dev": "cross-env FIREBASE_ENV=development preact watch --port 5000",
     "app:deploy": "firebase use default && yarn app:build && firebase deploy --only hosting",
-    "functions:build": "babel functions/*.es6 --out-dir .",
+    "functions:build": "firebase use default && babel functions/*.es6 --out-dir .",
     "functions:dev": "concurrently \"babel functions/*.es6 --watch --out-dir .\" \"yarn functions:dev-serve\"",
     "functions:dev-serve": "firebase use staging && cross-env FIREBASE_ENV=development firebase serve --only functions --port 5001",
     "functions:deploy": "firebase use default && yarn functions:build && firebase deploy --only functions",
-    "all:build": "yarn app:build && yarn functions:build",
+    "all:build": "firebase use default && yarn app:build && yarn functions:build",
     "all:dev": "concurrently \"yarn app:dev\" \"yarn functions:dev\"",
     "all:deploy": "firebase use default && yarn all:build && firebase deploy",
     "lint": "eslint src",
@@ -32,7 +32,8 @@
       "react/prefer-stateless-function": "off",
       "linebreak-style": "off",
       "react/jsx-filename-extension": "off",
-      "object-shorthand": "off"
+      "object-shorthand": "off",
+      "no-use-before-define": "off"
     }
   },
   "lint-staged": {
@@ -64,7 +65,7 @@
     "eslint-plugin-jsx-a11y": "^6.0.3",
     "eslint-plugin-react": "^7.5.1",
     "fast-async": "^6.3.0",
-    "flow-bin": "^0.61.0",
+    "flow-bin": "^0.62.0",
     "husky": "^0.14.3",
     "if-env": "^1.0.0",
     "lint-staged": "^6.0.0",
@@ -80,6 +81,7 @@
     "asyncro": "^2.0.1",
     "date-fns": "^1.29.0",
     "firebase": "^4.8.1",
+    "mitt": "^1.1.3",
     "preact": "^8.2.1",
     "preact-compat": "^3.17.0",
     "preact-material-components": "^1.3.3",

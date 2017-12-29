@@ -13,5 +13,6 @@ module.name_mapper.extension='css' -> 'css-module-flow'
 module.name_mapper.extension='less' -> 'css-module-flow'
 module.name_mapper.extension='scss' -> 'css-module-flow'
 module.name_mapper.extension='styl' -> 'css-module-flow'
+all=true
 
 [lints]

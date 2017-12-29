@@ -5,7 +5,7 @@ import * as React from 'react';
 import TimerDisplay, { TimerMode } from '../components/TimerDisplay';
 
 import firebase from '../utils/firebase';
-import { getCurrentPuzzleCategory } from '../utils/firebase-utils';
+import { getCurrentPuzzleCategory } from '../utils/firebaseUtils';
 
 import { Penalty } from '../components/SolvesList';
 
@@ -98,7 +98,7 @@ class TimerDisplayContainer extends React.PureComponent<Props, State> {
           this.stopTimer(time);
 
           if (this.props.uid) {
-            const firestore = await firebase.firestore();
+            const firestore = await firebase.firestore(this.props.uid);
 
             const [puzzle, category] = await getCurrentPuzzleCategory(
               this.props.uid

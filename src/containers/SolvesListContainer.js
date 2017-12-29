@@ -4,7 +4,7 @@ import * as React from 'react';
 import SolvesList, { Solve } from '../components/SolvesList';
 
 import firebase from '../utils/firebase';
-import { onPuzzleCategoryChanged } from '../utils/firebase-utils';
+import * as firebaseUtils from '../utils/firebaseUtils';
 
 type Props = {
   uid: string
@@ -18,38 +18,23 @@ class SolvesListContainer extends React.PureComponent<Props, State> {
   state = {
     solves: []
   };
-  _unsubscribePuzzleCategory = null;
-  _unsubscribeSolves = null;
+  puzzleCategoryUnsub = null;
+  solvesUnsub = null;
 
   async componentDidUpdate(prevProps, prevState) {
     if (this.props.uid !== prevProps.uid) {
+      this.unsubscribe();
+      // eslint-disable-next-line react/no-did-update-set-state
+      this.setState({
+        solves: []
+      });
+
       if (this.props.uid) {
         // User is signed in.
-        onPuzzleCategoryChanged(async (puzzle, category, unsubscribe) => {
-          this._unsubscribePuzzleCategory = unsubscribe;
-
-          const firestore = await firebase.firestore();
-          const ref = firestore
-            .collection('users')
-            .doc(this.props.uid)
-            .collection('puzzles')
-            .doc(puzzle)
-            .collection('categories')
-            .doc(category)
-            .collection('solves');
-
-          this.unsubscribeSolves();
-          this._unsubscribeSolves = ref
-            .orderBy('timestamp', 'desc')
-            .onSnapshot(this.onCollectionUpdate);
-        }, this.props.uid);
-      } else {
-        this._unsubscribePuzzleCategory();
-        this._unsubscribeSolves();
-        // eslint-disable-next-line react/no-did-update-set-state
-        this.setState({
-          solves: []
-        });
+        firebaseUtils.onPuzzleCategoryChanged(
+          this.props.uid,
+          this.onPuzzleCategoryChanged
+        );
       }
     }
   }
@@ -57,20 +42,34 @@ class SolvesListContainer extends React.PureComponent<Props, State> {
   async componentDidMount() {}
 
   componentWillUnmount() {
-    this._unsubscribeSolves();
+    this.unsubscribe();
   }
 
-  unsubscribePuzzleCategory() {
-    if (this._unsubscribePuzzleCategory) {
-      this._unsubscribePuzzleCategory();
+  unsubscribe() {
+    if (this.puzzleCategoryUnsub) {
+      this.puzzleCategoryUnsub();
+    }
+    if (this.solvesUnsub) {
+      this.solvesUnsub();
     }
   }
 
-  unsubscribeSolves() {
-    if (this._unsubscribeSolves) {
-      this._unsubscribeSolves();
-    }
-  }
+  onPuzzleCategoryChanged = async (puzzle, category, unsubscribe) => {
+    this.puzzleCategoryUnsub = unsubscribe;
+
+    const firestore = await firebase.firestore(this.props.uid);
+    const ref = firestore
+      .collection('users')
+      .doc(this.props.uid)
+      .collection('puzzles')
+      .doc(puzzle)
+      .collection('categories')
+      .doc(category)
+      .collection('solves');
+    this.solvesUnsub = ref
+      .orderBy('timestamp', 'desc')
+      .onSnapshot(this.onCollectionUpdate);
+  };
 
   onCollectionUpdate = querySnapshot => {
     const solves = [];
