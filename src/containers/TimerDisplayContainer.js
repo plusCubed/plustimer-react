@@ -123,8 +123,10 @@ class TimerDisplayContainer extends React.PureComponent<Props, State> {
         this.resetTimer();
         break;
       case TimerMode.Running:
-        this.startTimer(now);
-        await this.fetchScramble();
+        if (!this.scrambling) {
+          this.startTimer(now);
+          await this.fetchScramble();
+        }
         break;
       case TimerMode.Stopped:
         this.stopTimer(now);
