@@ -182,6 +182,9 @@ class TimerDisplayContainer extends React.PureComponent<Props, State> {
 
   async advanceScramble() {
     if (this.scrambling) {
+      this.setState({
+        currentScramble: 'Scrambling...'
+      });
       await this.scrambling;
     }
     this.setState({
