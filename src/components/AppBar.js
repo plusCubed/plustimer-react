@@ -7,19 +7,16 @@ import PuzzleSelect from '../containers/PuzzleSelect';
 
 import style from './AppBar.css';
 
-type Props = {
-  uid: string,
-  wcaProfile: any
-};
+type Props = {};
 
-const AppBar = (props: Props) => {
+const AppBar = () => {
   return (
     <header className={style.toolbar}>
-      <PuzzleSelect uid={props.uid} />
+      <PuzzleSelect />
 
       <span className={style.toolbarSpacer} />
 
-      <ProfileContainer uid={props.uid} wcaProfile={props.wcaProfile} />
+      <ProfileContainer />
     </header>
   );
 };

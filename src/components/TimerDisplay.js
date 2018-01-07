@@ -9,7 +9,8 @@ type Props = {
   displayTime: number,
   mode: string,
   onDown: () => void,
-  onUp: () => void
+  onUp: () => void,
+  scramble: string
 };
 
 export const TimerMode = {
@@ -49,10 +50,11 @@ class TimerDisplay extends React.PureComponent<Props, void> {
   }
 
   render() {
-    const { onDown, onUp, displayTime, mode } = this.props;
+    const { onDown, onUp, displayTime, mode, scramble } = this.props;
 
     return (
       <div className={style.timer} onTouchStart={onDown} onTouchEnd={onUp}>
+        <div className={style.scramble}>{scramble}</div>
         <div className={`${style.timerText} ${style[mode]}`}>
           {formatTime(displayTime)}
         </div>

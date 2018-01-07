@@ -2,12 +2,16 @@
 
 import * as React from 'react';
 
+import { connect } from 'unistore/full/preact.es';
+
 import TimerDisplay, { TimerMode } from '../components/TimerDisplay';
 
 import firebase from '../utils/firebase';
-import { getCurrentPuzzleCategory } from '../utils/firebaseUtils';
+import * as firebaseUtils from '../utils/firebaseUtils';
 
 import { Penalty } from '../components/SolvesList';
+
+import scrambleService from '../utils/scrambleService';
 
 export const TimerModeAction = {
   Down: 'down',
@@ -42,25 +46,48 @@ export const transitionMode = (action: string, timerMode: string): string => {
 };
 
 type Props = {
-  uid: string
+  uid: string,
+  puzzle: string,
+  category: string
 };
 
 type State = {
   startTime: number,
   displayTime: number,
-  mode: string
+  mode: string,
+  currentScramble: string,
+  nextScramble: string,
+  scrambling: boolean
 };
 
+@connect('uid,puzzle,category')
 class TimerDisplayContainer extends React.PureComponent<Props, State> {
   state = {
     startTime: -1,
     displayTime: 0,
-    mode: TimerMode.Ready
+    mode: TimerMode.Ready,
+    currentScramble: ''
   };
+
+  nextScramble = '';
+  scrambling = false;
 
   animationFrameId = 0;
 
-  componentDidMount() {}
+  async componentDidUpdate(prevProps) {
+    if (
+      (this.props.uid !== prevProps.uid ||
+        this.props.puzzle !== prevProps.puzzle) &&
+      this.props.puzzle
+    ) {
+      console.log('Puzzle changed');
+
+      if (!this.scrambling) {
+        await this.fetchScramble();
+        await this.advanceScramble();
+      }
+    }
+  }
 
   componentWillUnmount() {
     this.stopTimer();
@@ -83,50 +110,82 @@ class TimerDisplayContainer extends React.PureComponent<Props, State> {
       return;
     }
 
-    const time = Math.trunc(performance.now());
+    const now = Math.trunc(performance.now());
     this.setState({ mode: newMode });
 
     switch (newMode) {
+      case TimerMode.Ready:
+        if (oldMode === TimerMode.Stopped) {
+          await this.advanceScramble();
+        }
+        break;
       case TimerMode.HandOnTimer:
         this.resetTimer();
         break;
       case TimerMode.Running:
-        this.startTimer(time);
+        this.startTimer(now);
+        await this.fetchScramble();
         break;
       case TimerMode.Stopped:
-        {
-          this.stopTimer(time);
-
-          if (this.props.uid) {
-            const firestore = await firebase.firestore(this.props.uid);
-
-            const [puzzle, category] = await getCurrentPuzzleCategory(
-              this.props.uid
-            );
-
-            const puzzleRef = firestore
-              .collection('users')
-              .doc(this.props.uid)
-              .collection('puzzles')
-              .doc(puzzle);
-            const categoryRef = puzzleRef
-              .collection('categories')
-              .doc(category);
-            const solvesRef = categoryRef.collection('solves');
-
-            const docRef = await solvesRef.add({
-              time: Math.floor(time - this.state.startTime),
-              timestamp: new Date(),
-              scramble: '',
-              penalty: Penalty.NORMAL
-            });
-            console.log('Document written with ID: ', docRef.id);
-          }
-        }
+        this.stopTimer(now);
+        await this.addSolve(now);
         break;
       default:
         break;
     }
+  }
+
+  async addSolve(now) {
+    if (!this.props.uid || !this.props.puzzle || !this.props.category) {
+      return;
+    }
+    const firestore = await firebase.firestore(this.props.uid);
+    const puzzleRef = firestore
+      .collection('users')
+      .doc(this.props.uid)
+      .collection('puzzles')
+      .doc(this.props.puzzle);
+    const categoryRef = puzzleRef
+      .collection('categories')
+      .doc(this.props.category);
+    const solvesRef = categoryRef.collection('solves');
+    const docRef = await solvesRef.add({
+      time: Math.floor(now - this.state.startTime),
+      timestamp: new Date(),
+      scramble: this.state.currentScramble,
+      penalty: Penalty.NORMAL
+    });
+    console.log('Document written with ID: ', docRef.id);
+  }
+
+  async fetchScramble() {
+    if (!this.props.uid || !this.props.puzzle) {
+      return;
+    }
+    console.log('Fetching scramble');
+    const firestore = await firebase.firestore(this.props.uid);
+    const puzzleDoc = await firestore
+      .collection('users')
+      .doc(this.props.uid)
+      .collection('puzzles')
+      .doc(this.props.puzzle)
+      .get();
+    const scrambler = puzzleDoc.get('scrambler');
+    this.scrambling = scrambleService.getScramble(scrambler).then(scramble => {
+      console.log('Fetch scramble complete', scramble);
+      this.nextScramble = scramble;
+      this.scrambling = null;
+    });
+  }
+
+  async advanceScramble() {
+    if (this.scrambling) {
+      await this.scrambling;
+    }
+    this.setState({
+      currentScramble: this.nextScramble
+    });
+    console.log('Scramble advanced');
   }
 
   resetTimer() {
@@ -153,6 +212,7 @@ class TimerDisplayContainer extends React.PureComponent<Props, State> {
   render() {
     return (
       <TimerDisplay
+        scramble={this.state.currentScramble}
         displayTime={this.state.displayTime}
         mode={this.state.mode}
         onDown={this.handleDown}

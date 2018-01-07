@@ -1,24 +1,21 @@
 // @flow
 
 import * as React from 'react';
+import { createStore, Provider } from 'unistore/full/preact.es';
 
 import firebase from '../utils/firebase';
 import App from '../components/App';
-import { restoreBackup } from '../utils/firebaseUtils';
+import * as preferences from '../utils/preferences';
+import * as firebaseUtils from '../utils/firebaseUtils';
 
-type State = {
-  uid: string,
-  wcaProfile: any
-};
+const store = createStore();
 
-class AppContainer extends React.PureComponent<void, State> {
-  state = {
-    uid: '',
-    wcaProfile: null
-  };
+class AppContainer extends React.PureComponent<void, void> {
+  state = {};
 
   async componentDidMount() {
     const auth = await firebase.auth();
+
     const firestore = await firebase.firestore(true);
     try {
       await firestore.enablePersistence();
@@ -36,6 +33,7 @@ class AppContainer extends React.PureComponent<void, State> {
 
       console.log('Logged In', uid);
 
+      // Restore local Firestore to newly created account
       const localFirestore = localStorage.getItem('localFirestore');
       if (localFirestore) {
         const auth = await firebase.auth();
@@ -43,36 +41,45 @@ class AppContainer extends React.PureComponent<void, State> {
         const backup = {
           backup: JSON.parse(localFirestore).users.local
         };
-        const result = await restoreBackup(idToken, backup);
+        const result = await firebaseUtils.restoreBackup(idToken, backup);
         console.log('Local -> Remote', result);
         localStorage.removeItem('localFirestore');
       }
 
+      // Get user doc & WCA profile
       const firestore = await firebase.firestore(true);
-
       const userDoc = await firestore
         .collection('users')
         .doc(uid)
         .get();
 
       const wcaProfile = userDoc.data().wca;
-      this.setState({
-        uid: uid,
-        wcaProfile: wcaProfile
-      });
+
+      store.setState({ uid: uid, wcaProfile: wcaProfile });
     } else {
-      // Signed out
-      this.setState({
-        uid: 'local',
-        wcaProfile: null
-      });
+      // Signed out - local
+      store.setState({ uid: 'local', wcaProfile: null });
     }
+
+    this.unsubscribePuzzle && this.unsubscribePuzzle();
+    this.unsubscribePuzzle = preferences.onChange(true, 'puzzle', value => {
+      store.setState({ puzzle: value });
+    });
+
+    this.unsubscribeCategory && this.unsubscribeCategory();
+    this.unsubscribeCategory = preferences.onChange(true, 'category', value => {
+      store.setState({ category: value });
+    });
   };
 
   componentWillUnmount() {}
 
   render() {
-    return <App uid={this.state.uid} wcaProfile={this.state.wcaProfile} />;
+    return (
+      <Provider store={store}>
+        <App />
+      </Provider>
+    );
   }
 }
 

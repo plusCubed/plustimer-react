@@ -29,6 +29,16 @@
   transition: color 0s;
 }
 
+.scramble {
+  grid-area: scramble;
+  justify-self: stretch;
+  font-family: monospace;
+  font-size: 18px;
+  padding: 16px;
+  text-align: center;
+  white-space: pre-line;
+}
+
 @media (max-width: 599px) {
   .timerText {
     font-size: 25vw;

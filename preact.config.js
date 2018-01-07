@@ -17,6 +17,11 @@ export default function (config, env, helpers) {
   };
   swPrecachePlugin(config, precacheConfig);
 
+  config.module.loaders.push({
+    test: /\.worker\.js$/,
+    use: { loader: 'worker-loader' }
+  });
+
   config.plugins.push(
     new HtmlWebpackPlugin({
       filename: 'popup.html',

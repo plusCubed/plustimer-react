@@ -2,6 +2,8 @@
 
 import * as React from 'react';
 
+import { connect } from 'unistore/full/preact.es';
+
 import Profile from '../components/Profile';
 import firebase from '../utils/firebase';
 
@@ -10,6 +12,7 @@ type Props = {
   wcaProfile: any
 };
 
+@connect('uid,wcaProfile')
 class ProfileContainer extends React.PureComponent<Props, void> {
   handleLoginClick = async () => {
     window.open('popup.html', '_blank', 'height=585,width=400');

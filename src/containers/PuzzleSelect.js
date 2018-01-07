@@ -1,7 +1,9 @@
 import * as React from 'react';
+import { connect } from 'unistore/full/preact.es';
 
 import { buildMapFromObject } from '../utils/utils';
 import firebase from '../utils/firebase';
+import * as preferences from '../utils/preferences';
 
 import Select from '../components/Select';
 
@@ -16,6 +18,7 @@ type State = {
   category: string
 };
 
+@connect('uid')
 class PuzzleCategorySelect extends React.PureComponent<Props, State> {
   state = {
     puzzle: '',
@@ -42,44 +45,34 @@ class PuzzleCategorySelect extends React.PureComponent<Props, State> {
   }
 
   async componentDidUpdate(prevProps, prevState) {
-    if (this.props.uid !== prevProps.uid) {
-      if (this.props.uid) {
-        const firestore = await firebase.firestore(this.props.uid);
-        const userDoc = await firestore.doc(`users/${this.props.uid}`).get();
-
-        let currentPuzzle;
-        if (userDoc.exists && userDoc.get('currentPuzzle')) {
-          currentPuzzle = userDoc.get('currentPuzzle');
-        } else {
-          currentPuzzle = '333';
-        }
-
-        await this.handlePuzzleChange(currentPuzzle);
+    if (this.props.uid !== prevProps.uid && this.props.uid) {
+      let currentPuzzle = preferences.getItem('puzzle');
+      if (!currentPuzzle) {
+        currentPuzzle = '333';
       }
+
+      await this.handlePuzzleChange(currentPuzzle);
     }
   }
 
   handlePuzzleChange = async puzzle => {
     this.setState({ puzzle: puzzle });
 
-    if (!puzzle) {
-      return;
-    }
-
     console.log('New puzzle', puzzle);
 
     const firestore = await firebase.firestore(this.props.uid);
-
-    // Set current puzzle in the user doc
     const userRef = firestore.collection('users').doc(this.props.uid);
-    await userRef.set({ currentPuzzle: puzzle }, { merge: true });
+
+    // Set current puzzle
+    preferences.setItem('puzzle', puzzle);
 
     // Get the current category for the selected puzzle
     const puzzleRef = userRef.collection('puzzles').doc(puzzle);
     const puzzleDoc = await puzzleRef.get();
     let currentCategory;
     if (puzzleDoc.exists) {
-      currentCategory = puzzleDoc.get('currentCategory');
+      currentCategory = (await puzzleDoc.ref.collection('categories').get())
+        .docs[0].id;
     } else {
       // If the puzzle doc doesn't exist, write the default
       const puzzleData = { ...puzzleDefaults[puzzle] };
@@ -90,7 +83,7 @@ class PuzzleCategorySelect extends React.PureComponent<Props, State> {
       currentCategory = Object.keys(puzzleDefaults[puzzle].categories)[0];
     }
 
-    await this.handleCategoryChange(currentCategory);
+    await this.handleCategoryChange(currentCategory, puzzle);
   };
 
   handleCategoryChange = async (category, puzzle = this.state.puzzle) => {
@@ -103,12 +96,12 @@ class PuzzleCategorySelect extends React.PureComponent<Props, State> {
     }
 
     const firestore = await firebase.firestore(this.props.uid);
-
-    // Set current category in the puzzle doc
     const puzzleRef = firestore.doc(
       `users/${this.props.uid}/puzzles/${puzzle}`
     );
-    await puzzleRef.set({ currentCategory: category }, { merge: true });
+
+    // Set current category in the puzzle doc
+    preferences.setItem('category', category);
 
     // If the category doc doesn't exist, write the default (the name)
     const categoryRef = puzzleRef.collection('categories').doc(category);
