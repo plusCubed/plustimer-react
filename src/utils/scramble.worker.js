@@ -40,10 +40,10 @@ var randomInt = function() {
   }
 
   var cryptoObject_;
-  if (typeof this.crypto !== 'undefined') {
-    cryptoObject_ = this.crypto;
-  } else if (typeof this.msCrypto !== 'undefined') {
-    cryptoObject_ = this.msCrypto;
+  if (typeof self.crypto !== 'undefined') {
+    cryptoObject_ = self.crypto;
+  } else if (typeof self.msCrypto !== 'undefined') {
+    cryptoObject_ = self.msCrypto;
   } else {
     cryptoObject_ = null;
   }
