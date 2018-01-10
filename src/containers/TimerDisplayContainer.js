@@ -78,12 +78,13 @@ class TimerDisplayContainer extends React.PureComponent<Props, State> {
     if (
       (this.props.uid !== prevProps.uid ||
         this.props.puzzle !== prevProps.puzzle) &&
+      this.props.uid &&
       this.props.puzzle
     ) {
-      console.log('Puzzle changed');
+      console.log('User/puzzle changed, generating scrambles');
 
       if (!this.scrambling) {
-        await this.fetchScramble();
+        this.startFetchScramble();
         await this.advanceScramble();
       }
     }
@@ -125,7 +126,7 @@ class TimerDisplayContainer extends React.PureComponent<Props, State> {
       case TimerMode.Running:
         if (!this.scrambling) {
           this.startTimer(now);
-          await this.fetchScramble();
+          this.startFetchScramble();
         }
         break;
       case TimerMode.Stopped:
@@ -153,11 +154,15 @@ class TimerDisplayContainer extends React.PureComponent<Props, State> {
     const solvesRef = categoryRef.collection('solves');
     const docRef = await solvesRef.add({
       time: Math.floor(now - this.state.startTime),
-      timestamp: new Date(),
+      timestamp: Date.now(),
       scramble: this.state.currentScramble,
       penalty: Penalty.NORMAL
     });
     console.log('Document written with ID: ', docRef.id);
+  }
+
+  startFetchScramble() {
+    this.scrambling = this.fetchScramble();
   }
 
   async fetchScramble() {
@@ -166,24 +171,35 @@ class TimerDisplayContainer extends React.PureComponent<Props, State> {
     }
     console.log('Fetching scramble');
     const firestore = await firebase.firestore(this.props.uid);
-    const puzzleDoc = await firestore
-      .collection('users')
-      .doc(this.props.uid)
-      .collection('puzzles')
-      .doc(this.props.puzzle)
-      .get();
-    const scrambler = puzzleDoc.get('scrambler');
-    this.scrambling = scrambleService.getScramble(scrambler).then(scramble => {
-      console.log('Fetch scramble complete', scramble);
-      this.nextScramble = scramble;
-      this.scrambling = null;
+
+    const waitForPuzzleDoc = new Promise(resolve => {
+      const unsub = firestore
+        .collection('users')
+        .doc(this.props.uid)
+        .collection('puzzles')
+        .doc(this.props.puzzle)
+        .onSnapshot(puzzleDoc => {
+          if (puzzleDoc.exists) {
+            unsub();
+            resolve(puzzleDoc);
+          } else {
+            console.log('Waiting for puzzle doc initialization...');
+          }
+        });
     });
+    const puzzleDoc = await waitForPuzzleDoc;
+    const scrambler = puzzleDoc.get('scrambler');
+    const scramble = await scrambleService.getScramble(scrambler);
+
+    console.log('Fetch scramble complete', scramble);
+    this.nextScramble = scramble;
+    this.scrambling = null;
   }
 
   async advanceScramble() {
     if (this.scrambling) {
       this.setState({
-        currentScramble: 'Scrambling...'
+        currentScramble: ''
       });
       await this.scrambling;
     }

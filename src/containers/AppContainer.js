@@ -38,8 +38,9 @@ class AppContainer extends React.PureComponent<void, void> {
       if (localFirestore) {
         const auth = await firebase.auth();
         const idToken = await auth.currentUser.getIdToken();
+        const localUser = JSON.parse(localFirestore).users.local;
         const backup = {
-          backup: JSON.parse(localFirestore).users.local
+          backup: localUser
         };
         const result = await firebaseUtils.restoreBackup(idToken, backup);
         console.log('Local -> Remote', result);

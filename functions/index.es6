@@ -1,5 +1,4 @@
 import { backupDocument, restoreDocument } from './firestore-backup';
-import { deleteDocumentRecursive } from './firestore-utils';
 
 const functions = require('firebase-functions');
 const cookieParser = require('cookie-parser');
@@ -78,7 +77,7 @@ exports.redirect = functions.https.onRequest((req, res) => {
  *
  * @returns {Promise<string>} The Firebase custom auth token in a promise.
  */
-async function createFirebaseAccount(wcaProfile, accessToken, idToken) {
+async function createFirebaseAccount(wcaProfile, accessToken) {
   // The UID we'll assign to the user.
   const wcaUid = `wca:${wcaProfile.id}`;
 
@@ -184,16 +183,10 @@ exports.token = functions.https.onRequest((req, res) => {
       }
       */
 
-      let idToken;
-      if (queryState.includes('|')) {
-        idToken = queryState.split('|')[0];
-      }
-
       // Create a Firebase account and get the Custom Auth Token.
       const firebaseToken = await createFirebaseAccount(
         wcaResponse.me,
-        accessToken,
-        idToken
+        accessToken
       );
 
       // Serve an HTML page that signs the user in and updates the user profile.
@@ -242,7 +235,7 @@ exports.restore = functions.https.onRequest(async (req, res) => {
         .collection('users')
         .doc(uid);
 
-      console.log('Restore request', backup);
+      console.log('Restore request', JSON.stringify(backup));
 
       const batch = admin.firestore().batch();
       restoreDocument(userRef, 'backup', backup, batch);

@@ -54,7 +54,9 @@ class TimerDisplay extends React.PureComponent<Props, void> {
 
     return (
       <div className={style.timer} onTouchStart={onDown} onTouchEnd={onUp}>
-        <div className={style.scramble}>{scramble}</div>
+        <div className={style.scramble}>
+          {scramble || 'Generating scramble...'}
+        </div>
         <div className={`${style.timerText} ${style[mode]}`}>
           {formatTime(displayTime)}
         </div>

@@ -6,7 +6,7 @@
     "cors": "^2.8.4",
     "es6-promise-pool": "^2.5.0",
     "firebase-admin": "^5.5.0",
-    "firebase-functions": "^0.7.5",
+    "firebase-functions": "^0.8.0",
     "request": "^2.74.0",
     "request-promise-native": "^1.0.3",
     "safe-compare": "^1.1.0",

@@ -86,13 +86,14 @@ export const restoreDocument = (docRef, path, backup, batch) => {
   // console.log(`Restoring Document '${path}'`);
 
   const docBackup = deep(backup, path);
+  const docData = docBackup._doc;
 
-  const docData = deep(backup, path + '/_doc');
-
-  delete docBackup['_doc'];
+  delete docBackup._doc;
   const collections = docBackup;
 
-  batch.set(docRef, docData, { merge: true });
+  if (docData) {
+    batch.set(docRef, docData, { merge: true });
+  }
 
   for (const collectionId of Object.keys(collections)) {
     // eslint-disable-next-line no-use-before-define,no-await-in-loop
@@ -113,7 +114,7 @@ export const restoreDocument = (docRef, path, backup, batch) => {
  * @returns {Promise<void>}
  */
 export const restoreCollection = (collectionRef, path, backup, batch) => {
-  // console.log(`Restoring Collection '${path}'`);
+  console.log(`Restoring Collection '${path}'`);
 
   const collection = deep(backup, path);
   for (const docId of Object.keys(collection)) {
