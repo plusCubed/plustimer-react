@@ -1,6 +1,7 @@
 // @flow
 
-import * as React from 'react';
+import { h } from 'preact';
+import * as React from '../utils/purecomponent';
 import { connect } from 'unistore/full/preact.es';
 
 import SolvesList, { Solve } from '../components/SolvesList';
@@ -27,9 +28,12 @@ class SolvesListContainer extends React.PureComponent<Props, State> {
 
   async componentDidUpdate(prevProps: Props) {
     if (
-      this.props.uid !== prevProps.uid ||
-      this.props.puzzle !== prevProps.puzzle ||
-      this.props.category !== prevProps.category
+      (this.props.uid !== prevProps.uid ||
+        this.props.puzzle !== prevProps.puzzle ||
+        this.props.category !== prevProps.category) &&
+      this.props.uid &&
+      this.props.puzzle &&
+      this.props.category
     ) {
       this.unsubscribe();
 

@@ -1,6 +1,7 @@
 // @flow
 
-import * as React from 'react';
+import { h } from 'preact';
+import * as React from '../utils/purecomponent';
 import { createStore, Provider } from 'unistore/full/preact.es';
 
 import firebase from '../utils/firebase';
@@ -63,13 +64,17 @@ class AppContainer extends React.PureComponent<void, void> {
     }
 
     this.unsubscribePuzzle && this.unsubscribePuzzle();
-    this.unsubscribePuzzle = preferences.onChange(true, 'puzzle', value => {
-      store.setState({ puzzle: value });
-    });
+    this.unsubscribePuzzle = preferences.onChange(true, 'puzzle', puzzle => {
+      store.setState({ puzzle: puzzle });
 
-    this.unsubscribeCategory && this.unsubscribeCategory();
-    this.unsubscribeCategory = preferences.onChange(true, 'category', value => {
-      store.setState({ category: value });
+      this.unsubscribeCategory && this.unsubscribeCategory();
+      this.unsubscribeCategory = preferences.onChange(
+        true,
+        'category',
+        categories => {
+          store.setState({ category: JSON.parse(categories)[puzzle] });
+        }
+      );
     });
   };
 

@@ -1,6 +1,7 @@
 // @flow
 
-import * as React from 'react';
+import { h } from 'preact';
+import * as React from '../utils/purecomponent';
 
 import style from './Select.css';
 

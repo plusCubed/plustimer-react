@@ -1,6 +1,7 @@
 // @flow
 
-import * as React from 'react';
+import { h } from 'preact';
+import * as React from '../utils/purecomponent';
 import { connect } from 'unistore/full/preact.es';
 
 import { buildMapFromObject } from '../utils/utils';
@@ -90,8 +91,10 @@ class PuzzleCategorySelect extends React.PureComponent<Props, State> {
 
     if (!newCategory) {
       if (puzzleDoc.exists) {
-        newCategory = (await puzzleDoc.ref.collection('categories').get())
-          .docs[0].id;
+        const categoriesSnapshot = await puzzleDoc.ref
+          .collection('categories')
+          .get();
+        newCategory = categoriesSnapshot.docs[0].id;
       } else {
         newCategory = 'normal';
       }
@@ -118,11 +121,11 @@ class PuzzleCategorySelect extends React.PureComponent<Props, State> {
     );
 
     // Set current category in the puzzle doc
-    const savedCategory = JSON.parse(preferences.getItem('category'));
+    const savedCategories = JSON.parse(preferences.getItem('category'));
     preferences.setItem(
       'category',
       JSON.stringify({
-        ...savedCategory,
+        ...savedCategories,
         [puzzle]: category
       })
     );
