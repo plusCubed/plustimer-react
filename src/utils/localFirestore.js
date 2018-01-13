@@ -161,10 +161,11 @@ class DocumentReference {
 }
 
 class DocumentSnapshot {
-  path = '';
-  docData = null;
-  id = '';
-  ref = null;
+  path: string;
+  docData: any;
+  id: string;
+  ref: DocumentReference;
+  exists: boolean;
 
   constructor(data, ref: DocumentReference) {
     this.path = ref.path;
@@ -184,8 +185,8 @@ class DocumentSnapshot {
 }
 
 class QuerySnapshot {
-  docs: DocumentSnapshot[] = null;
-  query = null;
+  docs: DocumentSnapshot[];
+  query: Query;
 
   constructor(snapshots: DocumentSnapshot[], query: Query) {
     this.docs = snapshots;

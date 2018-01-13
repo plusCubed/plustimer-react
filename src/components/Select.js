@@ -10,7 +10,7 @@ type Props = {
   defaults: Map<string, string>,
   uid: string,
   path: string,
-  onChange: (value: string) => void,
+  onChange: (value: string) => any,
   value: string
 };
 
@@ -23,7 +23,7 @@ class Select extends React.PureComponent<Props, State> {
     options: new Map()
   };
 
-  async componentDidUpdate(prevProps, prevState) {
+  async componentDidUpdate(prevProps: Props, prevState: State) {
     // Check that the path changed and is valid
     if (
       this.props.uid &&
@@ -46,7 +46,7 @@ class Select extends React.PureComponent<Props, State> {
     }
   }
 
-  handleChange = event => {
+  handleChange = (event: Event) => {
     this.props.onChange(event.target.value);
   };
 

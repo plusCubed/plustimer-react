@@ -1,3 +1,5 @@
+// @flow
+
 interface TimeParts {
   secString: string;
   decimals: string;
@@ -47,8 +49,8 @@ export function formatTime(time: number): string {
   return `${parts.secString}.${parts.decimals}`;
 }
 
-export function buildMapFromObject(obj) {
-  const map = new Map();
+export function buildMapFromObject(obj: any) {
+  const map: Map<string, any> = new Map();
   Object.keys(obj).forEach(key => {
     map.set(key, obj[key]);
   });

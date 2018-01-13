@@ -7,7 +7,6 @@ import { connect } from 'unistore/full/preact.es';
 import TimerDisplay, { TimerMode } from '../components/TimerDisplay';
 
 import firebase from '../utils/firebase';
-import * as firebaseUtils from '../utils/firebaseUtils';
 
 import { Penalty } from '../components/SolvesList';
 

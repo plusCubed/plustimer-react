@@ -1,3 +1,5 @@
+// @flow
+
 import mitt from 'mitt';
 
 import ScrambleWorker from './scramble.worker';

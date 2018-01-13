@@ -6,11 +6,11 @@ import { connect } from 'unistore/full/preact.es';
 import SolvesList, { Solve } from '../components/SolvesList';
 
 import firebase from '../utils/firebase';
-import * as firebaseUtils from '../utils/firebaseUtils';
-import * as preferences from '../utils/preferences';
 
 type Props = {
-  uid: string
+  uid: string,
+  puzzle: string,
+  category: string
 };
 
 type State = {
@@ -25,9 +25,7 @@ class SolvesListContainer extends React.PureComponent<Props, State> {
 
   solvesUnsub = null;
 
-  componentDidMount(prevProps) {}
-
-  async componentDidUpdate(prevProps) {
+  async componentDidUpdate(prevProps: Props) {
     if (
       this.props.uid !== prevProps.uid ||
       this.props.puzzle !== prevProps.puzzle ||
@@ -60,8 +58,8 @@ class SolvesListContainer extends React.PureComponent<Props, State> {
     }
   }
 
-  onCollectionUpdate = querySnapshot => {
-    const solves = [];
+  onCollectionUpdate = (querySnapshot: QuerySnapshot) => {
+    const solves: Solve[] = [];
     querySnapshot.forEach(doc => {
       const solve = doc.data();
       solves.push({
