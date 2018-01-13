@@ -2,7 +2,7 @@
 
 import AppContainer from './containers/AppContainer';
 
-import handleRenderErrors from './utils/errors';
+//import handleRenderErrors from './utils/errors';
 
 import './index.css';
 
@@ -22,7 +22,7 @@ if (
 }
 
 if (process.env.NODE_ENV !== 'production') {
-  handleRenderErrors();
+  //handleRenderErrors();
 }
 
 export default AppContainer;

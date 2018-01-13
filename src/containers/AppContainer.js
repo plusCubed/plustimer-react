@@ -1,7 +1,7 @@
 // @flow
 
 import * as React from 'react';
-import { createStore, Provider } from 'unistore/full/preact.es';
+import { createStore, Provider } from 'unistore/full/react.es';
 
 import firebase from '../utils/firebase';
 import App from '../components/App';
@@ -74,6 +74,10 @@ class AppContainer extends React.PureComponent<void, void> {
   };
 
   componentWillUnmount() {}
+
+  componentDidCatch(e) {
+    console.error(e);
+  }
 
   render() {
     return (

@@ -1,4 +1,4 @@
-/* eslint-disable import/no-extraneous-dependencies */
+/* eslint-disable import/no-extraneous-dependencies,no-param-reassign */
 const webpack = require('webpack');
 
 const flowPlugin = require('preact-cli-plugin-flow');
@@ -8,9 +8,25 @@ const fastAsyncPlugin = require('preact-cli-plugin-fast-async');
 const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
+const path = require('path');
+
 export default function (config, env, helpers) {
   flowPlugin(config);
   fastAsyncPlugin(config);
+
+  // Use project entry.js
+  config.entry.bundle = [path.resolve(__dirname, './src/entry')];
+  if(!env.production) {
+    config.entry.bundle.push(...['webpack-dev-server/client', 'webpack/hot/dev-server']);
+  }
+
+  config.resolve.alias = Object.assign(
+    config.resolve.alias,
+    {
+      'react': 'nervjs',
+      'react-dom': 'nervjs'
+    }
+  );
 
   const precacheConfig = {
     navigateFallbackWhitelist: [/^(?!\/__)(?!\/popup).*/],

@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 
-import { connect } from 'unistore/full/preact.es';
+import { connect } from 'unistore/full/react.es';
 
 import TimerDisplay, { TimerMode } from '../components/TimerDisplay';
 

@@ -1,7 +1,7 @@
 // @flow
 
 import * as React from 'react';
-import { connect } from 'unistore/full/preact.es';
+import { connect } from 'unistore/full/react.es';
 
 import SolvesList, { Solve } from '../components/SolvesList';
 
