@@ -1,3 +1,5 @@
+// @flow
+
 import * as React from 'react';
 import { connect } from 'unistore/full/preact.es';
 
@@ -20,15 +22,18 @@ type State = {
 
 @connect('uid')
 class PuzzleCategorySelect extends React.PureComponent<Props, State> {
+  defaultPuzzles: Map<string, string>;
+  defaultCategories: Map<string, Map<string, string>>;
+
   state = {
     puzzle: '',
     category: ''
   };
 
-  constructor(props) {
+  constructor(props: Props) {
     super(props);
     this.defaultPuzzles = Object.entries(puzzleDefaults).reduce(
-      (map, [key, value]) => {
+      (map, [key, value]: [string, any]) => {
         map.set(key, value.name);
         return map;
       },
@@ -36,7 +41,7 @@ class PuzzleCategorySelect extends React.PureComponent<Props, State> {
     );
 
     this.defaultCategories = Object.entries(puzzleDefaults).reduce(
-      (map, [key, value]) => {
+      (map, [key, value]: [string, any]) => {
         map.set(key, buildMapFromObject(value.categories));
         return map;
       },
@@ -44,7 +49,7 @@ class PuzzleCategorySelect extends React.PureComponent<Props, State> {
     );
   }
 
-  async componentDidUpdate(prevProps, prevState) {
+  async componentDidUpdate(prevProps: Props, prevState: State) {
     if (this.props.uid !== prevProps.uid && this.props.uid) {
       let currentPuzzle = preferences.getItem('puzzle');
       if (!currentPuzzle) {
@@ -55,7 +60,7 @@ class PuzzleCategorySelect extends React.PureComponent<Props, State> {
     }
   }
 
-  handlePuzzleChange = async puzzle => {
+  handlePuzzleChange = async (puzzle: string) => {
     this.setState({ puzzle: puzzle });
 
     console.log('New puzzle', puzzle);
@@ -69,24 +74,36 @@ class PuzzleCategorySelect extends React.PureComponent<Props, State> {
     // Get the current category for the selected puzzle
     const puzzleRef = userRef.collection('puzzles').doc(puzzle);
     const puzzleDoc = await puzzleRef.get();
-    let currentCategory;
-    if (puzzleDoc.exists) {
-      currentCategory = (await puzzleDoc.ref.collection('categories').get())
-        .docs[0].id;
-    } else {
+    let newCategory;
+
+    const savedCategory = JSON.parse(preferences.getItem('category'));
+    if (savedCategory) {
+      newCategory = savedCategory[puzzle];
+    }
+
+    if (!puzzleDoc.exists) {
       // If the puzzle doc doesn't exist, write the default
       const puzzleData = { ...puzzleDefaults[puzzle] };
       delete puzzleData.categories;
       await puzzleDoc.ref.set(puzzleData, { merge: true });
-
-      // Use the first category as the current
-      currentCategory = Object.keys(puzzleDefaults[puzzle].categories)[0];
     }
 
-    await this.handleCategoryChange(currentCategory, puzzle);
+    if (!newCategory) {
+      if (puzzleDoc.exists) {
+        newCategory = (await puzzleDoc.ref.collection('categories').get())
+          .docs[0].id;
+      } else {
+        newCategory = 'normal';
+      }
+    }
+
+    await this.handleCategoryChange(newCategory, puzzle);
   };
 
-  handleCategoryChange = async (category, puzzle = this.state.puzzle) => {
+  handleCategoryChange = async (
+    category: string,
+    puzzle: string = this.state.puzzle
+  ) => {
     this.setState({ category: category });
 
     console.log('New category', category, puzzle);
@@ -101,7 +118,14 @@ class PuzzleCategorySelect extends React.PureComponent<Props, State> {
     );
 
     // Set current category in the puzzle doc
-    preferences.setItem('category', category);
+    const savedCategory = JSON.parse(preferences.getItem('category'));
+    preferences.setItem(
+      'category',
+      JSON.stringify({
+        ...savedCategory,
+        [puzzle]: category
+      })
+    );
 
     // If the category doc doesn't exist, write the default (the name)
     const categoryRef = puzzleRef.collection('categories').doc(category);
