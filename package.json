@@ -73,7 +73,7 @@
     "preact-cli-plugin-fast-async": "^1.0.0",
     "preact-cli-plugin-flow": "^0.2.0",
     "preact-cli-sw-precache": "^1.0.3",
-    "prettier": "^1.9.2",
+    "prettier": "^1.10.2",
     "rimraf": "^2.6.2",
     "webpack-bundle-analyzer": "^2.9.2",
     "worker-loader": "^1.1.0"
@@ -81,11 +81,12 @@
   "dependencies": {
     "asyncro": "^2.0.1",
     "date-fns": "^1.29.0",
-    "firebase": "^4.8.1",
+    "firebase": "^4.8.2",
     "mitt": "^1.1.3",
     "preact": "^8.2.1",
     "preact-compat": "^3.17.0",
     "preact-material-components": "^1.3.4",
+    "preact-portal": "^1.1.2",
     "preact-router": "^2.5.5",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
