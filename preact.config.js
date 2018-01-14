@@ -12,6 +12,11 @@ export default function (config, env, helpers) {
   flowPlugin(config);
   fastAsyncPlugin(config);
 
+  // Bug fix 2.1.1
+  const babel = config.module.loaders
+    .filter( loader => loader.loader === 'babel-loader')[0].options;
+  babel.plugins.push('syntax-dynamic-import');
+
   const precacheConfig = {
     navigateFallbackWhitelist: [/^(?!\/__)(?!\/popup).*/],
   };

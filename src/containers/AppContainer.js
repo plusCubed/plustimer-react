@@ -49,11 +49,10 @@ class AppContainer extends React.PureComponent<void, void> {
       }
 
       // Get user doc & WCA profile
-      const firestore = await firebase.firestore(true);
-      const userDoc = await firestore
-        .collection('users')
-        .doc(uid)
-        .get();
+      const firestore = await firebase.firestore(uid);
+      const userDoc = await firebaseUtils.getDoc(
+        firestore.collection('users').doc(uid)
+      );
 
       const wcaProfile = userDoc.data().wca;
 
