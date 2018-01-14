@@ -1,7 +1,6 @@
 // @flow
 
-import { h } from 'preact';
-import * as React from '../utils/purecomponent';
+import * as React from 'react';
 import { formatTime } from '../utils/utils';
 
 import style from './TimerDisplay.css';

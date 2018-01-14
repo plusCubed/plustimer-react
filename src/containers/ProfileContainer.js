@@ -1,8 +1,6 @@
 // @flow
 
-import { h } from 'preact';
-import * as React from '../utils/purecomponent';
-
+import * as React from 'react';
 import { connect } from 'unistore/full/react.es';
 
 import Profile from '../components/Profile';

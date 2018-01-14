@@ -3,7 +3,7 @@ import * as ReactDOM from 'react-dom';
 
 if (process.env.NODE_ENV === 'development') {
   // enable preact devtools
-  /*require('preact/devtools');*/
+  require('nerv-devtools');
 } else if (
   process.env.ADD_SW &&
   'serviceWorker' in navigator &&
@@ -22,8 +22,7 @@ if (typeof app === 'function') {
 
   let init = () => {
     let app = interopDefault(require('preact-cli-entrypoint'));
-    console.log(app);
-    root = ReactDOM.render(React.createElement(app, null), document.body, root);
+    root = ReactDOM.render(React.createElement(app), document.body, root);
   };
 
   if (module.hot) module.hot.accept('preact-cli-entrypoint', init);

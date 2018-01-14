@@ -1,7 +1,6 @@
 // @flow
 
-import { h } from 'preact';
-import * as React from '../utils/purecomponent';
+import * as React from 'react';
 
 import style from './AppBar.css';
 
