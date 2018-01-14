@@ -33,7 +33,9 @@
       "linebreak-style": "off",
       "react/jsx-filename-extension": "off",
       "object-shorthand": "off",
-      "no-use-before-define": "off"
+      "no-use-before-define": "off",
+      "no-undef": "warn",
+      "prefer-destructuring": "warn"
     }
   },
   "lint-staged": {
@@ -69,8 +71,8 @@
     "husky": "^0.14.3",
     "if-env": "^1.0.0",
     "lint-staged": "^6.0.0",
-    "preact-cli": "^2.0.0",
-    "preact-cli-plugin-fast-async": "^1.0.0",
+    "preact-cli": "^2.1.1",
+    "preact-cli-plugin-fast-async": "^1.0.1",
     "preact-cli-plugin-flow": "^0.2.0",
     "preact-cli-sw-precache": "^1.0.3",
     "prettier": "^1.10.2",

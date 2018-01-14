@@ -1,6 +1,7 @@
 // @flow
 
-import * as React from 'react';
+import { h } from 'preact';
+import * as React from '../utils/purecomponent';
 
 import ProfileContainer from '../containers/ProfileContainer';
 import PuzzleSelect from '../containers/PuzzleSelect';

@@ -13,6 +13,9 @@ const store = createStore();
 class AppContainer extends React.PureComponent<void, void> {
   state = {};
 
+  unsubscribePuzzle: () => void;
+  unsubscribeCategory: () => void;
+
   async componentDidMount() {
     const auth = await firebase.auth();
 
@@ -26,7 +29,7 @@ class AppContainer extends React.PureComponent<void, void> {
     auth.onAuthStateChanged(this.onAuthStateChanged);
   }
 
-  onAuthStateChanged = async user => {
+  onAuthStateChanged = async (user: any) => {
     if (user) {
       // User is signed in.
       const { uid } = user;
@@ -49,10 +52,9 @@ class AppContainer extends React.PureComponent<void, void> {
 
       // Get user doc & WCA profile
       const firestore = await firebase.firestore(true);
-      const userDoc = await firestore
-        .collection('users')
-        .doc(uid)
-        .get();
+      const userDoc = await firebaseUtils.getDoc(
+        firestore.collection('users').doc(uid)
+      );
 
       const wcaProfile = userDoc.data().wca;
 
@@ -63,13 +65,17 @@ class AppContainer extends React.PureComponent<void, void> {
     }
 
     this.unsubscribePuzzle && this.unsubscribePuzzle();
-    this.unsubscribePuzzle = preferences.onChange(true, 'puzzle', value => {
-      store.setState({ puzzle: value });
-    });
+    this.unsubscribePuzzle = preferences.onChange(true, 'puzzle', puzzle => {
+      store.setState({ puzzle: puzzle });
 
-    this.unsubscribeCategory && this.unsubscribeCategory();
-    this.unsubscribeCategory = preferences.onChange(true, 'category', value => {
-      store.setState({ category: value });
+      this.unsubscribeCategory && this.unsubscribeCategory();
+      this.unsubscribeCategory = preferences.onChange(
+        true,
+        'category',
+        categories => {
+          store.setState({ category: JSON.parse(categories)[puzzle] });
+        }
+      );
     });
   };
 

@@ -5,6 +5,7 @@ import { connect } from 'unistore/full/react.es';
 
 import { buildMapFromObject } from '../utils/utils';
 import firebase from '../utils/firebase';
+import * as firebaseUtils from '../utils/firebaseUtils';
 import * as preferences from '../utils/preferences';
 
 import Select from '../components/Select';
@@ -73,7 +74,7 @@ class PuzzleCategorySelect extends React.PureComponent<Props, State> {
 
     // Get the current category for the selected puzzle
     const puzzleRef = userRef.collection('puzzles').doc(puzzle);
-    const puzzleDoc = await puzzleRef.get();
+    const puzzleDoc = await firebaseUtils.getDoc(puzzleRef);
     let newCategory;
 
     const savedCategory = JSON.parse(preferences.getItem('category'));
@@ -90,8 +91,10 @@ class PuzzleCategorySelect extends React.PureComponent<Props, State> {
 
     if (!newCategory) {
       if (puzzleDoc.exists) {
-        newCategory = (await puzzleDoc.ref.collection('categories').get())
-          .docs[0].id;
+        const categoriesSnapshot = await puzzleDoc.ref
+          .collection('categories')
+          .get();
+        newCategory = categoriesSnapshot.docs[0].id;
       } else {
         newCategory = 'normal';
       }
@@ -118,18 +121,18 @@ class PuzzleCategorySelect extends React.PureComponent<Props, State> {
     );
 
     // Set current category in the puzzle doc
-    const savedCategory = JSON.parse(preferences.getItem('category'));
+    const savedCategories = JSON.parse(preferences.getItem('category'));
     preferences.setItem(
       'category',
       JSON.stringify({
-        ...savedCategory,
+        ...savedCategories,
         [puzzle]: category
       })
     );
 
     // If the category doc doesn't exist, write the default (the name)
     const categoryRef = puzzleRef.collection('categories').doc(category);
-    const categoryDoc = await categoryRef.get();
+    const categoryDoc = await firebaseUtils.getDoc(categoryRef);
     if (!categoryDoc.exists) {
       const name = puzzleDefaults[puzzle].categories[category];
       await categoryDoc.ref.set({ name: name }, { merge: true });

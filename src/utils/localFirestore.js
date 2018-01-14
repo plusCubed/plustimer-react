@@ -136,7 +136,7 @@ class DocumentReference {
     emitter.emit(this.path, this.buildSnapshot(newData));
   }
 
-  async get(): DocumentSnapshot {
+  async get(): Promise<DocumentSnapshot> {
     const firestore = getFirestore();
 
     const docData = deep(firestore, `${this.path}/_doc`);
@@ -166,6 +166,7 @@ class DocumentSnapshot {
   id: string;
   ref: DocumentReference;
   exists: boolean;
+  metadata: SnapshotMetadata;
 
   constructor(data, ref: DocumentReference) {
     this.path = ref.path;
@@ -173,6 +174,7 @@ class DocumentSnapshot {
     this.id = ref.id;
     this.ref = ref;
     this.exists = !!data;
+    this.metadata = { fromCache: false, hasPendingWrites: false };
   }
 
   data() {
@@ -199,10 +201,10 @@ class QuerySnapshot {
 }
 
 const localFirestore = {
-  collection(id) {
+  collection(id: string) {
     return new CollectionReference(id);
   },
-  doc(id) {
+  doc(id: string) {
     return new DocumentReference(id);
   },
   enablePersistence() {}

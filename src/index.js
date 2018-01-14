@@ -2,8 +2,6 @@
 
 import AppContainer from './containers/AppContainer';
 
-//import handleRenderErrors from './utils/errors';
-
 import './index.css';
 
 if (
@@ -19,10 +17,6 @@ if (
       window.location.reload();
     }
   };
-}
-
-if (process.env.NODE_ENV !== 'production') {
-  //handleRenderErrors();
 }
 
 export default AppContainer;

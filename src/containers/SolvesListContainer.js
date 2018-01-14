@@ -27,9 +27,12 @@ class SolvesListContainer extends React.PureComponent<Props, State> {
 
   async componentDidUpdate(prevProps: Props) {
     if (
-      this.props.uid !== prevProps.uid ||
-      this.props.puzzle !== prevProps.puzzle ||
-      this.props.category !== prevProps.category
+      (this.props.uid !== prevProps.uid ||
+        this.props.puzzle !== prevProps.puzzle ||
+        this.props.category !== prevProps.category) &&
+      this.props.uid &&
+      this.props.puzzle &&
+      this.props.category
     ) {
       this.unsubscribe();
 
