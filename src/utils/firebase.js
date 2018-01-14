@@ -28,7 +28,7 @@ const localFirestoreAsync = async () => localFirestore();
 export default {
   app: app,
   auth: authAsync,
-  firestore: async (uid: string): Promise<FirebaseFirestore> => {
+  firestore: async (uid: string | boolean): Promise<FirebaseFirestore> => {
     return uid && uid !== 'local' ? firestoreAsync() : localFirestoreAsync();
   }
 };
