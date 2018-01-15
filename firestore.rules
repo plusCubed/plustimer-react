@@ -1,10 +1,41 @@
 service cloud.firestore {
   match /databases/{database}/documents {
   	match /users/{userId} {
-      allow read, write: if request.auth.uid == userId;
 
+  	  // Allow reading user doc and all sub-docs as signed-in user
+      allow read: if request.auth.uid == userId;
       match /{allChildren=**} {
-      	allow read, write: if request.auth.uid == userId;
+        allow read: if request.auth.uid == userId;
+      }
+
+      allow write: if request.auth.uid == userId
+            	   && request.resource.data.keys().hasAll(["wca"])
+                   && request.resource.data.size() == 1
+                   && request.resource.data.name is map;
+
+      match /puzzles/{puzzleId} {
+      	allow write: if request.auth.uid == userId
+      	             && request.resource.data.keys().hasAll(["name", "scrambler"])
+                     && request.resource.data.size() == 2
+                     && request.resource.data.name is string
+                     && request.resource.data.scrambler is string;
+
+        match /categories/{categoryId} {
+          allow write: if request.auth.uid == userId
+                       && request.resource.data.keys().hasAll(["name"])
+                       && request.resource.data.size() == 1
+                       && request.resource.data.name is string;
+
+          match /solves/{solveId} {
+            allow write: if request.auth.uid == userId
+                         && request.resource.data.keys().hasAll(["time", "timestamp", "penalty", "scramble"])
+                         && request.resource.data.size() == 4
+                         && request.resource.data.time is number
+                         && request.resource.data.timestamp is number
+                         && request.resource.data.penalty is number
+                         && request.resource.data.scramble is string;
+          }
+        }
       }
     }
 
