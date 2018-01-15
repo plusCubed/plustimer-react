@@ -11,8 +11,14 @@ import * as firebaseUtils from '../utils/firebaseUtils';
 
 const store = createStore();
 
-class AppContainer extends React.PureComponent<void, void> {
-  state = {};
+type State = {
+  signingIn: boolean
+};
+
+class AppContainer extends React.PureComponent<void, State> {
+  state = {
+    signingIn: false
+  };
 
   unsubscribePuzzle: () => void;
   unsubscribeCategory: () => void;
@@ -40,6 +46,11 @@ class AppContainer extends React.PureComponent<void, void> {
       // Restore local Firestore to newly created account
       const localFirestore = localStorage.getItem('localFirestore');
       if (localFirestore) {
+        // This will take a while, display the loading dialog
+        this.setState({
+          signingIn: true
+        });
+
         const auth = await firebase.auth();
         const idToken = await auth.currentUser.getIdToken();
         const localUser = JSON.parse(localFirestore).users.local;
@@ -60,6 +71,10 @@ class AppContainer extends React.PureComponent<void, void> {
       const wcaProfile = userDoc.data().wca;
 
       store.setState({ uid: uid, wcaProfile: wcaProfile });
+
+      this.setState({
+        signingIn: false
+      });
     } else {
       // Signed out - local
       store.setState({ uid: 'local', wcaProfile: null });
@@ -85,7 +100,7 @@ class AppContainer extends React.PureComponent<void, void> {
   render() {
     return (
       <Provider store={store}>
-        <App />
+        <App signingIn={this.state.signingIn} />
       </Provider>
     );
   }
