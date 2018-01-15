@@ -71,3 +71,5 @@ package-lock.json
 # API files
 firebaseConfig.js
 firebaseConfigDebug.js
+
+.firebaserc
