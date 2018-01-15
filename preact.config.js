@@ -9,23 +9,30 @@ const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 export default function (config, env, helpers) {
-  flowPlugin(config);
-  fastAsyncPlugin(config);
 
-  // Bug fix 2.1.1
-  const babel = config.module.loaders
-    .filter( loader => loader.loader === 'babel-loader')[0].options;
-  babel.plugins.push('syntax-dynamic-import');
-
-  const precacheConfig = {
-    navigateFallbackWhitelist: [/^(?!\/__)(?!\/popup).*/],
-  };
-  swPrecachePlugin(config, precacheConfig);
+  // LOADERS ---
 
   config.module.loaders.push({
     test: /\.worker\.js$/,
     use: { loader: 'worker-loader' }
   });
+
+  // BABEL ---
+
+  // Workaround CLI 2.1.1
+  const babel = config.module.loaders
+    .filter( loader => loader.loader === 'babel-loader')[0].options;
+  babel.plugins.push('syntax-dynamic-import');
+
+  fastAsyncPlugin(config);
+  flowPlugin(config);
+
+  // PLUGINS ---
+
+  const precacheConfig = {
+    navigateFallbackWhitelist: [/^(?!\/__)(?!\/popup).*/],
+  };
+  swPrecachePlugin(config, precacheConfig);
 
   config.plugins.push(
     new HtmlWebpackPlugin({
