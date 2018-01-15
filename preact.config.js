@@ -5,11 +5,10 @@ const flowPlugin = require('preact-cli-plugin-flow');
 const swPrecachePlugin = require('preact-cli-sw-precache');
 const fastAsyncPlugin = require('preact-cli-plugin-fast-async');
 
-const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer');
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-export default function (config, env, helpers) {
-
+export default function(config, env, helpers) {
   // LOADERS ---
 
   config.module.loaders.push({
@@ -30,7 +29,7 @@ export default function (config, env, helpers) {
   // PLUGINS ---
 
   const precacheConfig = {
-    navigateFallbackWhitelist: [/^(?!\/__)(?!\/popup).*/],
+    navigateFallbackWhitelist: [/^(?!\/__)(?!\/popup).*/]
   };
   swPrecachePlugin(config, precacheConfig);
 
@@ -51,12 +50,15 @@ export default function (config, env, helpers) {
       inject: false
     }),
     new webpack.DefinePlugin({
-      'process.env.FIREBASE_ENV': JSON.stringify(process.env.FIREBASE_ENV === 'development' ? 'development' : 'production')
+      'process.env.FIREBASE_ENV': JSON.stringify(
+        process.env.FIREBASE_ENV === 'development'
+          ? 'development'
+          : 'production'
+      )
     })
   );
 
-
-  if(!env.ssr && env.production){
+  if (!env.ssr && env.production) {
     config.plugins.push(
       new BundleAnalyzerPlugin({
         analyzerMode: 'static'
