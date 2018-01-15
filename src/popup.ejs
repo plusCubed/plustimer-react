@@ -15,14 +15,14 @@ Please wait...
 <!-- If you do not serve/host your project using Firebase Hosting see https://firebase.google.com/docs/web/setup -->
 
 <% if (process.env.FIREBASE_ENV !== 'development') { %>
-    <script src="/__/firebase/4.8.1/firebase-app.js"></script>
-    <script src="/__/firebase/4.8.1/firebase-auth.js"></script>
-    <script src="/__/firebase/4.8.1/firebase-firestore.js"></script>
+    <script src="/__/firebase/4.8.2/firebase-app.js"></script>
+    <script src="/__/firebase/4.8.2/firebase-auth.js"></script>
+    <script src="/__/firebase/4.8.2/firebase-firestore.js"></script>
     <script src="/__/firebase/init.js"></script>
 <% } else { %>
-    <script src="https://www.gstatic.com/firebasejs/4.8.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/4.8.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/4.8.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.8.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.8.2/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.8.2/firebase-firestore.js"></script>
     <script>
       var config = <%= JSON.stringify(require('./utils/firebaseConfigDebug').default) %>;
       firebase.initializeApp(config);
