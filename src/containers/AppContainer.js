@@ -88,8 +88,10 @@ class AppContainer extends React.PureComponent<void, State> {
       this.unsubscribeCategory = preferences.onChange(
         true,
         'category',
-        categories => {
-          store.setState({ category: JSON.parse(categories)[puzzle] });
+        categoriesString => {
+          const categories = JSON.parse(categoriesString);
+          if (categories !== null)
+            store.setState({ category: categories[puzzle] });
         }
       );
     });
