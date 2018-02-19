@@ -18,11 +18,6 @@ export default function(config, env, helpers) {
 
   // BABEL ---
 
-  // Workaround CLI 2.1.1
-  const babel = config.module.loaders
-    .filter( loader => loader.loader === 'babel-loader')[0].options;
-  babel.plugins.push('syntax-dynamic-import');
-
   fastAsyncPlugin(config);
   flowPlugin(config);
 
