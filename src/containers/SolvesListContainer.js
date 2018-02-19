@@ -4,7 +4,8 @@ import { h } from 'preact';
 import * as React from '../utils/purecomponent';
 import { connect } from 'unistore/full/preact.es';
 
-import SolvesList, { Solve } from '../components/SolvesList';
+import SolvesList from '../components/SolvesList';
+import type { Solve } from '../components/SolvesList';
 
 import firebase from '../utils/firebase';
 
@@ -24,7 +25,7 @@ class SolvesListContainer extends React.PureComponent<Props, State> {
     solves: []
   };
 
-  solvesUnsub = null;
+  unsubscribeSolves = null;
 
   async componentDidUpdate(prevProps: Props) {
     if (
@@ -46,7 +47,7 @@ class SolvesListContainer extends React.PureComponent<Props, State> {
         .collection('categories')
         .doc(this.props.category)
         .collection('solves');
-      this.solvesUnsub = ref
+      this.unsubscribeSolves = ref
         .orderBy('timestamp', 'desc')
         .onSnapshot(this.onCollectionUpdate);
     }
@@ -57,10 +58,47 @@ class SolvesListContainer extends React.PureComponent<Props, State> {
   }
 
   unsubscribe() {
-    if (this.solvesUnsub) {
-      this.solvesUnsub();
+    if (this.unsubscribeSolves) {
+      this.unsubscribeSolves();
     }
   }
+
+  async getSolveRef(solve) {
+    const firestore = await firebase.firestore(this.props.uid);
+    return firestore
+      .collection('users')
+      .doc(this.props.uid)
+      .collection('puzzles')
+      .doc(this.props.puzzle)
+      .collection('categories')
+      .doc(this.props.category)
+      .collection('solves')
+      .doc(solve.id);
+  }
+
+  handlePenalty = (solve: Solve, penalty: number) => async () => {
+    if (!this.props.uid || !this.props.puzzle || !this.props.category) {
+      return;
+    }
+
+    const solveRef = await this.getSolveRef(solve);
+
+    solveRef.set(
+      {
+        penalty: penalty
+      },
+      { merge: true }
+    );
+  };
+
+  handleDelete = (solve: Solve) => async () => {
+    if (!this.props.uid || !this.props.puzzle || !this.props.category) {
+      return;
+    }
+
+    const solveRef = await this.getSolveRef(solve);
+    solveRef.delete();
+  };
 
   onCollectionUpdate = (querySnapshot: QuerySnapshot) => {
     const solves: Solve[] = [];
@@ -77,7 +115,13 @@ class SolvesListContainer extends React.PureComponent<Props, State> {
   };
 
   render() {
-    return <SolvesList solves={this.state.solves} />;
+    return (
+      <SolvesList
+        solves={this.state.solves}
+        onPenalty={this.handlePenalty}
+        onDelete={this.handleDelete}
+      />
+    );
   }
 }
 

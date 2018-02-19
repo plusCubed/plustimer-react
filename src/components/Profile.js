@@ -5,6 +5,10 @@ import * as React from '../utils/purecomponent';
 
 import style from './AppBar.css';
 
+import Button from 'preact-material-components/Button';
+import 'preact-material-components/Button/style.css';
+import 'preact-material-components/Theme/style.css';
+
 type ProfileProps = {
   loggedIn: boolean,
   avatarImg: string,
@@ -21,9 +25,9 @@ const Profile = (props: ProfileProps) => {
       onClick={props.onAvatarClick}
     />
   ) : (
-    <button className={style.toolbarButton} onClick={props.onLoginClick}>
+    <Button className={style.toolbarButton} onClick={props.onLoginClick}>
       Login
-    </button>
+    </Button>
   );
 };
 

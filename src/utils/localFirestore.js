@@ -15,7 +15,8 @@ function newId(): string {
   return autoId;
 }
 
-const emitter = mitt();
+const mittListeners = Object.create(null);
+const emitter = mitt(mittListeners);
 
 const getFirestore = () => {
   const firestoreString = localStorage.getItem('localFirestore');
@@ -134,6 +135,9 @@ class DocumentReference {
 
     // Emit new snapshot
     emitter.emit(this.path, this.buildSnapshot(newData));
+    // Notify parent collection
+    if (this.path.includes('/'))
+      emitter.emit(this.path.slice(0, this.path.lastIndexOf('/')));
   }
 
   async get(): Promise<DocumentSnapshot> {
@@ -142,6 +146,22 @@ class DocumentReference {
     const docData = deep(firestore, `${this.path}/_doc`);
 
     return this.buildSnapshot(docData);
+  }
+
+  async delete() {
+    const firestore = getFirestore();
+
+    const parentPath = this.path.slice(0, this.path.lastIndexOf('/'));
+    let parentData = deep(firestore, parentPath);
+    delete parentData[this.id];
+
+    localStorage.setItem('localFirestore', JSON.stringify(firestore));
+
+    // Notify parent collection
+    if (this.path.includes('/'))
+      emitter.emit(this.path.slice(0, this.path.lastIndexOf('/')));
+
+    delete mittListeners[this.path];
   }
 
   buildSnapshot(data) {
@@ -155,7 +175,7 @@ class DocumentReference {
     this.get().then(snapshot => callback(snapshot));
 
     return () => {
-      emitter.off(`${this.path}/_doc`, callback);
+      emitter.off(this.path, callback);
     };
   }
 }

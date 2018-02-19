@@ -2,7 +2,6 @@
 
 import { h } from 'preact';
 import * as React from '../utils/purecomponent';
-import Portal from 'preact-portal';
 
 import style from './App.css';
 
@@ -16,16 +15,14 @@ type Props = {
 
 const SigningInDialog = () => {
   return (
-    <Portal into="body">
-      <div className={style.dialog}>
-        <div className={style.dialogBody}>
-          <div className={style.dialogText}>Signing in...</div>
-          <div className={style.progress}>
-            <div className={style.indeterminate} />
-          </div>
+    <div className={style.dialog}>
+      <div className={style.dialogBody}>
+        <div className={style.dialogText}>Signing in...</div>
+        <div className={style.progress}>
+          <div className={style.indeterminate} />
         </div>
       </div>
-    </Portal>
+    </div>
   );
 };
 

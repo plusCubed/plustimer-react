@@ -3,12 +3,99 @@
   box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2),
     0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0, 0, 0, 0.12);
   height: 100%;
-  min-width: 300px;
+  min-width: 160px;
   grid-area: solves;
 }
 
 .solveItem {
+  position: relative;
+}
+
+.solveListItem {
   padding: 8px 16px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.solveListItem.popupOpen {
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
+.solveListItemText {
+  font-weight: 500;
+  color: #3f51b5;
+}
+
+.solvePopup {
+  position: absolute;
+  left: 152px;
+  top: -12px;
+  background: white;
+  padding: 16px;
+  box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2),
+    0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0, 0, 0, 0.12);
+  display: inline-grid;
+  min-width: 300px;
+  grid-template-columns: auto 1fr auto;
+  grid-template-rows: 40px auto 40px 40px;
+  grid-template-areas:
+    'time timestamp timestamp'
+    'scramble scramble scramble'
+    'penalty penalty penalty'
+    'actions actions actions';
+}
+
+.solvePopupTime {
+  grid-area: time;
+  padding: 0 0 8px;
+  font-size: 24px;
+}
+
+.solvePopupTimestamp {
+  grid-area: timestamp;
+  align-self: center;
+  justify-self: end;
+  padding: 0 0 8px;
+}
+
+.solvePopupScramble {
+  grid-area: scramble;
+  padding: 0 0 16px;
+  font-size: 16px;
+  font-family: monospace;
+}
+
+.solvePopupActions {
+  grid-area: actions;
+  --mdc-theme-primary: #000;
+  margin-top: 8px;
+  justify-self: end;
+}
+
+.solvePopupPenalty {
+  grid-area: penalty;
+  flex-direction: row;
+  align-self: start;
+  display: flex;
+  border: 2px solid grey;
+  border-radius: 2px;
+}
+
+.penaltyButton {
+  --mdc-theme-primary: #000;
+  flex: 1;
+  min-width: 36px;
+}
+.penaltyButtonNone {
+  border-radius: 2px 0px 0px 2px !important;
+}
+.penaltyButtonTwo {
+  border-left: 2px solid grey !important;
+  border-right: 2px solid grey !important;
+  border-radius: 0px 0px 0px 0px !important;
+}
+.penaltyButtonDnf {
+  border-radius: 2px 0px 0px 2px !important;
 }
 
 @media (max-width: 840px) {
@@ -21,9 +108,31 @@
 
   .solveItem {
     display: inline-block;
+  }
+
+  .solveListItem {
     height: 48px;
     padding: 0 16px;
+  }
+
+  .solveListItemText {
     vertical-align: middle;
     line-height: 48px;
+  }
+
+  .solvePopup {
+    padding: 24px;
+    width: 70%;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    overflow: auto;
+    background: #fff;
+    box-shadow: 0px 11px 15px -7px rgba(0, 0, 0, 0.2),
+      0px 24px 38px 3px rgba(0, 0, 0, 0.14),
+      0px 9px 46px 8px rgba(0, 0, 0, 0.12);
+    border-radius: 2px;
+    white-space: normal;
   }
 }

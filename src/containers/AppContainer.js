@@ -9,7 +9,12 @@ import App from '../components/App';
 import * as preferences from '../utils/preferences';
 import * as firebaseUtils from '../utils/firebaseUtils';
 
-const store = createStore();
+let store = createStore();
+
+if (process.env.NODE_ENV === 'development') {
+  const devtools = require('unistore/devtools');
+  store = devtools(store);
+}
 
 type State = {
   signingIn: boolean
