@@ -156,7 +156,7 @@ class TimerDisplayContainer extends React.PureComponent<Props, State> {
       time: Math.floor(now - this.state.startTime),
       timestamp: Date.now(),
       scramble: this.state.currentScramble,
-      penalty: Penalty.NORMAL
+      penalty: Penalty.NONE
     });
     console.log('Document written with ID: ', docRef.id);
   }
