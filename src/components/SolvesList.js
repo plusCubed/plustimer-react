@@ -40,39 +40,65 @@ const buildSolveTimeString = solve => {
   }
 };
 
-const SolveModifier = ({ solve, onPenalty, onDelete, onDismiss }) => (
-  <div className={style.solvePopup}>
-    <div className={style.solvePopupTime}>{buildSolveTimeString(solve)}</div>
-    <div className={style.solvePopupTimestamp}>
-      {new Date(solve.timestamp).toLocaleString()}
-    </div>
-    <div className={style.solvePopupScramble}>{solve.scramble}</div>
-    <div className={style.solvePopupPenalty}>
-      <Button
-        className={`${style.penaltyButton} ${style.penaltyButtonNone}`}
-        onClick={onPenalty(solve, Penalty.NONE)}
-      >
-        OK
-      </Button>
-      <Button
-        className={`${style.penaltyButton} ${style.penaltyButtonTwo}`}
-        onClick={onPenalty(solve, Penalty.PLUS_TWO)}
-      >
-        +2
-      </Button>
-      <Button
-        className={`${style.penaltyButton} ${style.penaltyButtonDnf}`}
-        onClick={onPenalty(solve, Penalty.DNF)}
-      >
-        DNF
-      </Button>
-    </div>
-    <div className={style.solvePopupActions}>
-      <Button onClick={onDelete(solve)}>Delete</Button>
-      <Button onClick={onDismiss}>Done</Button>
-    </div>
-  </div>
-);
+class SolveModifier extends React.PureComponent {
+  state = {
+    height: 0
+  };
+
+  componentDidMount() {
+    this.setState({
+      height: this.base.getBoundingClientRect().height
+    });
+  }
+
+  render() {
+    const { parent, solve, onPenalty, onDelete, onDismiss } = this.props;
+    const maxTop =
+      typeof window !== 'undefined'
+        ? window.innerHeight - this.state.height
+        : Number.MAX_VALUE;
+    const position = {
+      top: Math.min(parent.top, maxTop),
+      left: parent.right
+    };
+    const dateTime = new Date(solve.timestamp);
+    return (
+      <div className={style.solvePopup} style={position}>
+        <div className={style.solvePopupTime}>
+          {buildSolveTimeString(solve)}
+        </div>
+        <div className={style.solvePopupTimestamp}>
+          {dateTime.toLocaleDateString() + '\n' + dateTime.toLocaleTimeString()}
+        </div>
+        <div className={style.solvePopupScramble}>{solve.scramble}</div>
+        <div className={style.solvePopupPenalty}>
+          <Button
+            className={`${style.penaltyButton} ${style.penaltyButtonNone}`}
+            onClick={onPenalty(solve, Penalty.NONE)}
+          >
+            OK
+          </Button>
+          <Button
+            className={`${style.penaltyButton} ${style.penaltyButtonTwo}`}
+            onClick={onPenalty(solve, Penalty.PLUS_TWO)}
+          >
+            +2
+          </Button>
+          <Button
+            className={`${style.penaltyButton} ${style.penaltyButtonDnf}`}
+            onClick={onPenalty(solve, Penalty.DNF)}
+          >
+            DNF
+          </Button>
+        </div>
+        <div className={style.solvePopupActions}>
+          <Button onClick={onDelete(solve)}>Delete</Button>
+          <Button onClick={onDismiss}>Done</Button>
+        </div>
+      </div>
+    );
+  }
+}
 
 class SolveItem extends React.PureComponent {
   state = {
@@ -117,6 +143,7 @@ class SolveItem extends React.PureComponent {
         </div>
         {popupOpen ? (
           <SolveModifier
+            parent={this.base.getBoundingClientRect()}
             solve={solve}
             onPenalty={onPenalty}
             onDelete={onDelete}
@@ -131,14 +158,19 @@ class SolveItem extends React.PureComponent {
 const SolvesList = ({ solves, onPenalty, onDelete }: Props) => {
   return (
     <div className={style.solves}>
-      {solves.map(solve => (
-        <SolveItem
-          key={solve.id}
-          solve={solve}
-          onPenalty={onPenalty}
-          onDelete={onDelete}
-        />
-      ))}
+      <div className={style.solveList}>
+        {solves.map(solve => (
+          <SolveItem
+            key={solve.id}
+            solve={solve}
+            onPenalty={onPenalty}
+            onDelete={onDelete}
+          />
+        ))}
+      </div>
+      <div>
+        <Button className={style.historyButton}>History</Button>
+      </div>
     </div>
   );
 };

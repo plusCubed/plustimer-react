@@ -2,13 +2,28 @@
   background: #fff;
   box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2),
     0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0, 0, 0, 0.12);
-  height: 100%;
   min-width: 160px;
   grid-area: solves;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+}
+
+.solveList {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.historyButton {
+  --mdc-theme-primary: #000;
+  box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2),
+    0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0, 0, 0, 0.12);
+  border-radius: 0;
+  width: 100%;
 }
 
 .solveItem {
-  position: relative;
 }
 
 .solveListItem {
@@ -24,20 +39,19 @@
 .solveListItemText {
   font-weight: 500;
   color: #3f51b5;
+  user-select: none;
 }
 
 .solvePopup {
-  position: absolute;
-  left: 152px;
-  top: -12px;
+  position: fixed;
   background: white;
   padding: 16px;
   box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2),
     0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0, 0, 0, 0.12);
   display: inline-grid;
-  min-width: 300px;
+  max-width: 350px;
   grid-template-columns: auto 1fr auto;
-  grid-template-rows: 40px auto 40px 40px;
+  grid-template-rows: 48px auto 40px 40px;
   grid-template-areas:
     'time timestamp timestamp'
     'scramble scramble scramble'
@@ -53,9 +67,10 @@
 
 .solvePopupTimestamp {
   grid-area: timestamp;
-  align-self: center;
-  justify-self: end;
-  padding: 0 0 8px;
+  align-self: start;
+  text-align: end;
+  padding: 0 0 8px 8px;
+  white-space: pre-line;
 }
 
 .solvePopupScramble {
@@ -100,10 +115,18 @@
 
 @media (max-width: 840px) {
   .solves {
+    flex-direction: row;
     height: 48px;
-    overflow-x: scroll;
-    overflow-y: hidden;
     white-space: nowrap;
+  }
+
+  .solveList {
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .historyButton {
+    height: 100%;
   }
 
   .solveItem {
@@ -124,8 +147,8 @@
     padding: 24px;
     width: 70%;
     position: fixed;
-    top: 50%;
-    left: 50%;
+    top: 50% !important;
+    left: 50% !important;
     transform: translate(-50%, -50%);
     overflow: auto;
     background: #fff;
