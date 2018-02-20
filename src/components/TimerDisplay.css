@@ -37,6 +37,7 @@
   padding: 16px;
   text-align: center;
   white-space: pre-line;
+  user-select: none;
 }
 
 @media (max-width: 599px) {
