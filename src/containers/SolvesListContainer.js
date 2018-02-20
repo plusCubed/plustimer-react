@@ -49,6 +49,7 @@ class SolvesListContainer extends React.PureComponent<Props, State> {
         .collection('solves');
       this.unsubscribeSolves = ref
         .orderBy('timestamp', 'desc')
+        .limit(1000)
         .onSnapshot(this.onCollectionUpdate);
     }
   }
@@ -109,9 +110,8 @@ class SolvesListContainer extends React.PureComponent<Props, State> {
         id: doc.id
       });
     });
-    this.setState({
-      solves
-    });
+
+    this.setState({ solves });
   };
 
   render() {

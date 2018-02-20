@@ -25,7 +25,8 @@ const getFirestore = () => {
 
 class Query {
   path = '';
-  orderParam: [string, string] = null;
+  orderParam: [string, string] = null; //field,direction
+  limitParam: number = -1;
 
   constructor(path) {
     this.path = path;
@@ -36,16 +37,20 @@ class Query {
     return this;
   }
 
+  limit(limit: number) {
+    this.limitParam = limit;
+    return this;
+  }
+
   async get(): QuerySnapshot {
     const firestore = getFirestore();
-    const collection = deep(firestore, `${this.path}`);
+    let collection = deep(firestore, `${this.path}`);
 
-    let snapshots;
+    let snapshots = [];
 
-    if (!collection) {
-      snapshots = [];
-    } else {
+    if (collection) {
       snapshots = Object.entries(collection)
+        .slice(0, this.limitParam !== -1 ? this.limitParam : undefined)
         .filter(([key, value]) => key !== '_doc')
         .map(([key, value]) => {
           const ref = new DocumentReference(`${this.path}/${key}`);
