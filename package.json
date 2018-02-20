@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "scripts": {
     "app:start": "if-env NODE_ENV=production && npm run -s serve || npm run -s dev",
-    "app:build": "firebase use default && preact build && preact serve --server config --dest build",
+    "app:build": "firebase use default && preact build && preact serve --server config --dest .",
     "app:serve": "yarn build && preact serve",
     "app:dev": "cross-env FIREBASE_ENV=development preact watch --port 5000",
     "app:deploy": "firebase use default && yarn app:build && firebase deploy --only hosting",
