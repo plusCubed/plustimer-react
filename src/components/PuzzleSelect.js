@@ -83,13 +83,6 @@ class PuzzleCategorySelect extends React.PureComponent<Props, State> {
       newCategory = savedCategory[puzzle];
     }
 
-    if (!puzzleDoc.exists) {
-      // If the puzzle doc doesn't exist, write the default
-      const puzzleData = { ...puzzleDefaults[puzzle] };
-      delete puzzleData.categories;
-      await puzzleDoc.ref.set(puzzleData, { merge: true });
-    }
-
     if (!newCategory) {
       if (puzzleDoc.exists) {
         const categoriesSnapshot = await puzzleDoc.ref
@@ -116,11 +109,6 @@ class PuzzleCategorySelect extends React.PureComponent<Props, State> {
       return;
     }
 
-    const firestore = await firebase.firestore(this.props.uid);
-    const puzzleRef = firestore.doc(
-      `users/${this.props.uid}/puzzles/${puzzle}`
-    );
-
     // Set current category in the puzzle doc
     const savedCategories = JSON.parse(preferences.getItem('category'));
     preferences.setItem(
@@ -130,14 +118,6 @@ class PuzzleCategorySelect extends React.PureComponent<Props, State> {
         [puzzle]: category
       })
     );
-
-    // If the category doc doesn't exist, write the default (the name)
-    const categoryRef = puzzleRef.collection('categories').doc(category);
-    const categoryDoc = await firebaseUtils.getDoc(categoryRef);
-    if (!categoryDoc.exists) {
-      const name = puzzleDefaults[puzzle].categories[category];
-      await categoryDoc.ref.set({ name: name }, { merge: true });
-    }
   };
 
   render() {

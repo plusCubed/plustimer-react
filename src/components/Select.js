@@ -37,7 +37,7 @@ class Select extends React.PureComponent<Props, State> {
       const docSnapshots = querySnapshot.docs;
       const options: Map<string, string> = docSnapshots.reduce(
         (options, doc) => {
-          options.set(doc.id, doc.data().name);
+          if (doc.exists) options.set(doc.id, doc.data().name);
           return options;
         },
         new Map(this.props.defaults)

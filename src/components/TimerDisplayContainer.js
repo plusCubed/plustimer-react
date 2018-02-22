@@ -5,13 +5,14 @@ import * as React from '../utils/purecomponent';
 
 import { connect } from 'unistore/full/preact.es';
 
-import TimerDisplay, { TimerMode } from '../components/TimerDisplay';
-
 import firebase from '../utils/firebase';
 
+import TimerDisplay, { TimerMode } from '../components/TimerDisplay';
 import { Penalty } from '../components/SolvesList';
 
 import scrambleService from '../utils/scrambleService';
+
+import puzzleDefaults from '../puzzleDefaults.json';
 
 export const TimerModeAction = {
   Down: 'down',
@@ -166,29 +167,38 @@ class TimerDisplayContainer extends React.PureComponent<Props, State> {
   }
 
   async fetchScramble() {
-    if (!this.props.uid || !this.props.puzzle) {
+    if (!this.props.puzzle) {
       return;
     }
-    console.log('Fetching scramble');
-    const firestore = await firebase.firestore(this.props.uid);
 
-    const waitForPuzzleDoc = new Promise(resolve => {
-      const unsub = firestore
-        .collection('users')
-        .doc(this.props.uid)
-        .collection('puzzles')
-        .doc(this.props.puzzle)
-        .onSnapshot(puzzleDoc => {
-          if (puzzleDoc.exists) {
-            unsub();
-            resolve(puzzleDoc);
-          } else {
-            console.log('Waiting for puzzle doc initialization...');
-          }
-        });
-    });
-    const puzzleDoc = await waitForPuzzleDoc;
-    const scrambler = puzzleDoc.get('scrambler');
+    let scrambler;
+    if (puzzleDefaults[this.props.puzzle]) {
+      scrambler = puzzleDefaults[this.props.puzzle].scrambler;
+    } else {
+      if (!this.props.uid) {
+        return;
+      }
+      const firestore = await firebase.firestore(this.props.uid);
+      const puzzleDoc = await new Promise(resolve => {
+        const unsub = firestore
+          .collection('users')
+          .doc(this.props.uid)
+          .collection('puzzles')
+          .doc(this.props.puzzle)
+          .onSnapshot(puzzleDoc => {
+            if (puzzleDoc.exists) {
+              unsub();
+              resolve(puzzleDoc);
+            } else {
+              console.log('Waiting for puzzle doc initialization...');
+            }
+          });
+      });
+      scrambler = puzzleDoc.get('scrambler');
+    }
+
+    console.log('Fetching scramble');
+
     const scramble = await scrambleService.getScramble(scrambler);
 
     console.log('Fetch scramble complete', scramble);
