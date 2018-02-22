@@ -148,7 +148,9 @@ class SolvesListContainer extends React.PureComponent<Props, State> {
   render() {
     return (
       <div className={style.solves}>
-        <Media query="(min-width: 841px)" render={() => <Statistics />} />
+        {this.state.current ? (
+          <Media query="(min-width: 841px)" render={() => <Statistics />} />
+        ) : null}
         <SolvesList
           sessions={
             this.state.current
