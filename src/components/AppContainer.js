@@ -9,7 +9,13 @@ import App from '../components/App';
 import * as preferences from '../utils/preferences';
 import * as firebaseUtils from '../utils/firebaseUtils';
 
-let store = createStore();
+let store = createStore({
+  uid: '',
+  wcaProfile: null,
+  puzzle: '',
+  category: '',
+  sessions: [[]]
+});
 
 if (process.env.NODE_ENV === 'development') {
   const devtools = require('unistore/devtools');

@@ -41,10 +41,6 @@ export function timeParts(time: number): TimeParts {
 }
 
 export function formatTime(time: number): string {
-  if (time === null /* || time === NOT_ENOUGH_SOLVES */) {
-    return '--';
-  }
-
   const parts = timeParts(time);
   return `${parts.secString}.${parts.decimals}`;
 }
@@ -55,4 +51,12 @@ export function buildMapFromObject(obj: any) {
     map.set(key, obj[key]);
   });
   return map;
+}
+
+export function mean(arr: number[]): number {
+  let total = 0;
+  for (let i = 0; i < arr.length; i++) {
+    total += arr[i];
+  }
+  return total / arr.length;
 }

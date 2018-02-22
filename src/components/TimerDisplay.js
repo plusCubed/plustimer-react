@@ -3,6 +3,9 @@
 import { h } from 'preact';
 import * as React from '../utils/purecomponent';
 import { formatTime } from '../utils/utils';
+import Media from 'react-media';
+
+import Statistics from './Statistics';
 
 import style from './TimerDisplay.css';
 
@@ -61,6 +64,7 @@ class TimerDisplay extends React.PureComponent<Props, void> {
         <div className={`${style.timerText} ${style[mode]}`}>
           {formatTime(displayTime)}
         </div>
+        <Media query="(max-width: 840px)" render={() => <Statistics />} />
       </div>
     );
   }

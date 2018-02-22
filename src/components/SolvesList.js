@@ -157,17 +157,25 @@ class SolveItem extends React.PureComponent {
   }
 }
 
-const SolvesList = ({ solves, onPenalty, onDelete }: Props) => {
+const SolvesList = ({ sessions, onPenalty, onDelete }: Props) => {
   return (
     <div className={style.solveList}>
-      {solves.map(solve => (
-        <SolveItem
-          key={solve.id}
-          solve={solve}
-          onPenalty={onPenalty}
-          onDelete={onDelete}
-        />
-      ))}
+      {sessions.map((solves, sessionIndex) =>
+        solves.map((solve, index) =>
+          [
+            <SolveItem
+              key={solve.id}
+              solve={solve}
+              onPenalty={onPenalty}
+              onDelete={onDelete}
+            />
+          ].concat([
+            solves.length >= 2 && index === 0 && sessionIndex !== 0 ? (
+              <div className={style.divider} />
+            ) : null
+          ])
+        )
+      )}
     </div>
   );
 };

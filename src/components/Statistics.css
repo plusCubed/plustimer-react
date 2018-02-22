@@ -1,0 +1,22 @@
+.stats {
+  grid-area: stats;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  user-select: none;
+  cursor: default;
+  padding: 8px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.stats td {
+  border: none;
+  text-align: right;
+  min-width: 72px;
+}
+
+.stats .type {
+  min-width: unset;
+}
