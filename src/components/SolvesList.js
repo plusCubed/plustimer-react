@@ -3,12 +3,12 @@
 import { h } from 'preact';
 import * as React from '../utils/purecomponent';
 
-import style from './SolvesList.css';
-import { formatTime } from '../utils/utils';
-
 import Button from 'preact-material-components/Button';
 import 'preact-material-components/Button/style.css';
 import 'preact-material-components/Theme/style.css';
+
+import style from './SolvesList.css';
+import { formatTime } from '../utils/utils';
 
 export const Penalty = {
   NONE: 0,
@@ -17,8 +17,10 @@ export const Penalty = {
 };
 
 export type Solve = {
+  // Firebase key
   id: string,
   time: number,
+  // Unix timestamp in ms
   timestamp: number,
   scramble: string,
   penalty: number
@@ -157,20 +159,15 @@ class SolveItem extends React.PureComponent {
 
 const SolvesList = ({ solves, onPenalty, onDelete }: Props) => {
   return (
-    <div className={style.solves}>
-      <div className={style.solveList}>
-        {solves.map(solve => (
-          <SolveItem
-            key={solve.id}
-            solve={solve}
-            onPenalty={onPenalty}
-            onDelete={onDelete}
-          />
-        ))}
-      </div>
-      <div>
-        <Button className={style.historyButton}>History</Button>
-      </div>
+    <div className={style.solveList}>
+      {solves.map(solve => (
+        <SolveItem
+          key={solve.id}
+          solve={solve}
+          onPenalty={onPenalty}
+          onDelete={onDelete}
+        />
+      ))}
     </div>
   );
 };

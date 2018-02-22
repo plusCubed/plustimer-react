@@ -29,14 +29,8 @@
       "prettier"
     ],
     "rules": {
-      "no-unused-vars": "warn",
-      "react/sort-comp": "off",
-      "lines-around-comment": "off",
-      "linebreak-style": "off",
-      "object-shorthand": "off",
-      "no-use-before-define": "off",
-      "no-undef": "warn",
-      "prefer-destructuring": "warn"
+      "jsx-a11y/href-no-hash": "off",
+      "jsx-a11y/anchor-is-valid": ["warn", { "aspects": ["invalidHref"] }]
     }
   },
   "lint-staged": {
@@ -60,10 +54,10 @@
     "concurrently": "^3.5.1",
     "copy-webpack-plugin": "^4.4.1",
     "cross-env": "^5.1.3",
-    "eslint": "^4.18.0",
+    "eslint": "^4.18.1",
     "eslint-config-prettier": "^2.9.0",
     "eslint-config-react-app": "^2.1.0",
-    "eslint-plugin-flowtype": "^2.45.0",
+    "eslint-plugin-flowtype": "^2.46.0",
     "eslint-plugin-import": "^2.8.0",
     "eslint-plugin-jsx-a11y": "^6.0.3",
     "eslint-plugin-react": "^7.7.0",
@@ -71,7 +65,7 @@
     "flow-bin": "^0.66.0",
     "husky": "^0.14.3",
     "if-env": "^1.0.4",
-    "lint-staged": "^6.1.1",
+    "lint-staged": "^7.0.0",
     "preact-cli": "^2.2.1",
     "preact-cli-plugin-critical-css": "^0.1.0",
     "preact-cli-plugin-fast-async": "^1.0.1",

@@ -6,8 +6,8 @@ import * as React from '../utils/purecomponent';
 import style from './App.css';
 
 import AppBar from '../components/AppBar';
-import TimerContainer from '../containers/TimerDisplayContainer';
-import SolvesListContainer from '../containers/SolvesListContainer';
+import TimerContainer from '../components/TimerDisplayContainer';
+import SolvesListContainer from '../components/SolvesListContainer';
 
 type Props = {
   signingIn: boolean

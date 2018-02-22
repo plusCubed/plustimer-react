@@ -16,11 +16,23 @@
 }
 
 .historyButton {
-  --mdc-theme-primary: #000;
+  --mdc-theme-primary: #3f51b5;
+  fill: #3f51b5;
   box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2),
     0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0, 0, 0, 0.12);
   border-radius: 0;
   width: 100%;
+  min-height: 48px;
+}
+
+.historyButton.active {
+  --mdc-theme-primary: #3f51b5;
+  fill: var(--mdc-theme-text-primary-on-dark, #fff);
+}
+
+.historyIcon {
+  width: 24px;
+  height: 100%;
 }
 
 .solveItem {
@@ -50,13 +62,13 @@
     0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0, 0, 0, 0.12);
   display: inline-grid;
   max-width: 350px;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto 1fr;
   grid-template-rows: 48px auto 40px 40px;
   grid-template-areas:
-    'time timestamp timestamp'
-    'scramble scramble scramble'
-    'penalty penalty penalty'
-    'actions actions actions';
+    'time timestamp'
+    'scramble scramble'
+    'penalty penalty'
+    'actions actions';
 }
 
 .solvePopupTime {
@@ -145,7 +157,8 @@
 
   .solvePopup {
     padding: 24px;
-    width: 70%;
+    width: calc(100% - 32px);
+    max-width: 360px;
     position: fixed;
     top: 50% !important;
     left: 50% !important;

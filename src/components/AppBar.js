@@ -3,8 +3,8 @@
 import { h } from 'preact';
 import * as React from '../utils/purecomponent';
 
-import ProfileContainer from '../containers/ProfileContainer';
-import PuzzleSelect from '../containers/PuzzleSelect';
+import ProfileContainer from '../components/ProfileContainer';
+import PuzzleSelect from '../components/PuzzleSelect';
 
 import style from './AppBar.css';
 

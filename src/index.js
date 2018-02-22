@@ -1,6 +1,6 @@
 // @flow
 
-import AppContainer from './containers/AppContainer';
+import AppContainer from './components/AppContainer';
 
 import handleRenderErrors from './utils/errors';
 
