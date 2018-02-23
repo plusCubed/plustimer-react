@@ -3,6 +3,10 @@
 import { h } from 'preact';
 import * as React from '../utils/preact';
 
+import Button from 'preact-material-components/Button';
+import 'preact-material-components/Button/style.css';
+import 'preact-material-components/Theme/style.css';
+
 import style from './App.css';
 
 import AppBar from '../components/AppBar';
@@ -10,7 +14,8 @@ import TimerContainer from '../components/TimerDisplayContainer';
 import SolvesListContainer from '../components/SolvesListContainer';
 
 type Props = {
-  signingIn: boolean
+  signingIn: boolean,
+  updateAvailable: boolean
 };
 
 const SigningInDialog = () => {
@@ -26,13 +31,31 @@ const SigningInDialog = () => {
   );
 };
 
+class UpdateAvailable extends React.PureComponent {
+  handleRefresh = () => {
+    window.location.reload();
+  };
+  render() {
+    return (
+      <div className={style.snackbar}>
+        <span>Update available!</span>
+        <span className={style.snackbarSpacer} />
+        <Button className={style.snackbarButton} onClick={this.handleRefresh}>
+          Refresh
+        </Button>
+      </div>
+    );
+  }
+}
+
 const App = (props: Props) => {
   return (
     <div className={style.app}>
-      {props.signingIn && <SigningInDialog />}
+      {props.signingIn ? <SigningInDialog /> : null}
       <AppBar />
       <TimerContainer />
       <SolvesListContainer />
+      {props.updateAvailable ? <UpdateAvailable /> : null}
     </div>
   );
 };

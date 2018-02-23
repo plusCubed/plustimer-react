@@ -23,16 +23,37 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 type State = {
-  signingIn: boolean
+  signingIn: boolean,
+  updateAvailable: boolean
 };
 
 class AppContainer extends React.PureComponent<void, State> {
   state = {
-    signingIn: false
+    signingIn: false,
+    updateAvailable: false
   };
 
   unsubscribePuzzle: () => void;
   unsubscribeCategory: () => void;
+
+  constructor(props) {
+    super(props);
+
+    if (
+      process.env.NODE_ENV !== 'development' &&
+      process.env.ADD_SW &&
+      typeof window !== 'undefined' &&
+      'serviceWorker' in navigator &&
+      window.location.protocol === 'https:' &&
+      navigator.serviceWorker.controller
+    ) {
+      navigator.serviceWorker.controller.onstatechange = event => {
+        if (event.target.state === 'redundant') {
+          this.setState({ updateAvailable: true });
+        }
+      };
+    }
+  }
 
   async componentDidMount() {
     const auth = await firebase.auth();
@@ -113,7 +134,10 @@ class AppContainer extends React.PureComponent<void, State> {
   render() {
     return (
       <Provider store={store}>
-        <App signingIn={this.state.signingIn} />
+        <App
+          signingIn={this.state.signingIn}
+          updateAvailable={this.state.updateAvailable}
+        />
       </Provider>
     );
   }
