@@ -43,7 +43,7 @@
         "headers": [
           {
             "key": "Link",
-            "value": "</bundle.96fe6.js>; rel=preload; as=script, </style.a23c1.css>; rel=preload; as=style"
+            "value": "</bundle.5313b.js>; rel=preload; as=script, </style.a23c1.css>; rel=preload; as=style"
           }
         ]
       }

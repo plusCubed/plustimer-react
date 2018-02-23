@@ -33,7 +33,7 @@
   grid-area: scramble;
   justify-self: stretch;
   font-family: monospace;
-  font-size: 18px;
+  font-size: 3vh;
   padding: 16px;
   text-align: center;
   white-space: pre-line;
