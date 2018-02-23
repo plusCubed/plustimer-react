@@ -14,9 +14,10 @@
 .stats td {
   border: none;
   text-align: right;
-  min-width: 72px;
+  min-width: 64px;
 }
 
 .stats .type {
+  text-align: center;
   min-width: unset;
 }

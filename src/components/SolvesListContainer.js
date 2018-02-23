@@ -1,7 +1,7 @@
 // @flow
 
 import { h } from 'preact';
-import * as React from '../utils/purecomponent';
+import * as React from '../utils/preact';
 import { connect } from 'unistore/full/preact.es';
 import Media from 'react-media';
 
@@ -20,10 +20,13 @@ import style from './SolvesList.css';
 type Props = {
   uid: string,
   puzzle: string,
-  category: string
+  category: string,
+  sessions: [[Solve]]
 };
 
-type State = {};
+type State = {
+  current: boolean
+};
 
 // 15 minutes
 const TIME_BETWEEN_SESSIONS = 15 * 60 * 1000;

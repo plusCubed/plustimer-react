@@ -1,7 +1,7 @@
 // @flow
 
 import { h } from 'preact';
-import * as React from '../utils/purecomponent';
+import * as React from '../utils/preact';
 import { connect } from 'unistore/full/preact.es';
 
 import { buildMapFromObject } from '../utils/utils';

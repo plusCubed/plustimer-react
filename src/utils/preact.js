@@ -1,4 +1,5 @@
 import { Component } from 'preact';
+import { shallowEqual } from './utils';
 
 export class PureComponent extends Component {
   shouldComponentUpdate(props, state) {
@@ -8,8 +9,4 @@ export class PureComponent extends Component {
   }
 }
 
-function shallowEqual(a, b) {
-  for (let key in a) if (a[key] !== b[key]) return false;
-  for (let key in b) if (!(key in a)) return false;
-  return true;
-}
+export { Component };

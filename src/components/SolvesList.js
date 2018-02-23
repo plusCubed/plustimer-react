@@ -1,14 +1,14 @@
 // @flow
 
 import { h } from 'preact';
-import * as React from '../utils/purecomponent';
+import * as React from '../utils/preact';
 
 import Button from 'preact-material-components/Button';
 import 'preact-material-components/Button/style.css';
 import 'preact-material-components/Theme/style.css';
 
 import style from './SolvesList.css';
-import { formatTime } from '../utils/utils';
+import { formatTime, shallowEqual } from '../utils/utils';
 
 export const Penalty = {
   NONE: 0,
@@ -42,7 +42,19 @@ const buildSolveTimeString = solve => {
   }
 };
 
-class SolveModifier extends React.PureComponent {
+type SolvePopupProps = {
+  solve: Solve,
+  onPenalty: (Solve, number) => void,
+  onDelete: Solve => void,
+  onDismiss: () => void,
+  parent: ClientRect
+};
+
+type SolvePopupState = {
+  height: number
+};
+
+class SolvePopup extends React.Component<SolvePopupProps, SolvePopupState> {
   state = {
     height: 0
   };
@@ -51,6 +63,13 @@ class SolveModifier extends React.PureComponent {
     this.setState({
       height: this.base.getBoundingClientRect().height
     });
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return !(
+      shallowEqual(this.props.solve, nextProps.solve) &&
+      shallowEqual(this.state, nextState)
+    );
   }
 
   render() {
@@ -102,7 +121,18 @@ class SolveModifier extends React.PureComponent {
   }
 }
 
-class SolveItem extends React.PureComponent {
+type SolveItemProps = {
+  solve: Solve,
+  onPenalty: (Solve, number) => void,
+  onDelete: Solve => void
+};
+
+type SolveItemState = {
+  popupOpen: boolean,
+  popupLock: boolean
+};
+
+class SolveItem extends React.Component<SolveItemProps, SolveItemState> {
   state = {
     popupOpen: false,
     popupLock: false
@@ -124,6 +154,13 @@ class SolveItem extends React.PureComponent {
     this.setState({ popupOpen: false, popupLock: false });
   };
 
+  shouldComponentUpdate(nextProps, nextState) {
+    return !(
+      shallowEqual(this.props.solve, nextProps.solve) &&
+      shallowEqual(this.state, nextState)
+    );
+  }
+
   render() {
     const { solve, onPenalty, onDelete } = this.props;
     const popupOpen = this.state.popupOpen || this.state.popupLock;
@@ -144,7 +181,7 @@ class SolveItem extends React.PureComponent {
           </div>
         </div>
         {popupOpen ? (
-          <SolveModifier
+          <SolvePopup
             parent={this.base.getBoundingClientRect()}
             solve={solve}
             onPenalty={onPenalty}
@@ -161,20 +198,20 @@ const SolvesList = ({ sessions, onPenalty, onDelete }: Props) => {
   return (
     <div className={style.solveList}>
       {sessions.map((solves, sessionIndex) =>
-        solves.map((solve, index) =>
-          [
+        solves.map((solve, index) => {
+          const solveItem = [
             <SolveItem
               key={solve.id}
               solve={solve}
               onPenalty={onPenalty}
               onDelete={onDelete}
             />
-          ].concat([
-            solves.length >= 2 && index === 0 && sessionIndex !== 0 ? (
-              <div className={style.divider} />
-            ) : null
-          ])
-        )
+          ];
+          if (solves.length >= 2 && index === 0 && sessionIndex !== 0) {
+            solveItem.concat(<div className={style.divider} />);
+          }
+          return solveItem;
+        })
       )}
     </div>
   );

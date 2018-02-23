@@ -1,7 +1,7 @@
 // @flow
 
 import { h } from 'preact';
-import * as React from '../utils/purecomponent';
+import * as React from '../utils/preact';
 import { createStore, Provider } from 'unistore/full/preact.es';
 
 import firebase from '../utils/firebase';

@@ -1,41 +1,60 @@
 // @flow
 
 import { h } from 'preact';
-import * as React from '../utils/purecomponent';
+import * as React from '../utils/preact';
 import { connect } from 'unistore/full/preact.es';
 
 import { formatTime, mean } from '../utils/utils';
 
 import style from './Statistics.css';
 
+import { Penalty } from './SolvesList';
 import type { Solve } from './SolvesList';
 
 const NOT_ENOUGH_SOLVES = -1;
+const NOT_APPLICABLE = -2;
 
-const getCurrentAverage = (count: number, solves: Solve[]) => {
+const getActualTime = (solve: Solve) => {
+  switch (solve.penalty) {
+    case Penalty.DNF:
+      return Number.MAX_VALUE;
+    case Penalty.PLUS_TWO:
+      return solve.time + 2000;
+    case Penalty.NONE:
+    default:
+      return solve.time;
+  }
+};
+
+const getNSolves = (count: number, solves: Solve[], best: boolean) => {
+  solves = solves.slice().map(solve => getActualTime(solve));
+  if (best) {
+    // Best MoN
+    solves = solves.sort((a, b) => a - b).slice(0, count);
+  } else {
+    // Current MoN
+    solves = solves.slice(0, count).sort((a, b) => a - b);
+  }
+  return solves;
+};
+
+const getMean = (count: number, solves: Solve[], best: boolean) => {
   if (solves.length >= count) {
-    const lastNSolves = solves
-      .slice()
-      .slice(0, count)
-      .map(solve => solve.time);
-    const min = Math.min(...lastNSolves);
-    const max = Math.max(...lastNSolves);
-    return mean(lastNSolves.filter(time => time !== min && time !== max));
+    solves = getNSolves(count, solves, best);
+    if (solves.includes(Number.MAX_VALUE)) return Number.MAX_VALUE;
+    else return mean(solves);
   } else {
     return NOT_ENOUGH_SOLVES;
   }
 };
 
-const getBestAverage = (count: number, solves: Solve[]) => {
+const getAverage = (count: number, solves: Solve[], best: boolean) => {
   if (solves.length >= count) {
-    const bestNSolves = solves
-      .slice()
-      .sort((a: Solve, b: Solve) => a.time - b.time)
-      .slice(0, count)
-      .map(solve => solve.time);
-    const min = Math.min(...bestNSolves);
-    const max = Math.max(...bestNSolves);
-    return mean(bestNSolves.filter(time => time !== min && time !== max));
+    const trim = Math.ceil(count / 20);
+    solves = getNSolves(count, solves, best).slice(trim, count - trim);
+
+    if (solves.includes(Number.MAX_VALUE)) return Number.MAX_VALUE;
+    else return mean(solves);
   } else {
     return NOT_ENOUGH_SOLVES;
   }
@@ -44,34 +63,56 @@ const getBestAverage = (count: number, solves: Solve[]) => {
 @connect('sessions')
 class StatisticsWrapper extends React.PureComponent<{ sessions: [[Solve]] }> {
   render() {
-    const averages = [];
+    const solves = this.props.sessions[0];
+    const stats = [];
+
+    stats.push({
+      name: 'Single',
+      current: NOT_APPLICABLE,
+      best: getMean(1, solves, true)
+    });
+
+    if (solves.length >= 3) {
+      stats.push({
+        name: 'Mo3',
+        current: getMean(3, solves, false),
+        best: getMean(3, solves, true)
+      });
+    }
+
     [5, 12, 50, 100, 500, 1000].every(count => {
-      if (this.props.sessions[0].length < count && count >= 50) {
+      if (solves.length < count) {
         return false;
       }
-      averages.push({
-        count: count,
-        current: getCurrentAverage(count, this.props.sessions[0]),
-        best: getBestAverage(count, this.props.sessions[0])
+      stats.push({
+        name: `Ao${count}`,
+        current: getAverage(count, solves, false),
+        best: getAverage(count, solves, true)
       });
       return true;
     });
 
-    return <Statistics averages={averages} />;
+    return <Statistics stats={stats} />;
   }
 }
 
-const buildTime = (time: number) => {
-  if (time === NOT_ENOUGH_SOLVES) {
-    return '--';
+const buildStatsTimeString = (time: number) => {
+  switch (time) {
+    case NOT_ENOUGH_SOLVES:
+      return '--';
+    case NOT_APPLICABLE:
+      return 'N/A';
+    case Number.MAX_VALUE:
+      return 'DNF';
+    default:
+      return formatTime(time);
   }
-  return formatTime(time);
 };
 
 const Statistics = ({
-  averages
+  stats
 }: {
-  averages: [{ count: number, current: number, best: number }]
+  stats: [{ name: string, current: number, best: number }]
 }) => {
   return (
     <div className={style.stats}>
@@ -84,11 +125,11 @@ const Statistics = ({
           </tr>
         </thead>
         <tbody>
-          {averages.map(({ count, current, best }) => (
+          {stats.map(({ name, current, best }) => (
             <tr>
-              <td className={style.type}>Ao{count}</td>
-              <td>{buildTime(current)}</td>
-              <td>{buildTime(best)}</td>
+              <td className={style.type}>{name}</td>
+              <td>{buildStatsTimeString(current)}</td>
+              <td>{buildStatsTimeString(best)}</td>
             </tr>
           ))}
         </tbody>
