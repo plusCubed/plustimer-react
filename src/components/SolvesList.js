@@ -208,7 +208,7 @@ const SolvesList = ({ sessions, onPenalty, onDelete }: Props) => {
             />
           ];
           if (solves.length >= 2 && index === 0 && sessionIndex !== 0) {
-            solveItem.concat(<div className={style.divider} />);
+            solveItem.push(<div className={style.divider} />);
           }
           return solveItem;
         })
