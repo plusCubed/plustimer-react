@@ -1,21 +1,21 @@
 // @flow
 
-import { h } from 'preact';
-import * as React from '../utils/preact';
-import { connect } from 'unistore/full/preact.es';
-import Media from 'react-media';
+import { h } from "preact";
+import * as React from "../utils/preact";
+import { connect } from "unistore/full/preact.es";
+import Media from "react-media";
 
-import Button from 'preact-material-components/Button';
-import 'preact-material-components/Button/style.css';
-import 'preact-material-components/Theme/style.css';
+import Button from "preact-material-components/Button";
+import "preact-material-components/Button/style.css";
+import "preact-material-components/Theme/style.css";
 
-import SolvesList from './SolvesList';
-import type { Solve } from './SolvesList';
-import Statistics from './Statistics';
+import SolvesList from "./SolvesList";
+import type { Solve } from "./SolvesList";
+import Statistics from "./Statistics";
 
-import firebase from '../utils/firebase';
+import firebase from "../utils/firebase";
 
-import style from './SolvesList.css';
+import style from "./SolvesList.css";
 
 type Props = {
   uid: string,
@@ -49,7 +49,10 @@ const actions = store => ({
   }
 });
 
-@connect('uid,puzzle,category,sessions', actions)
+@connect(
+  "uid,puzzle,category,sessions",
+  actions
+)
 class SolvesListContainer extends React.PureComponent<Props, State> {
   state = {
     current: true
@@ -70,15 +73,15 @@ class SolvesListContainer extends React.PureComponent<Props, State> {
 
       const firestore = await firebase.firestore(this.props.uid);
       const ref = firestore
-        .collection('users')
+        .collection("users")
         .doc(this.props.uid)
-        .collection('puzzles')
+        .collection("puzzles")
         .doc(this.props.puzzle)
-        .collection('categories')
+        .collection("categories")
         .doc(this.props.category)
-        .collection('solves');
+        .collection("solves");
       this.unsubscribeSolves = ref
-        .orderBy('timestamp', 'desc')
+        .orderBy("timestamp", "desc")
         .limit(1000)
         .onSnapshot(this.onCollectionUpdate);
     }
@@ -110,13 +113,13 @@ class SolvesListContainer extends React.PureComponent<Props, State> {
   async getSolveRef(solve) {
     const firestore = await firebase.firestore(this.props.uid);
     return firestore
-      .collection('users')
+      .collection("users")
       .doc(this.props.uid)
-      .collection('puzzles')
+      .collection("puzzles")
       .doc(this.props.puzzle)
-      .collection('categories')
+      .collection("categories")
       .doc(this.props.category)
-      .collection('solves')
+      .collection("solves")
       .doc(solve.id);
   }
 
@@ -127,12 +130,7 @@ class SolvesListContainer extends React.PureComponent<Props, State> {
 
     const solveRef = await this.getSolveRef(solve);
 
-    solveRef.set(
-      {
-        penalty: penalty
-      },
-      { merge: true }
-    );
+    solveRef.set({ penalty: penalty }, { merge: true });
   };
 
   handleSolveDelete = (solve: Solve) => async () => {
@@ -149,27 +147,29 @@ class SolvesListContainer extends React.PureComponent<Props, State> {
   };
 
   render() {
+    const sessions = this.state.current
+      ? this.props.sessions.slice(0, 1)
+      : this.props.sessions.slice(1);
+
+    const stats = this.state.current ? (
+      <Media query="(min-width: 841px)" render={() => <Statistics />} />
+    ) : null;
+
     return (
       <div className={style.solves}>
-        {this.state.current ? (
-          <Media query="(min-width: 841px)" render={() => <Statistics />} />
-        ) : null}
+        {stats}
+
         <SolvesList
-          sessions={
-            this.state.current
-              ? this.props.sessions.slice(0, 1)
-              : this.props.sessions.slice(1)
-          }
+          sessions={sessions}
           onPenalty={this.handleSolvePenalty}
           onDelete={this.handleSolveDelete}
         />
+
         <Button
           onClick={this.handleHistoryClick}
-          className={
-            style.historyButton +
-            ' ' +
-            (!this.state.current ? style.active : '')
-          }
+          className={`${style.historyButton} ${
+            !this.state.current ? style.active : ""
+          }`}
           unelevated={!this.state.current}
         >
           <svg className={style.historyIcon} viewBox="0 0 24 24">

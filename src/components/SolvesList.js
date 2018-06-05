@@ -1,14 +1,14 @@
 // @flow
 
-import { h } from 'preact';
-import * as React from '../utils/preact';
+import { h } from "preact";
+import * as React from "../utils/preact";
 
-import Button from 'preact-material-components/Button';
-import 'preact-material-components/Button/style.css';
-import 'preact-material-components/Theme/style.css';
+import Button from "preact-material-components/Button";
+import "preact-material-components/Button/style.css";
+import "preact-material-components/Theme/style.css";
 
-import style from './SolvesList.css';
-import { formatTime, shallowEqual } from '../utils/utils';
+import style from "./SolvesList.css";
+import { formatTime, shallowEqual } from "../utils/utils";
 
 export const Penalty = {
   NONE: 0,
@@ -33,7 +33,7 @@ type Props = {
 const buildSolveTimeString = solve => {
   switch (solve.penalty) {
     case Penalty.DNF:
-      return 'DNF';
+      return "DNF";
     case Penalty.PLUS_TWO:
       return `${formatTime(solve.time + 2000)}+`;
     case Penalty.NONE:
@@ -75,7 +75,7 @@ class SolvePopup extends React.Component<SolvePopupProps, SolvePopupState> {
   render() {
     const { parent, solve, onPenalty, onDelete, onDismiss } = this.props;
     const maxTop =
-      typeof window !== 'undefined'
+      typeof window !== "undefined"
         ? window.innerHeight - this.state.height
         : Number.MAX_VALUE;
     const position = {
@@ -89,7 +89,7 @@ class SolvePopup extends React.Component<SolvePopupProps, SolvePopupState> {
           {buildSolveTimeString(solve)}
         </div>
         <div className={style.solvePopupTimestamp}>
-          {dateTime.toLocaleDateString() + '\n' + dateTime.toLocaleTimeString()}
+          {dateTime.toLocaleDateString() + "\n" + dateTime.toLocaleTimeString()}
         </div>
         <div className={style.solvePopupScramble}>{solve.scramble}</div>
         <div className={style.solvePopupPenalty}>
@@ -171,9 +171,9 @@ class SolveItem extends React.Component<SolveItemProps, SolveItemState> {
         onMouseLeave={this.handleHoverExit}
       >
         <div
-          className={
-            style.solveListItem + ' ' + (popupOpen ? style.popupOpen : '')
-          }
+          className={`${style.solveListItem} ${
+            popupOpen ? style.popupOpen : ""
+          }`}
           onClick={this.handleClick}
         >
           <div className={style.solveListItemText}>
