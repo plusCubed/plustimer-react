@@ -4,8 +4,8 @@
   grid-template-columns: auto 1fr;
   grid-template-rows: auto 1fr auto;
   grid-template-areas:
-    "appbar appbar"
-    "solves timer";
+    'appbar appbar'
+    'solves timer';
 }
 
 @media (max-width: 840px) {
@@ -13,16 +13,16 @@
     grid-template-columns: 1fr;
     grid-template-rows: auto 1fr auto;
     grid-template-areas:
-      "appbar"
-      "timer"
-      "solves";
+      'appbar'
+      'timer'
+      'solves';
   }
 
   .app.history {
     grid-template-rows: auto 1fr;
     grid-template-areas:
-      "appbar"
-      "solves";
+      'appbar'
+      'solves';
   }
 }
 
@@ -114,7 +114,7 @@
 }
 
 .progress .indeterminate:before {
-  content: "";
+  content: '';
   position: absolute;
   background-color: inherit;
   top: 0;
@@ -125,7 +125,7 @@
 }
 
 .progress .indeterminate:after {
-  content: "";
+  content: '';
   position: absolute;
   background-color: inherit;
   top: 0;

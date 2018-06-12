@@ -4,7 +4,7 @@ const webpack = require('webpack');
 const flowPlugin = require('preact-cli-plugin-flow');
 const swPrecachePlugin = require('preact-cli-sw-precache');
 const fastAsyncPlugin = require('preact-cli-plugin-fast-async');
-const criticalCssPlugin = require('preact-cli-plugin-critical-css');
+//const criticalCssPlugin = require('preact-cli-plugin-critical-css');
 
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -24,7 +24,7 @@ export default function(config, env, helpers) {
 
   // PLUGINS ---
 
-  criticalCssPlugin(config, env);
+  //criticalCssPlugin(config, env);
 
   const precacheConfig = {
     navigateFallbackWhitelist: [/^(?!\/__)(?!\/popup).*/]

@@ -218,7 +218,7 @@ scramblers['222'] = (function() {
       ori_sel[i] = scramblers.lib.randomInt.below(3);
       total += ori_sel[i];
     }
-    if (i <= 7) ori_sel[i] = (3 - total % 3) % 3;
+    if (i <= 7) ori_sel[i] = (3 - (total % 3)) % 3;
     ori_sel[fixed] = 0;
 
     // Convert to face format
@@ -614,7 +614,7 @@ scramblers['222'] = (function() {
     //convert array back to number
     q = 0;
     for (a = 5; a >= 0; a--) {
-      q = q * 3 + ps[a] % 3;
+      q = q * 3 + (ps[a] % 3);
     }
     return q;
   }
@@ -1147,7 +1147,7 @@ scramblers['333'] = (function() {
       if (done / 66432 > 0.01) {
         callback(
           'MEPermPrun: ' +
-            Math.floor(done * 100 / 66432) +
+            Math.floor((done * 100) / 66432) +
             '% (' +
             done +
             '/66432)'
@@ -1203,7 +1203,7 @@ scramblers['333'] = (function() {
       if (done / 66432 > 0.01) {
         callback(
           'MCPermPrun: ' +
-            Math.floor(done * 100 / 66432) +
+            Math.floor((done * 100) / 66432) +
             '% (' +
             done +
             '/66432)'
@@ -1374,7 +1374,7 @@ scramblers['333'] = (function() {
       if (done / 870912 > 0.01) {
         callback(
           'TwistFlipPrun: ' +
-            Math.floor(done * 100 / 870912) +
+            Math.floor((done * 100) / 870912) +
             '% (' +
             done +
             '/870912)'
@@ -1430,7 +1430,7 @@ scramblers['333'] = (function() {
       if (done / 160380 > 0.01) {
         callback(
           'UDSliceTwistPrun: ' +
-            Math.floor(done * 100 / 160380) +
+            Math.floor((done * 100) / 160380) +
             '% (' +
             done +
             '/160380)'
@@ -1486,7 +1486,7 @@ scramblers['333'] = (function() {
       if (done / 166320 > 0.01) {
         callback(
           'UDSliceFlipPrun: ' +
-            Math.floor(done * 100 / 166320) +
+            Math.floor((done * 100) / 166320) +
             '% (' +
             done +
             '/166320)'
@@ -1808,7 +1808,7 @@ scramblers['333'] = (function() {
     var i, j;
     obj.ep[11] = 8;
     for (i = 10; i >= 8; --i) {
-      obj.ep[i] = idx % (12 - i) + 8;
+      obj.ep[i] = (idx % (12 - i)) + 8;
       idx = ~~(idx / (12 - i));
       for (j = i + 1; j < 12; ++j) {
         obj.ep[j] >= obj.ep[i] && ++obj.ep[j];
@@ -2703,7 +2703,7 @@ scramblers['333'] = (function() {
     var i, p;
     p = 0;
     for (i = 10; i >= 0; --i) {
-      p = p + idx % (12 - i);
+      p = p + (idx % (12 - i));
       idx = ~~(idx / (12 - i));
     }
     p = p & 1;
@@ -2714,7 +2714,7 @@ scramblers['333'] = (function() {
     var i, p;
     p = 0;
     for (i = 2; i >= 0; --i) {
-      p = p + idx % (4 - i);
+      p = p + (idx % (4 - i));
       idx = ~~(idx / (4 - i));
     }
     p = p & 1;
@@ -2725,7 +2725,7 @@ scramblers['333'] = (function() {
     var i, p;
     p = 0;
     for (i = 6; i >= 0; --i) {
-      p = p + idx % (8 - i);
+      p = p + (idx % (8 - i));
       idx = ~~(idx / (8 - i));
     }
     p = p & 1;
@@ -2857,12 +2857,12 @@ scramblers['333'] = (function() {
   var gap = 4;
   //URFLBD
   var drawingCenters = [
-    [border + width / 2 * 9 + gap * 1, border + width / 2 * 3],
-    [border + width / 2 * 15 + gap * 2, border + width / 2 * 9 + gap * 1],
-    [border + width / 2 * 9 + gap * 1, border + width / 2 * 9 + gap * 1],
-    [border + width / 2 * 3 + gap * 0, border + width / 2 * 9 + gap * 1],
-    [border + width / 2 * 21 + gap * 3, border + width / 2 * 9 + gap * 1],
-    [border + width / 2 * 9 + gap * 1, border + width / 2 * 15 + gap * 2]
+    [border + (width / 2) * 9 + gap * 1, border + (width / 2) * 3],
+    [border + (width / 2) * 15 + gap * 2, border + (width / 2) * 9 + gap * 1],
+    [border + (width / 2) * 9 + gap * 1, border + (width / 2) * 9 + gap * 1],
+    [border + (width / 2) * 3 + gap * 0, border + (width / 2) * 9 + gap * 1],
+    [border + (width / 2) * 21 + gap * 3, border + (width / 2) * 9 + gap * 1],
+    [border + (width / 2) * 9 + gap * 1, border + (width / 2) * 15 + gap * 2]
   ];
 
   function colorGet(col) {
@@ -3610,8 +3610,8 @@ scramblers['clock'] = (function() {
     drawCircle(r, w, h, cx, cy, 13, face_fill, 'none', 0);
     drawCircle(r, w, h, cx, cy, 4, '#F00', 'none', 0);
 
-    var c = Math.cos(hour / 12 * Math.TAU);
-    var s = Math.sin(hour / 12 * Math.TAU);
+    var c = Math.cos((hour / 12) * Math.TAU);
+    var s = Math.sin((hour / 12) * Math.TAU);
 
     arrx = [cx, cx + 4, cx - 4];
     arry = [cy - 12, cy - 1, cy - 1];
@@ -4654,10 +4654,10 @@ scramblers['minx'] = (function() {
   Math.TAU = Math.PI * 2;
 
   var s18 = function(i) {
-    return Math.sin(Math.TAU * i / 20);
+    return Math.sin((Math.TAU * i) / 20);
   };
   var c18 = function(i) {
-    return Math.cos(Math.TAU * i / 20);
+    return Math.cos((Math.TAU * i) / 20);
   };
 
   var colors = [
@@ -4731,13 +4731,13 @@ scramblers['minx'] = (function() {
 
     for (var side = 0; side < 12; side++) {
       for (var i = 0; i < 5; i++) {
-        var dx = majorR * (1 - centerFrac) / 2 / Math.tan(Math.TAU / 10);
+        var dx = (majorR * (1 - centerFrac)) / 2 / Math.tan(Math.TAU / 10);
         var arrx = [0, dx, 0, -dx];
         var arry = [
           -majorR,
-          -majorR * (1 + centerFrac) / 2,
+          (-majorR * (1 + centerFrac)) / 2,
           -majorR * centerFrac,
-          -majorR * (1 + centerFrac) / 2
+          (-majorR * (1 + centerFrac)) / 2
         ];
 
         var p = drawPolygon(r, colors[state[index++]], arrx, arry);
@@ -4754,8 +4754,8 @@ scramblers['minx'] = (function() {
         var sx = Math.tan(Math.TAU / 10);
         var arrx = [c18(-1) * majorR - dx, dx, 0, s18(4) * centerFrac * majorR];
         var arry = [
-          s18(-1) * majorR - majorR + majorR * (1 + centerFrac) / 2,
-          -majorR * (1 + centerFrac) / 2,
+          s18(-1) * majorR - majorR + (majorR * (1 + centerFrac)) / 2,
+          (-majorR * (1 + centerFrac)) / 2,
           -majorR * centerFrac,
           -c18(4) * centerFrac * majorR
         ];
@@ -6190,12 +6190,12 @@ scramblers['pyram'] = (function() {
   var width = 18;
   //URFLBD
   var drawingCenters = [
-    [border + width / 2 * 1, border + width / 2 * 1],
-    [border + width / 2 * 5, border + width / 2 * 3],
-    [border + width / 2 * 3, border + width / 2 * 3],
-    [border + width / 2 * 1, border + width / 2 * 3],
-    [border + width / 2 * 7, border + width / 2 * 3],
-    [border + width / 2 * 3, border + width / 2 * 5]
+    [border + (width / 2) * 1, border + (width / 2) * 1],
+    [border + (width / 2) * 5, border + (width / 2) * 3],
+    [border + (width / 2) * 3, border + (width / 2) * 3],
+    [border + (width / 2) * 1, border + (width / 2) * 3],
+    [border + (width / 2) * 7, border + (width / 2) * 3],
+    [border + (width / 2) * 3, border + (width / 2) * 5]
   ];
 
   function colorGet(col) {
@@ -6260,7 +6260,7 @@ scramblers['pyram'] = (function() {
       for (var x = 0; x < 13; x++) {
         var col = state[0][y * 13 + x];
         if (col != 0) {
-          var xx = border + width + x * width / 2 * 2 / Math.sqrt(3);
+          var xx = border + width + (((x * width) / 2) * 2) / Math.sqrt(3);
           var yy = border + y * width;
           if (y > 3) {
             yy -= width / 2;
@@ -6271,7 +6271,7 @@ scramblers['pyram'] = (function() {
             h,
             xx,
             yy,
-            width / 2 * 2 / Math.sqrt(3),
+            ((width / 2) * 2) / Math.sqrt(3),
             width / 2,
             layout[y * 13 + x],
             colorString[col]
@@ -7201,7 +7201,7 @@ scramblers['sq1'] = (function() {
     var arrx, arry;
 
     var margin = 1;
-    var sidewid = 0.15 * 100 / z;
+    var sidewid = (0.15 * 100) / z;
     var cx = 50;
     var cy = 50;
     var radius = (cx - margin - sidewid * z) / z;
@@ -7212,11 +7212,11 @@ scramblers['sq1'] = (function() {
 
     //initialize angles
     for (var foo = 0; foo < 24; foo++) {
-      angles[foo] = (17 - foo * 2) / 12 * Math.PI;
+      angles[foo] = ((17 - foo * 2) / 12) * Math.PI;
       shapes = shapes.concat('xxxxxxxxxxxxxxxx');
     }
     for (var foo = 0; foo < 24; foo++) {
-      angles2[foo] = (19 - foo * 2) / 12 * Math.PI;
+      angles2[foo] = ((19 - foo * 2) / 12) * Math.PI;
       shapes = shapes.concat('xxxxxxxxxxxxxxxx');
     }
 
@@ -7872,7 +7872,7 @@ scramblers['skewb'] = (function() {
         r[3] = s + 2;
       }
       for (var i = 2; i >= 0; i--) {
-        e = e * 3 + r[i] % 3;
+        e = e * 3 + (r[i] % 3);
       }
       for (var i = 3; i >= 0; i--) {
         e = e * 3 + n[i];
