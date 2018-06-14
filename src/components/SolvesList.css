@@ -13,6 +13,9 @@
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+  grid-template-rows: repeat(auto-fill, 48px);
 }
 
 .divider {
@@ -39,10 +42,12 @@
 }
 
 .solveItem {
+  display: inline-block; /*No effect on grid*/
 }
 
 .solveListItem {
-  padding: 8px 16px;
+  height: 48px;
+  padding: 0 16px;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
@@ -52,6 +57,8 @@
 }
 
 .solveListItemText {
+  vertical-align: middle;
+  line-height: 48px;
   font-weight: 500;
   color: #3f51b5;
   user-select: none;
@@ -135,9 +142,23 @@
     white-space: nowrap;
   }
 
+  .solves.expanded {
+    position: fixed;
+    width: 100%;
+    height: auto;
+    top: 56px;
+    bottom: 0;
+    flex-direction: column;
+  }
+
   .solveList {
     overflow-x: auto;
     overflow-y: hidden;
+    display: block; /*disable grid*/
+  }
+
+  .solveList.expanded {
+    display: grid;
   }
 
   .historyButton {
@@ -145,18 +166,9 @@
     height: 100%;
   }
 
-  .solveItem {
-    display: inline-block;
-  }
-
-  .solveListItem {
+  .historyButton.expanded {
+    width: 100%;
     height: 48px;
-    padding: 0 16px;
-  }
-
-  .solveListItemText {
-    vertical-align: middle;
-    line-height: 48px;
   }
 
   .divider {

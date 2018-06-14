@@ -2,6 +2,7 @@
 
 import { h } from 'preact';
 import * as React from '../utils/preact';
+import Media from 'react-media';
 
 import Button from 'preact-material-components/Button';
 import 'preact-material-components/Button/style.css';
@@ -194,9 +195,9 @@ class SolveItem extends React.Component<SolveItemProps, SolveItemState> {
   }
 }
 
-const SolvesList = ({ sessions, onPenalty, onDelete }: Props) => {
+const SolvesList = ({ sessions, expanded, onPenalty, onDelete }: Props) => {
   return (
-    <div className={style.solveList}>
+    <div className={style.solveList + (expanded ? ' ' + style.expanded : '')}>
       {sessions.map((solves, sessionIndex) =>
         solves.map((solve, index) => {
           const solveItem = [
@@ -207,9 +208,9 @@ const SolvesList = ({ sessions, onPenalty, onDelete }: Props) => {
               onDelete={onDelete}
             />
           ];
-          if (solves.length >= 2 && index === 0 && sessionIndex !== 0) {
-            solveItem.push(<div className={style.divider} />);
-          }
+          /*if (solves.length >= 2 && index === 0 && sessionIndex !== 0) {
+              solveItem.push(<div className={style.divider} />);
+            }*/
           return solveItem;
         })
       )}

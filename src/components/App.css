@@ -17,13 +17,6 @@
       'timer'
       'solves';
   }
-
-  .app.history {
-    grid-template-rows: auto 1fr;
-    grid-template-areas:
-      'appbar'
-      'solves';
-  }
 }
 
 .dialog {
