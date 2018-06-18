@@ -2,11 +2,9 @@
 
 import { h } from 'preact';
 import * as React from '../utils/preact';
-import Media from 'react-media';
 
 import Button from 'preact-material-components/Button';
 import 'preact-material-components/Button/style.css';
-import 'preact-material-components/Theme/style.css';
 
 import style from './SolvesList.css';
 import { formatTime, shallowEqual } from '../utils/utils';

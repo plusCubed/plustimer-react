@@ -1,6 +1,6 @@
 // @flow
 
-import firebase from '@firebase/app';
+import firebase from 'firebase/app';
 
 // Put Firebase config object in firebaseConfig.js
 import config from './firebaseConfig';
@@ -15,11 +15,11 @@ else firebase.initializeApp(debugConfig);
 const app = () => firebase.app();
 
 const firestoreAsync = async () => {
-  await import('@firebase/firestore');
+  await import('firebase/firestore');
   return firebase.firestore();
 };
 const authAsync = async () => {
-  await import('@firebase/auth');
+  await import('firebase/auth');
   return firebase.auth();
 };
 

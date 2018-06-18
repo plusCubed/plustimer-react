@@ -24,8 +24,8 @@ type State = {
 
 @connect('uid')
 class PuzzleCategorySelect extends React.PureComponent<Props, State> {
-  defaultPuzzles: Map<string, string>;
-  defaultCategories: Map<string, Map<string, string>>;
+  defaultPuzzles: Map<string, string>; // puzzle: GUI name
+  defaultCategories: Map<string, Map<string, string>>; // puzzle: (category: GUI name)
 
   state = {
     puzzle: '',
