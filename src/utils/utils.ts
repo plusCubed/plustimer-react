@@ -1,5 +1,3 @@
-// @flow
-
 interface TimeParts {
   secString: string;
   decimals: string;

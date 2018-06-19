@@ -1,5 +1,4 @@
-// @flow
-
+function get(...args: any[])
 function get(obj, path) {
   const keys = Array.isArray(path) ? path : path.split('/');
   for (let i = 0; i < keys.length; i++) {
@@ -13,6 +12,7 @@ function get(obj, path) {
   return obj;
 }
 
+function set(...args: any[])
 function set(obj, path, value) {
   const keys = Array.isArray(path) ? path : path.split('/');
   let itObj = obj;
@@ -25,7 +25,7 @@ function set(obj, path, value) {
   return obj;
 }
 
-export default function deep(obj, path, value) {
+export default function deep(obj, path, value?) {
   if (arguments.length === 3) return set(...arguments);
   return get(...arguments);
 }

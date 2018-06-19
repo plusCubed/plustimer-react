@@ -1,13 +1,11 @@
-// @flow
-
 import { h } from 'preact';
-import * as React from '../utils/preact';
-import { createStore, Provider } from 'unistore/full/preact.es';
+import PureComponent from './PureComponent';
 
-import firebase from '../utils/firebase';
+import { createStore, Provider } from 'unistore/full/preact';
 import App from '../components/App';
-import * as preferences from '../utils/preferences';
 import * as firebaseUtils from '../utils/firebaseUtils';
+import firebase from '../utils/asyncFirebase';
+import * as preferences from '../utils/preferences';
 
 let store = createStore({
   uid: '',
@@ -22,19 +20,18 @@ if (process.env.NODE_ENV === 'development') {
   store = devtools(store);
 }
 
-type State = {
-  signingIn: boolean,
-  updateAvailable: boolean
-};
+interface IState {
+  signingIn: boolean;
+  updateAvailable: boolean;
+}
 
-class AppWrapper extends React.PureComponent<void, State> {
-  state = {
+class AppWrapper extends PureComponent<void, IState> {
+  public readonly state = {
     signingIn: false,
     updateAvailable: false
   };
-
-  unsubscribePuzzle: () => void;
-  unsubscribeCategory: () => void;
+  private unsubscribePuzzle: (() => void);
+  private unsubscribeCategory: (() => void);
 
   constructor(props) {
     super(props);
@@ -47,14 +44,14 @@ class AppWrapper extends React.PureComponent<void, State> {
       navigator.serviceWorker.controller
     ) {
       navigator.serviceWorker.controller.onstatechange = event => {
-        if (event.target.state === 'redundant') {
+        if ((event.target as any).state === 'redundant') {
           this.setState({ updateAvailable: true });
         }
       };
     }
   }
 
-  async componentDidMount() {
+  public async componentDidMount() {
     const auth = await firebase.auth();
 
     const firestore = await firebase.firestore(true);
@@ -66,8 +63,7 @@ class AppWrapper extends React.PureComponent<void, State> {
 
     auth.onAuthStateChanged(this.onAuthStateChanged);
   }
-
-  onAuthStateChanged = async (user: any) => {
+  public readonly onAuthStateChanged = async (user: any) => {
     if (user) {
       // User is signed in.
       const { uid } = user;
@@ -88,6 +84,7 @@ class AppWrapper extends React.PureComponent<void, State> {
         const backup = {
           backup: localUser
         };
+
         const result = await firebaseUtils.restoreBackup(idToken, backup);
         console.log('Local -> Remote', result);
         localStorage.removeItem('localFirestore');
@@ -101,7 +98,7 @@ class AppWrapper extends React.PureComponent<void, State> {
 
       const wcaProfile = userDoc.data().wca;
 
-      store.setState({ uid: uid, wcaProfile: wcaProfile });
+      store.setState({ uid, wcaProfile });
 
       this.setState({
         signingIn: false
@@ -111,9 +108,11 @@ class AppWrapper extends React.PureComponent<void, State> {
       store.setState({ uid: 'local', wcaProfile: null });
     }
 
-    this.unsubscribePuzzle && this.unsubscribePuzzle();
+    if(this.unsubscribePuzzle) {
+      this.unsubscribePuzzle();
+    }
     this.unsubscribePuzzle = preferences.onChange(true, 'puzzle', puzzle => {
-      store.setState({ puzzle: puzzle });
+      store.setState({ puzzle });
 
       this.unsubscribeCategory && this.unsubscribeCategory();
       this.unsubscribeCategory = preferences.onChange(
@@ -121,16 +120,17 @@ class AppWrapper extends React.PureComponent<void, State> {
         'category',
         categoriesString => {
           const categories = JSON.parse(categoriesString);
-          if (categories !== null)
+          if (categories !== null) {
             store.setState({ category: categories[puzzle] });
+          }
         }
       );
     });
   };
 
-  componentWillUnmount() {}
+  public componentWillUnmount() {}
 
-  render() {
+  public render() {
     return (
       <Provider store={store}>
         <App

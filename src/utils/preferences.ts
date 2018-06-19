@@ -1,8 +1,6 @@
-// @flow
-
 import mitt from 'mitt';
 
-const emitter = mitt();
+const emitter = new mitt();
 
 export const setItem = (key: string, value: string) => {
   if (getItem(key) !== value) {
@@ -18,7 +16,7 @@ export const getItem = (key: string): string => {
 export const onChange = (
   initial: boolean,
   key: string,
-  callback: string => void
+  callback: (value: string) => void
 ) => {
   emitter.on(key, callback);
   if (initial) {

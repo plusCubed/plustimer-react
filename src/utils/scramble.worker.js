@@ -1,5 +1,3 @@
-// @flow
-
 self.addEventListener(
   'message',
   function(e) {

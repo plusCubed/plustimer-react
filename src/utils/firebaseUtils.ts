@@ -1,9 +1,7 @@
-// @flow
-
-import firebase from './firebase';
+import firebaseWrapper from './asyncFirebase';
 
 const DEBUG = process.env.FIREBASE_ENV === 'development';
-const projectId = firebase.app().options.projectId;
+const projectId = (firebaseWrapper.app().options as any).projectId;
 const functionsUrl = DEBUG
   ? `http://localhost:5001/${projectId}/us-central1`
   : `https://us-central1-${projectId}.cloudfunctions.net`;
@@ -28,12 +26,12 @@ export const restoreBackup = (
  * Gets document snapshot from cache/network
  */
 export const getDoc = (
-  doc: DocumentReference,
+  doc: import('firebase').firestore.DocumentReference,
   network?: boolean
-): Promise<DocumentSnapshot> => {
-  return new Promise((resolve, reject) => {
+) => {
+  return new Promise<import('firebase').firestore.DocumentSnapshot>((resolve, reject) => {
     const unsubscribe = doc.onSnapshot(
-      (snapshot: DocumentSnapshot) => {
+      snapshot => {
         if (!(network && snapshot.metadata.fromCache)) {
           unsubscribe();
           resolve(snapshot);

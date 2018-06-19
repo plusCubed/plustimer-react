@@ -1,5 +1,3 @@
-// @flow
-
 import AppWrapper from './components/AppWrapper';
 
 import handleRenderErrors from './utils/errors';

@@ -1,5 +1,5 @@
-/* eslint-disable import/no-extraneous-dependencies */
 const webpack = require('webpack');
+const path = require('path');
 
 const flowPlugin = require('preact-cli-plugin-flow');
 const swPrecachePlugin = require('preact-cli-sw-precache');
@@ -13,8 +13,15 @@ export default function(config, env, helpers) {
   // LOADERS ---
 
   config.module.loaders.push({
-    test: /\.worker\.js$/,
-    use: { loader: 'worker-loader' }
+    enforce: 'pre',
+    test: /\.tsx?$/,
+    loader: 'awesome-typescript-loader',
+    options: {
+      useBabel: true,
+      babelOptions: helpers.getLoadersByName(config, 'babel-loader')[0].rule.options,
+      useCache: true,
+      cacheDirectory: "node_modules/.cache/awesome-typescript-loader",
+    }
   });
 
   // BABEL ---

@@ -1,5 +1,3 @@
-// @flow
-
 import firebase from 'firebase/app';
 
 // Put Firebase config object in firebaseConfig.js
@@ -8,8 +6,11 @@ import debugConfig from './firebaseConfigDebug';
 
 import localFirestore from './localFirestore';
 
-if (process.env.NODE_ENV === 'production') firebase.initializeApp(config);
-else firebase.initializeApp(debugConfig);
+if (process.env.NODE_ENV === 'production') {
+  firebase.initializeApp(config);
+} else {
+  firebase.initializeApp(debugConfig);
+}
 
 // May not be initialized
 const app = () => firebase.app();
@@ -26,9 +27,12 @@ const authAsync = async () => {
 const localFirestoreAsync = async () => localFirestore();
 
 export default {
-  app: app,
+  app,
   auth: authAsync,
-  firestore: async (uid: string | boolean): Promise<FirebaseFirestore> => {
+  firestore: async (
+    uid: string | boolean
+  ): Promise<firebase.firestore.Firestore> => {
+    // @ts-ignore
     return uid && uid !== 'local' ? firestoreAsync() : localFirestoreAsync();
   }
 };

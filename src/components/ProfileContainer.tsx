@@ -1,32 +1,30 @@
-// @flow
-
 import { h } from 'preact';
-import * as React from '../utils/preact';
+import PureComponent from './PureComponent';
 
-import { connect } from 'unistore/full/preact.es';
+import { connect } from 'unistore/full/preact';
 
-import Profile from '../components/Profile';
-import firebase from '../utils/firebase';
+import firebase from '../utils/asyncFirebase';
+import Profile from './Profile';
 
-type Props = {
-  uid: string,
-  wcaProfile: any
-};
+interface Props {
+  uid?: string;
+  wcaProfile?: any;
+}
 
 @connect('uid,wcaProfile')
-class ProfileContainer extends React.PureComponent<Props, void> {
-  handleLoginClick = async () => {
+class ProfileContainer extends PureComponent<Props, {}> {
+  public handleLoginClick = async () => {
     window.open('popup.html', '_blank', 'height=585,width=400');
   };
 
-  handleAvatarClick = async () => {
+  public handleAvatarClick = async () => {
     const auth = await firebase.auth();
     await auth.signOut();
   };
 
-  componentWillUnmount() {}
+  public componentWillUnmount() {}
 
-  render() {
+  public render() {
     return (
       <Profile
         loggedIn={!!this.props.wcaProfile}

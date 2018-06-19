@@ -1,38 +1,25 @@
-// @flow
-
 import { h } from 'preact';
-import * as React from '../utils/preact';
-import { connect } from 'unistore/full/preact.es';
 import Media from 'react-media';
+import { connect } from 'unistore/full/preact';
+import PureComponent from './PureComponent';
 
 import Button from 'preact-material-components/Button';
 import 'preact-material-components/Button/style.css';
 
 import SolvesList from './SolvesList';
-import type { Solve } from './SolvesList';
+import { ISolve } from './SolvesList';
 import Statistics from './Statistics';
 
-import firebase from '../utils/firebase';
+import firebase from '../utils/asyncFirebase';
 
 import style from './SolvesList.css';
-
-type Props = {
-  uid: string,
-  puzzle: string,
-  category: string,
-  sessions: [[Solve]]
-};
-
-type State = {
-  current: boolean
-};
 
 // 15 minutes
 const TIME_BETWEEN_SESSIONS = 15 * 60 * 1000;
 
 const actions = store => ({
   // Pass in solves in new->old order
-  async updateSessions(state, solves: Solve[]) {
+  async updateSessions(state, solves: ISolve[]) {
     let timestamp = Date.now();
     let sessionIndex = 0;
     const sessions = [[]];
@@ -44,22 +31,34 @@ const actions = store => ({
       sessions[sessionIndex].push(solve);
       timestamp = solve.timestamp;
     });
-    store.setState({ sessions: sessions });
+    store.setState({ sessions });
   }
 });
+
+interface Props {
+  uid?: string,
+  puzzle?: string,
+  category?: string,
+  sessions?: ISolve[][],
+  updateSessions?: (solves: ISolve[]) => Promise<any>
+}
+
+interface State {
+  expanded: boolean
+}
 
 @connect(
   'uid,puzzle,category,sessions',
   actions
 )
-class SolvesListContainer extends React.PureComponent<Props, State> {
-  state = {
+class SolvesListContainer extends PureComponent<Props, State> {
+  public state = {
     expanded: false
   };
 
-  unsubscribeSolves = null;
+  public unsubscribeSolves = null;
 
-  async componentDidUpdate(prevProps: Props) {
+  public async componentDidUpdate(prevProps: Props) {
     if (
       (this.props.uid !== prevProps.uid ||
         this.props.puzzle !== prevProps.puzzle ||
@@ -86,10 +85,10 @@ class SolvesListContainer extends React.PureComponent<Props, State> {
     }
   }
 
-  onCollectionUpdate = (querySnapshot: QuerySnapshot) => {
-    const solves: Solve[] = [];
+  public onCollectionUpdate = (querySnapshot: import('firebase').firestore.QuerySnapshot) => {
+    const solves: ISolve[] = [];
     querySnapshot.forEach(doc => {
-      const solve = doc.data();
+      const solve = doc.data() as ISolve;
       solves.push({
         ...solve,
         id: doc.id
@@ -99,17 +98,17 @@ class SolvesListContainer extends React.PureComponent<Props, State> {
     this.props.updateSessions(solves);
   };
 
-  componentWillUnmount() {
+  public componentWillUnmount() {
     this.unsubscribe();
   }
 
-  unsubscribe() {
+  public unsubscribe() {
     if (this.unsubscribeSolves) {
       this.unsubscribeSolves();
     }
   }
 
-  async getSolveRef(solve) {
+  public async getSolveRef(solve) {
     const firestore = await firebase.firestore(this.props.uid);
     return firestore
       .collection('users')
@@ -122,17 +121,17 @@ class SolvesListContainer extends React.PureComponent<Props, State> {
       .doc(solve.id);
   }
 
-  handleSolvePenalty = (solve: Solve, penalty: number) => async () => {
+  public handleSolvePenalty = (solve: ISolve, penalty: number) => async () => {
     if (!this.props.uid || !this.props.puzzle || !this.props.category) {
       return;
     }
 
     const solveRef = await this.getSolveRef(solve);
 
-    solveRef.set({ penalty: penalty }, { merge: true });
+    solveRef.set({ penalty }, { merge: true });
   };
 
-  handleSolveDelete = (solve: Solve) => async () => {
+  public handleSolveDelete = (solve: ISolve) => async () => {
     if (!this.props.uid || !this.props.puzzle || !this.props.category) {
       return;
     }
@@ -141,15 +140,15 @@ class SolvesListContainer extends React.PureComponent<Props, State> {
     solveRef.delete();
   };
 
-  handleHistoryClick = () => {
+  /*handleHistoryClick = () => {
     this.setState({ current: !this.state.current });
-  };
+  };*/
 
-  handleExpandClick = () => {
+  public handleExpandClick = () => {
     this.setState({ expanded: !this.state.expanded });
   };
 
-  render() {
+  public render() {
     const sessions = true
       ? this.props.sessions.slice(0, 1)
       : this.props.sessions.slice(1);
@@ -180,7 +179,7 @@ class SolvesListContainer extends React.PureComponent<Props, State> {
                 style.active +
                 (this.state.expanded ? ' ' + style.expanded : '')
               }
-              unelevated={!this.state.current}
+              /*unelevated={!this.state.current}*/
             >
               <svg className={style.historyIcon} viewBox="0 0 24 24">
                 <path d="M11,7V12.11L15.71,14.9L16.5,13.62L12.5,11.25V7M12.5,2C8.97,2 5.91,3.92 4.27,6.77L2,4.5V11H8.5L5.75,8.25C6.96,5.73 9.5,4 12.5,4A7.5,7.5 0 0,1 20,11.5A7.5,7.5 0 0,1 12.5,19C9.23,19 6.47,16.91 5.44,14H3.34C4.44,18.03 8.11,21 12.5,21C17.74,21 22,16.75 22,11.5A9.5,9.5 0 0,0 12.5,2Z" />

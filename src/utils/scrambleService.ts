@@ -1,8 +1,6 @@
-// @flow
-
 import mitt from 'mitt';
 
-import ScrambleWorker from './scramble.worker';
+import ScrambleWorker from 'worker-loader!./scramble.worker';
 
 class ScrambleService {
   worker: Worker;
@@ -13,7 +11,7 @@ class ScrambleService {
     if (typeof window !== 'undefined') {
       this.worker = new ScrambleWorker();
 
-      this.requestedScrambles = mitt();
+      this.requestedScrambles = new mitt();
 
       this.worker.addEventListener(
         'message',
@@ -30,7 +28,7 @@ class ScrambleService {
       const commandId = this.nextCommandId;
       this.nextCommandId++;
 
-      const scramblePromise = new Promise(resolve => {
+      const scramblePromise = new Promise<string>(resolve => {
         const listener = e => {
           this.requestedScrambles.off(commandId, listener);
           const scramble = e.data.scramble.scrambleString.replace(
@@ -49,7 +47,7 @@ class ScrambleService {
       });
       return scramblePromise;
     } else {
-      return Promise.resolve();
+      return Promise.resolve(undefined);
     }
   }
 }

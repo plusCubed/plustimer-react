@@ -1,29 +1,27 @@
-// @flow
-
 import { h } from 'preact';
-import * as React from '../utils/preact';
-import { connect } from 'unistore/full/preact.es';
+import PureComponent from './PureComponent';
+import { connect } from 'unistore/full/preact';
 
 import { buildMapFromObject } from '../utils/utils';
-import firebase from '../utils/firebase';
+import firebase from '../utils/asyncFirebase';
 import * as firebaseUtils from '../utils/firebaseUtils';
 import * as preferences from '../utils/preferences';
 
-import Select from '../components/Select';
+import Select from './Select';
 
 import puzzleDefaults from '../puzzleDefaults.json';
 
-type Props = {
-  uid: string
-};
+interface Props {
+  uid?: string;
+}
 
-type State = {
-  puzzle: string,
-  category: string
-};
+interface State {
+  puzzle: string;
+  category: string;
+}
 
 @connect('uid')
-class PuzzleCategorySelect extends React.PureComponent<Props, State> {
+class PuzzleCategorySelect extends PureComponent<Props, State> {
   defaultPuzzles: Map<string, string>; // puzzle: GUI name
   defaultCategories: Map<string, Map<string, string>>; // puzzle: (category: GUI name)
 

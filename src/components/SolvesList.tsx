@@ -1,13 +1,11 @@
-// @flow
-
-import { h } from 'preact';
-import * as React from '../utils/preact';
+import { Component, h } from 'preact';
+import PureComponent from './PureComponent';
 
 import Button from 'preact-material-components/Button';
 import 'preact-material-components/Button/style.css';
 
-import style from './SolvesList.css';
 import { formatTime, shallowEqual } from '../utils/utils';
+import style from './SolvesList.css';
 
 export const Penalty = {
   NONE: 0,
@@ -15,19 +13,15 @@ export const Penalty = {
   DNF: 2
 };
 
-export type Solve = {
+export interface ISolve {
   // Firebase key
-  id: string,
-  time: number,
+  id: string;
+  time: number;
   // Unix timestamp in ms
-  timestamp: number,
-  scramble: string,
-  penalty: number
-};
-
-type Props = {
-  solves: Solve[]
-};
+  timestamp: number;
+  scramble: string;
+  penalty: number;
+}
 
 const buildSolveTimeString = solve => {
   switch (solve.penalty) {
@@ -41,37 +35,37 @@ const buildSolveTimeString = solve => {
   }
 };
 
-type SolvePopupProps = {
-  solve: Solve,
+interface SolvePopupProps {
+  solve: ISolve,
   onPenalty: (Solve, number) => void,
-  onDelete: Solve => void,
+  onDelete: (ISolve) => void,
   onDismiss: () => void,
   parent: ClientRect
-};
+}
 
-type SolvePopupState = {
+interface SolvePopupState {
   height: number
-};
+}
 
-class SolvePopup extends React.Component<SolvePopupProps, SolvePopupState> {
-  state = {
+class SolvePopup extends Component<SolvePopupProps, SolvePopupState> {
+  public state = {
     height: 0
   };
 
-  componentDidMount() {
+  public componentDidMount() {
     this.setState({
       height: this.base.getBoundingClientRect().height
     });
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
+  public shouldComponentUpdate(nextProps, nextState) {
     return !(
       shallowEqual(this.props.solve, nextProps.solve) &&
       shallowEqual(this.state, nextState)
     );
   }
 
-  render() {
+  public render() {
     const { parent, solve, onPenalty, onDelete, onDismiss } = this.props;
     const maxTop =
       typeof window !== 'undefined'
@@ -120,47 +114,47 @@ class SolvePopup extends React.Component<SolvePopupProps, SolvePopupState> {
   }
 }
 
-type SolveItemProps = {
-  solve: Solve,
-  onPenalty: (Solve, number) => void,
-  onDelete: Solve => void
-};
+interface SolveItemProps {
+  solve: ISolve,
+  onPenalty: (solve: ISolve, penalty: number) => void,
+  onDelete: (solve: ISolve) => void
+}
 
-type SolveItemState = {
+interface SolveItemState {
   popupOpen: boolean,
   popupLock: boolean
-};
+}
 
-class SolveItem extends React.Component<SolveItemProps, SolveItemState> {
-  state = {
+class SolveItem extends Component<SolveItemProps, SolveItemState> {
+  public state = {
     popupOpen: false,
     popupLock: false
   };
 
-  handleHover = () => {
+  public handleHover = () => {
     this.setState({ popupOpen: true });
   };
 
-  handleHoverExit = () => {
+  public handleHoverExit = () => {
     this.setState({ popupOpen: false });
   };
 
-  handleClick = () => {
-    if (!this.state.popupOpen) this.setState({ popupLock: true });
+  public handleClick = () => {
+    if (!this.state.popupOpen) { this.setState({ popupLock: true }); }
   };
 
-  handleDismiss = () => {
+  public handleDismiss = () => {
     this.setState({ popupOpen: false, popupLock: false });
   };
 
-  shouldComponentUpdate(nextProps, nextState) {
+  public shouldComponentUpdate(nextProps, nextState) {
     return !(
       shallowEqual(this.props.solve, nextProps.solve) &&
       shallowEqual(this.state, nextState)
     );
   }
 
-  render() {
+  public render() {
     const { solve, onPenalty, onDelete } = this.props;
     const popupOpen = this.state.popupOpen || this.state.popupLock;
     return (
@@ -191,6 +185,13 @@ class SolveItem extends React.Component<SolveItemProps, SolveItemState> {
       </div>
     );
   }
+}
+
+interface Props {
+  sessions: ISolve[][];
+  expanded: boolean;
+  onPenalty: (solve: ISolve, penalty: number) => void;
+  onDelete: (solve: ISolve) => void;
 }
 
 const SolvesList = ({ sessions, expanded, onPenalty, onDelete }: Props) => {

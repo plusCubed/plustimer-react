@@ -1,14 +1,12 @@
-// @flow
-
 import { h } from 'preact';
-import * as React from '../utils/preact';
+import PureComponent from './PureComponent';
 
-import { connect } from 'unistore/full/preact.es';
+import { connect } from 'unistore/full/preact';
 
-import firebase from '../utils/firebase';
+import firebase from '../utils/asyncFirebase';
 
-import TimerDisplay, { TimerMode } from '../components/TimerDisplay';
-import { Penalty } from '../components/SolvesList';
+import TimerDisplay, { TimerMode } from './TimerDisplay';
+import { Penalty } from './SolvesList';
 
 import scrambleService from '../utils/scrambleService';
 
@@ -47,23 +45,21 @@ export const transitionMode = (action: string, timerMode: string): string => {
 };
 
 type Props = {
-  uid: string,
-  puzzle: string,
-  category: string
+  uid?: string;
+  puzzle?: string;
+  category?: string;
 };
 
 type State = {
-  startTime: number,
-  displayTime: number,
-  mode: string,
-  currentScramble: string,
-  nextScramble: string,
-  scrambling: boolean
+  startTime: number;
+  displayTime: number;
+  mode: string;
+  currentScramble: string;
 };
 
 @connect('uid,puzzle,category')
-class TimerDisplayContainer extends React.PureComponent<Props, State> {
-  state = {
+class TimerDisplayContainer extends PureComponent<Props, State> {
+  public state = {
     startTime: -1,
     displayTime: 0,
     mode: TimerMode.Ready,
@@ -71,7 +67,7 @@ class TimerDisplayContainer extends React.PureComponent<Props, State> {
   };
 
   nextScramble = '';
-  scrambling = false;
+  scrambling: Promise<any> = null;
 
   animationFrameId = 0;
 
@@ -179,7 +175,7 @@ class TimerDisplayContainer extends React.PureComponent<Props, State> {
         return;
       }
       const firestore = await firebase.firestore(this.props.uid);
-      const puzzleDoc = await new Promise(resolve => {
+      const puzzleDoc = await new Promise<import('firebase').firestore.DocumentSnapshot>(resolve => {
         const unsub = firestore
           .collection('users')
           .doc(this.props.uid)
@@ -228,9 +224,10 @@ class TimerDisplayContainer extends React.PureComponent<Props, State> {
     this.animationFrameId = window.requestAnimationFrame(this.timerLoop);
   }
 
-  stopTimer(time) {
+  stopTimer(time?) {
     window.cancelAnimationFrame(this.animationFrameId);
-    this.setState({ displayTime: Math.floor(time - this.state.startTime) });
+    if(time)
+      this.setState({ displayTime: Math.floor(time - this.state.startTime) });
   }
 
   timerLoop = () => {

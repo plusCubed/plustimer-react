@@ -1,25 +1,23 @@
-// @flow
-
 import { h } from 'preact';
-import * as React from '../utils/preact';
+import PureComponent from './PureComponent';
 
 import style from './Select.css';
 
-import firebase from '../utils/firebase';
+import firebase from '../utils/asyncFirebase';
 
-type Props = {
-  defaults: Map<string, string>,
-  uid: string,
-  path: string,
-  onChange: (value: string) => any,
-  value: string
-};
+interface Props {
+  defaults: Map<string, string>;
+  uid: string;
+  path: string;
+  onChange: (value: string) => any;
+  value: string;
+}
 
-type State = {
-  options: Map<string, string>
-};
+interface State {
+  options: Map<string, string>;
+}
 
-class Select extends React.PureComponent<Props, State> {
+class Select extends PureComponent<Props, State> {
   state = {
     options: new Map()
   };
@@ -49,7 +47,7 @@ class Select extends React.PureComponent<Props, State> {
   }
 
   handleChange = (event: Event) => {
-    this.props.onChange(event.target.value);
+    this.props.onChange((event.target as any).value);
   };
 
   render() {

@@ -1,14 +1,8 @@
-// @flow
-
 import { h } from 'preact';
-import * as React from '../utils/preact';
 
-import ProfileContainer from '../components/ProfileContainer';
-import PuzzleSelect from '../components/PuzzleSelect';
-
-import style from './AppBar.css';
-
-type Props = {};
+import ProfileContainer from './ProfileContainer';
+import PuzzleSelect from './PuzzleSelect';
+import * as style from './AppBar.css';
 
 const AppBar = () => {
   return (

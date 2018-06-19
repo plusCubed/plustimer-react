@@ -1,5 +1,3 @@
-// @flow
-
 import mitt from 'mitt';
 
 import deep from './objectPath';
@@ -16,7 +14,7 @@ function newId(): string {
 }
 
 const mittListeners = Object.create(null);
-const emitter = mitt(mittListeners);
+const emitter = new mitt(mittListeners);
 
 const getFirestore = () => {
   const firestoreString = localStorage.getItem('localFirestore');
@@ -42,7 +40,7 @@ class Query {
     return this;
   }
 
-  async get(): QuerySnapshot {
+  async get(): Promise<QuerySnapshot> {
     const firestore = getFirestore();
     let collection = deep(firestore, `${this.path}`);
 
@@ -96,7 +94,7 @@ class CollectionReference extends Query {
     return new DocumentReference(`${this.path}/${docId}`);
   }
 
-  async add(data): DocumentReference {
+  async add(data): Promise<DocumentReference> {
     const id = newId();
 
     const docRef = new DocumentReference(`${this.path}/${id}`);
@@ -123,7 +121,7 @@ class DocumentReference {
     return new CollectionReference(`${this.path}/${collectionId}`);
   }
 
-  async set(data, options) {
+  async set(data, options?) {
     const oldFirestore = getFirestore();
 
     const oldData = (await this.get()).data();
@@ -191,7 +189,7 @@ class DocumentSnapshot {
   id: string;
   ref: DocumentReference;
   exists: boolean;
-  metadata: SnapshotMetadata;
+  metadata: import('firebase').firestore.SnapshotMetadata;
 
   constructor(data, ref: DocumentReference) {
     this.path = ref.path;
@@ -199,7 +197,7 @@ class DocumentSnapshot {
     this.id = ref.id;
     this.ref = ref;
     this.exists = !!data;
-    this.metadata = { fromCache: false, hasPendingWrites: false };
+    this.metadata = { fromCache: false, hasPendingWrites: false, isEqual: undefined};
   }
 
   data() {

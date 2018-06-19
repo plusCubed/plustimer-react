@@ -1,5 +1,3 @@
-// @flow
-
 import { options } from 'preact';
 
 export default function handleRenderErrors() {
@@ -27,7 +25,7 @@ function wrapFunctionalComponent(FnComponent) {
       console.error(err);
     }
   }
-  Wrapper.displayName = FnComponent.displayName;
+  (Wrapper as any).displayName = FnComponent.displayName;
 
   return (FnComponent.__safe = Wrapper);
 }

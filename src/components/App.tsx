@@ -1,23 +1,19 @@
-// @flow
-
 import { h } from 'preact';
-import * as React from '../utils/preact';
-
-import 'preact-material-components/Theme/style.css';
+import PureComponent from './PureComponent';
 
 import Button from 'preact-material-components/Button';
 import 'preact-material-components/Button/style.css';
+import 'preact-material-components/Theme/style.css';
 
-import style from './App.css';
+import AppBar from './AppBar';
+import SolvesListContainer from './SolvesListContainer';
+import TimerContainer from './TimerDisplayContainer';
+import * as style from './App.css';
 
-import AppBar from '../components/AppBar';
-import TimerContainer from '../components/TimerDisplayContainer';
-import SolvesListContainer from '../components/SolvesListContainer';
-
-type Props = {
-  signingIn: boolean,
-  updateAvailable: boolean
-};
+interface IProps {
+  signingIn: boolean;
+  updateAvailable: boolean;
+}
 
 const SigningInDialog = () => {
   return (
@@ -32,11 +28,11 @@ const SigningInDialog = () => {
   );
 };
 
-class UpdateAvailable extends React.PureComponent {
-  handleRefresh = () => {
+class UpdateAvailable extends PureComponent<{}, {}> {
+  public readonly handleRefresh = () => {
     window.location.reload();
   };
-  render() {
+  public render() {
     return (
       <div className={style.snackbar}>
         <span>Update available!</span>
@@ -49,7 +45,7 @@ class UpdateAvailable extends React.PureComponent {
   }
 }
 
-const App = (props: Props) => {
+const App = (props: IProps) => {
   return (
     <div className={style.app}>
       {props.signingIn ? <SigningInDialog /> : null}

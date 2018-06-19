@@ -1,20 +1,18 @@
-// @flow
-
 import { h } from 'preact';
-import * as React from '../utils/preact';
-import { connect } from 'unistore/full/preact.es';
+import { connect } from 'unistore/full/preact';
+
+import PureComponent from './PureComponent';
 
 import { formatTime, mean } from '../utils/utils';
 
 import style from './Statistics.css';
 
-import { Penalty } from './SolvesList';
-import type { Solve } from './SolvesList';
+import { ISolve, Penalty } from './SolvesList';
 
 const NOT_ENOUGH_SOLVES = -1;
 const NOT_APPLICABLE = -2;
 
-const getActualTime = (solve: Solve) => {
+const getActualTime = (solve: ISolve) => {
   switch (solve.penalty) {
     case Penalty.DNF:
       return Number.MAX_VALUE;
@@ -26,45 +24,49 @@ const getActualTime = (solve: Solve) => {
   }
 };
 
-const getNSolves = (count: number, solves: Solve[], best: boolean) => {
-  solves = solves.slice().map(solve => getActualTime(solve));
+const getNSolves = (count: number, solves: ISolve[], best: boolean) => {
+  let solveTimes = solves.slice().map(solve => getActualTime(solve));
   if (best) {
     // Best MoN
-    solves = solves.sort((a, b) => a - b).slice(0, count);
+    solveTimes = solveTimes.sort((a, b) => a - b).slice(0, count);
   } else {
     // Current MoN
-    solves = solves.slice(0, count).sort((a, b) => a - b);
+    solveTimes = solveTimes.slice(0, count).sort((a, b) => a - b);
   }
-  return solves;
+  return solveTimes;
 };
 
-const getMean = (count: number, solves: Solve[], best: boolean) => {
+const getMean = (count: number, solves: ISolve[], best: boolean) => {
   if (solves.length >= count) {
-    solves = getNSolves(count, solves, best);
-    if (solves.includes(Number.MAX_VALUE)) return Number.MAX_VALUE;
-    else return mean(solves);
+    const solveTimes = getNSolves(count, solves, best);
+    if (solveTimes.includes(Number.MAX_VALUE)) { return Number.MAX_VALUE; }
+    else { return mean(solveTimes); }
   } else {
     return NOT_ENOUGH_SOLVES;
   }
 };
 
-const getAverage = (count: number, solves: Solve[], best: boolean) => {
+const getAverage = (count: number, solves: ISolve[], best: boolean) => {
   if (solves.length >= count) {
     const trim = Math.ceil(count / 20);
-    solves = getNSolves(count, solves, best).slice(trim, count - trim);
+    const solveTimes = getNSolves(count, solves, best).slice(trim, count - trim);
 
-    if (solves.includes(Number.MAX_VALUE)) return Number.MAX_VALUE;
-    else return mean(solves);
+    if (solveTimes.includes(Number.MAX_VALUE)) { return Number.MAX_VALUE; }
+    else { return mean(solveTimes); }
   } else {
     return NOT_ENOUGH_SOLVES;
   }
 };
 
+interface Props {
+  sessions?: ISolve[][]
+}
+
 @connect('sessions')
-class StatisticsWrapper extends React.PureComponent<{ sessions: [[Solve]] }> {
-  render() {
+class StatisticsWrapper extends PureComponent<Props, {}> {
+  public render() {
     const solves = this.props.sessions[0];
-    const stats = [];
+    const stats: Array<{ name: string, current: number, best: number }> = [];
 
     stats.push({
       name: 'Single',
@@ -112,7 +114,7 @@ const buildStatsTimeString = (time: number) => {
 const Statistics = ({
   stats
 }: {
-  stats: [{ name: string, current: number, best: number }]
+  stats: Array<{ name: string, current: number, best: number }>
 }) => {
   return (
     <div className={style.stats}>
