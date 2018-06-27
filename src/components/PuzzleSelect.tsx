@@ -22,8 +22,8 @@ interface State {
 
 @connect('uid')
 class PuzzleCategorySelect extends PureComponent<Props, State> {
-  defaultPuzzles: Map<string, string>; // puzzle: GUI name
-  defaultCategories: Map<string, Map<string, string>>; // puzzle: (category: GUI name)
+  public defaultPuzzles: Map<string, string>; // puzzle: GUI name
+  public defaultCategories: Map<string, Map<string, string>>; // puzzle: (category: GUI name)
 
   state = {
     puzzle: '',
@@ -49,7 +49,7 @@ class PuzzleCategorySelect extends PureComponent<Props, State> {
     );
   }
 
-  async componentDidUpdate(prevProps: Props, prevState: State) {
+  public async componentDidUpdate(prevProps: Props, prevState: State) {
     if (this.props.uid !== prevProps.uid && this.props.uid) {
       let currentPuzzle = preferences.getItem('puzzle');
       if (!currentPuzzle) {
@@ -60,7 +60,7 @@ class PuzzleCategorySelect extends PureComponent<Props, State> {
     }
   }
 
-  handlePuzzleChange = async (puzzle: string) => {
+  private handlePuzzleChange = async (puzzle: string) => {
     this.setState({ puzzle: puzzle });
 
     console.log('New puzzle', puzzle);
@@ -95,7 +95,7 @@ class PuzzleCategorySelect extends PureComponent<Props, State> {
     await this.handleCategoryChange(newCategory, puzzle);
   };
 
-  handleCategoryChange = async (
+  private handleCategoryChange = async (
     category: string,
     puzzle: string = this.state.puzzle
   ) => {

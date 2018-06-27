@@ -187,32 +187,46 @@ class SolveItem extends Component<SolveItemProps, SolveItemState> {
   }
 }
 
-interface Props {
+const HistoryDivider = () => {
+  return (
+    <div className={style.divider}>
+    </div>
+  );
+};
+
+interface IProps {
   sessions: ISolve[][];
   expanded: boolean;
   onPenalty: (solve: ISolve, penalty: number) => void;
   onDelete: (solve: ISolve) => void;
 }
 
-const SolvesList = ({ sessions, expanded, onPenalty, onDelete }: Props) => {
+const SolvesList = ({ sessions, expanded, onPenalty, onDelete }: IProps) => {
   return (
     <div className={style.solveList + (expanded ? ' ' + style.expanded : '')}>
-      {sessions.map((solves, sessionIndex) =>
-        solves.map((solve, index) => {
-          const solveItem = [
-            <SolveItem
-              key={solve.id}
-              solve={solve}
-              onPenalty={onPenalty}
-              onDelete={onDelete}
-            />
-          ];
-          /*if (solves.length >= 2 && index === 0 && sessionIndex !== 0) {
-              solveItem.push(<div className={style.divider} />);
-            }*/
-          return solveItem;
-        })
-      )}
+      {sessions.map((solves, sessionIndex) => {
+        const solveElements = solves.map((solve, index) =>
+          <SolveItem
+            key={solve.id}
+            solve={solve}
+            onPenalty={onPenalty}
+            onDelete={onDelete}
+          />);
+
+        if(sessionIndex===0){
+          if(solveElements.length>0) {
+            return solveElements;
+          }else{
+            return <div>Do some solves!</div>
+          }
+        }else{
+          return [
+            <div className={style.divider}>
+            </div>,
+            solveElements
+          ]
+        }
+      })}
     </div>
   );
 };

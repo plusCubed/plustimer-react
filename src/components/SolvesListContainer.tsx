@@ -149,9 +149,7 @@ class SolvesListContainer extends PureComponent<Props, State> {
   };
 
   public render() {
-    const sessions = true
-      ? this.props.sessions.slice(0, 1)
-      : this.props.sessions.slice(1);
+    const sessions = this.props.sessions;
 
     return (
       <div
@@ -173,12 +171,7 @@ class SolvesListContainer extends PureComponent<Props, State> {
           render={() => (
             <Button
               onClick={this.handleExpandClick}
-              className={
-                style.historyButton +
-                ' ' +
-                style.active +
-                (this.state.expanded ? ' ' + style.expanded : '')
-              }
+              className={!this.state.expanded ? style.historyButton : style.historyButtonExpanded}
               /*unelevated={!this.state.current}*/
             >
               <svg className={style.historyIcon} viewBox="0 0 24 24">
