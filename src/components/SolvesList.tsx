@@ -196,14 +196,18 @@ const HistoryDivider = () => {
 
 interface IProps {
   sessions: ISolve[][];
+  onlyLast: boolean;
   expanded: boolean;
   onPenalty: (solve: ISolve, penalty: number) => void;
   onDelete: (solve: ISolve) => void;
 }
 
-const SolvesList = ({ sessions, expanded, onPenalty, onDelete }: IProps) => {
+const SolvesList = ({ sessions, expanded, onlyLast, onPenalty, onDelete }: IProps) => {
+  if(onlyLast) {
+    sessions = sessions.slice(0,1);
+  }
   return (
-    <div className={style.solveList + (expanded ? ' ' + style.expanded : '')}>
+    <div className={expanded ? style.solveListExpanded : style.solveList}>
       {sessions.map((solves, sessionIndex) => {
         const solveElements = solves.map((solve, index) =>
           <SolveItem
@@ -217,7 +221,7 @@ const SolvesList = ({ sessions, expanded, onPenalty, onDelete }: IProps) => {
           if(solveElements.length>0) {
             return solveElements;
           }else{
-            return <div>Do some solves!</div>
+            return <div className={style.emptyItem}>Do some solves!</div>
           }
         }else{
           return [

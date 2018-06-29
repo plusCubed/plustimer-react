@@ -15,5 +15,8 @@
     "rootDir": "src",
     "sourceRoot": "src",
     "resolveJsonModule": true
-  }
+  },
+  "include": [
+    "src"
+  ]
 }

@@ -48,6 +48,13 @@
   display: inline-block; /*No effect on grid*/
 }
 
+.emptyItem {
+  grid-column: 1/-1;
+  padding: 0 16px;
+  vertical-align: middle;
+  line-height: 48px;
+}
+
 .solveListItem {
   height: 48px;
   padding: 0 16px;
@@ -145,7 +152,8 @@
     white-space: nowrap;
   }
 
-  .solves.expanded {
+  .solvesExpanded {
+    composes: solves;
     position: fixed;
     width: 100%;
     height: auto;
@@ -160,7 +168,8 @@
     display: block; /*disable grid*/
   }
 
-  .solveList.expanded {
+  .solveListExpanded {
+    composes: solveList;
     display: grid;
   }
 
