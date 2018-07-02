@@ -140,10 +140,6 @@ class SolvesListContainer extends PureComponent<Props, State> {
     solveRef.delete();
   };
 
-  /*handleHistoryClick = () => {
-    this.setState({ current: !this.state.current });
-  };*/
-
   public handleExpandClick = () => {
     this.setState({ expanded: !this.state.expanded });
   };

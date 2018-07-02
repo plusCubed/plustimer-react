@@ -24,6 +24,24 @@
   height: 1px;
 }
 
+.dividerItem {
+  height: 16px;
+  grid-column: 1/-1;
+  display: flex;
+  flex-direction: row;
+}
+
+.dividerItemLine {
+  height: 8px;
+  border-bottom: 1px solid #444;
+  flex: 1;
+}
+
+.dividerIcon {
+  margin: 0 4px;
+  height: 16px;
+}
+
 .historyButton {
   --mdc-theme-primary: #3f51b5;
   fill: #3f51b5;
