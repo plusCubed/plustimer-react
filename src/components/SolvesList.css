@@ -189,6 +189,7 @@
   .solveListExpanded {
     composes: solveList;
     display: grid;
+    overflow-y: auto;
   }
 
   .historyButton {

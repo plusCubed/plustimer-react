@@ -6,8 +6,7 @@ import PureComponent from './PureComponent';
 import Button from 'preact-material-components/Button';
 import 'preact-material-components/Button/style.css';
 
-import SolvesList from './SolvesList';
-import { ISolve } from './SolvesList';
+import SolvesList, { ISolve } from './SolvesList';
 import Statistics from './Statistics';
 
 import firebase from '../utils/asyncFirebase';
@@ -153,7 +152,7 @@ class SolvesListContainer extends PureComponent<Props, State> {
         {desktop => {
           let onlyLast = !this.state.expanded;
           if(desktop){
-            onlyLast = false
+            onlyLast = false;
           }
           return (
             <div className={this.state.expanded ? style.solvesExpanded : style.solves}>
@@ -179,7 +178,7 @@ class SolvesListContainer extends PureComponent<Props, State> {
                   </Button>
                 :null}
             </div>
-          )
+          );
         }}
       </Media>
     );
