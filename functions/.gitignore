@@ -1,8 +1,0 @@
-# Compiled
-*.js
-
-# API files
-service-account.json
-service-account-debug.json
-wca-oauth.json
-wca-oauth-debug.json

@@ -13,8 +13,7 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "rootDir": "src",
-    "sourceRoot": "src",
-    "resolveJsonModule": true
+    "sourceRoot": "src"
   },
   "include": [
     "src"

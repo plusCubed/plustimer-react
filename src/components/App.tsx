@@ -48,7 +48,7 @@ class UpdateAvailable extends PureComponent<{}, {}> {
 const App = (props: IProps) => {
   return (
     <div className={style.app}>
-      {props.signingIn ? <SigningInDialog /> : null}
+      {/*{props.signingIn ? <SigningInDialog /> : null}*/}
       <AppBar />
       <TimerContainer />
       <SolvesListContainer />

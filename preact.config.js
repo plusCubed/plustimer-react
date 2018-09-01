@@ -1,23 +1,24 @@
 const webpack = require('webpack');
 const path = require('path');
 
-const flowPlugin = require('preact-cli-plugin-flow');
-const swPrecachePlugin = require('preact-cli-sw-precache');
-const fastAsyncPlugin = require('preact-cli-plugin-fast-async');
+//const flowPlugin = require('preact-cli-plugin-flow');
+//const swPrecachePlugin = require('preact-cli-sw-precache');
+//const fastAsyncPlugin = require('preact-cli-plugin-fast-async');
 //const criticalCssPlugin = require('preact-cli-plugin-critical-css');
 
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+// const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 export default function(config, env, helpers) {
   // LOADERS ---
 
-  config.module.loaders.push({
+  config.module.rules.push({
     enforce: 'pre',
     test: /\.tsx?$/,
     loader: 'awesome-typescript-loader',
     options: {
       useBabel: true,
+      babelCore: '@babel/core',
       babelOptions: helpers.getLoadersByName(config, 'babel-loader')[0].rule.options,
       useCache: true,
       cacheDirectory: "node_modules/.cache/awesome-typescript-loader",
@@ -26,15 +27,15 @@ export default function(config, env, helpers) {
 
   // BABEL ---
 
-  fastAsyncPlugin(config);
-  flowPlugin(config);
+  //fastAsyncPlugin(config);
+  //flowPlugin(config);
 
   // PLUGINS ---
 
   //criticalCssPlugin(config, env);
 
-  const precacheConfig = {
-    navigateFallbackWhitelist: [/^(?!\/__)(?!\/popup).*/]
+  /*const precacheConfig = {
+    navigateFallbackWhitelist: [/^(?!\/__)(?!\/popup).*!/]
   };
   swPrecachePlugin(config, precacheConfig);
 
@@ -61,7 +62,7 @@ export default function(config, env, helpers) {
           : 'production'
       )
     })
-  );
+  );*/
 
   if (!env.ssr && env.production) {
     config.plugins.push(

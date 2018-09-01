@@ -1,10 +1,7 @@
 import { h } from 'preact';
 import PureComponent from './PureComponent';
-import { connect } from 'unistore/full/preact';
 
 import { buildMapFromObject } from '../utils/utils';
-import firebase from '../utils/asyncFirebase';
-import * as firebaseUtils from '../utils/firebaseUtils';
 import * as preferences from '../utils/preferences';
 
 import Select from './Select';
@@ -20,7 +17,6 @@ interface State {
   category: string;
 }
 
-@connect('uid')
 class PuzzleCategorySelect extends PureComponent<Props, State> {
   public defaultPuzzles: Map<string, string>; // puzzle: GUI name
   public defaultCategories: Map<string, Map<string, string>>; // puzzle: (category: GUI name)

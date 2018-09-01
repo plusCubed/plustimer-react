@@ -3,8 +3,6 @@ import PureComponent from './PureComponent';
 
 import style from './Select.css';
 
-import firebase from '../utils/asyncFirebase';
-
 interface Props {
   defaults: Map<string, string>;
   uid: string;
