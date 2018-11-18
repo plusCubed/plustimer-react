@@ -1,5 +1,4 @@
 import { h } from 'preact';
-import { connect } from 'unistore/full/preact';
 
 import PureComponent from './PureComponent';
 
@@ -7,7 +6,8 @@ import { formatTime, mean } from '../utils/utils';
 
 import style from './Statistics.css';
 
-import { ISolve, Penalty } from './SolvesList';
+import { Penalty } from './SolvesList';
+import { ISolve } from './AppWrapper';
 
 const NOT_ENOUGH_SOLVES = -1;
 const NOT_APPLICABLE = -2;
@@ -59,13 +59,12 @@ const getAverage = (count: number, solves: ISolve[], best: boolean) => {
 };
 
 interface Props {
-  sessions?: ISolve[][]
+  //sessions?: IRepoSolve[][]
 }
 
-@connect('sessions')
 class StatisticsWrapper extends PureComponent<Props, {}> {
   public render() {
-    const solves = this.props.sessions[0];
+    /*const solves = this.props.sessions[0];
     const stats: Array<{ name: string, current: number, best: number }> = [];
 
     stats.push({
@@ -94,7 +93,8 @@ class StatisticsWrapper extends PureComponent<Props, {}> {
       return true;
     });
 
-    return <Statistics stats={stats} />;
+    return <Statistics stats={stats} />;*/
+    return <div></div>
   }
 }
 

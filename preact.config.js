@@ -25,6 +25,8 @@ export default function(config, env, helpers) {
     }
   });
 
+  config.output['globalObject'] = `(typeof self !== 'undefined' ? self : this)`;
+
   // BABEL ---
 
   //fastAsyncPlugin(config);

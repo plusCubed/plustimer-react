@@ -1,27 +1,17 @@
 import { Component, h } from 'preact';
-import PureComponent from './PureComponent';
 
 import Button from 'preact-material-components/Button';
 import 'preact-material-components/Button/style.css';
 
 import { formatTime, shallowEqual } from '../utils/utils';
 import style from './SolvesList.css';
+import { ISolve } from './AppWrapper';
 
 export const Penalty = {
   NONE: 0,
   PLUS_TWO: 1,
   DNF: 2
 };
-
-export interface ISolve {
-  // Firebase key
-  id: string;
-  time: number;
-  // Unix timestamp in ms
-  timestamp: number;
-  scramble: string;
-  penalty: number;
-}
 
 const buildSolveTimeString = solve => {
   switch (solve.penalty) {
@@ -72,7 +62,7 @@ class SolvePopup extends Component<SolvePopupProps, SolvePopupState> {
         ? window.innerHeight - this.state.height
         : Number.MAX_VALUE;
     const position = {
-      top: Math.min(parent.top, maxTop),
+      top: Math.min(parent.top+12, maxTop),
       left: parent.right
     };
     const dateTime = new Date(solve.timestamp);
@@ -200,20 +190,31 @@ const HistoryDivider = () => {
 };
 
 interface IProps {
-  sessions: ISolve[][];
+  //sessions: IRepoSolve[][];
+  solves: ISolve[];
   onlyLast: boolean;
   expanded: boolean;
   onPenalty: (solve: ISolve, penalty: number) => void;
   onDelete: (solve: ISolve) => void;
 }
 
-const SolvesList = ({ sessions, expanded, onlyLast, onPenalty, onDelete }: IProps) => {
-  if(onlyLast) {
+const SolvesList = ({ /*sessions, */solves, expanded, onlyLast, onPenalty, onDelete }: IProps) => {
+  /*if(onlyLast) {
     sessions = sessions.slice(0,1);
-  }
+  }*/
+
+  const solveDivs = solves.map((solve) => (
+    <SolveItem
+      key={solve.id}
+      solve={solve}
+      onPenalty={onPenalty}
+      onDelete={onDelete}
+    />
+  ));
+
   return (
     <div className={expanded ? style.solveListExpanded : style.solveList}>
-      {sessions.map((solves, sessionIndex) => {
+      {/*sessions.map((solves, sessionIndex) => {
         const solveElements = solves.map((solve, index) =>
           <SolveItem
             key={solve.id}
@@ -240,7 +241,10 @@ const SolvesList = ({ sessions, expanded, onlyLast, onPenalty, onDelete }: IProp
             solveElements
           ]
         }
-      })}
+      })*/}
+
+      {solveDivs}
+
     </div>
   );
 };

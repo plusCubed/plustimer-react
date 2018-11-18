@@ -6,10 +6,9 @@ import * as preferences from '../utils/preferences';
 
 import Select from './Select';
 
-import puzzleDefaults from '../puzzleDefaults.json';
+import puzzleDefaults from '../defaultPuzzles';
 
 interface Props {
-  uid?: string;
 }
 
 interface State {
@@ -46,14 +45,14 @@ class PuzzleCategorySelect extends PureComponent<Props, State> {
   }
 
   public async componentDidUpdate(prevProps: Props, prevState: State) {
-    if (this.props.uid !== prevProps.uid && this.props.uid) {
+    //if (this.props.uid !== prevProps.uid && this.props.uid) {
       let currentPuzzle = preferences.getItem('puzzle');
       if (!currentPuzzle) {
         currentPuzzle = '333';
       }
 
       await this.handlePuzzleChange(currentPuzzle);
-    }
+    //}
   }
 
   private handlePuzzleChange = async (puzzle: string) => {
@@ -61,7 +60,7 @@ class PuzzleCategorySelect extends PureComponent<Props, State> {
 
     console.log('New puzzle', puzzle);
 
-    const firestore = await firebase.firestore(this.props.uid);
+    /*const firestore = await firebase.firestore(this.props.uid);
     const userRef = firestore.collection('users').doc(this.props.uid);
 
     // Set current puzzle
@@ -88,7 +87,7 @@ class PuzzleCategorySelect extends PureComponent<Props, State> {
       }
     }
 
-    await this.handleCategoryChange(newCategory, puzzle);
+    await this.handleCategoryChange(newCategory, puzzle);*/
   };
 
   private handleCategoryChange = async (
@@ -118,20 +117,14 @@ class PuzzleCategorySelect extends PureComponent<Props, State> {
     return (
       <span>
         <Select
-          uid={this.props.uid}
           value={this.state.puzzle}
           defaults={this.defaultPuzzles}
-          path={`users/${this.props.uid}/puzzles`}
           onChange={this.handlePuzzleChange}
         />
 
         <Select
-          uid={this.props.uid}
           value={this.state.category}
           defaults={this.defaultCategories.get(this.state.puzzle)}
-          path={`users/${this.props.uid}/puzzles/${
-            this.state.puzzle
-          }/categories`}
           onChange={this.handleCategoryChange}
         />
       </span>

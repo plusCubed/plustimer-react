@@ -7,7 +7,9 @@ import * as style from './AppBar.css';
 const AppBar = () => {
   return (
     <header className={style.toolbar}>
+{/*
       <PuzzleSelect />
+*/}
 
       <span className={style.toolbarSpacer} />
 

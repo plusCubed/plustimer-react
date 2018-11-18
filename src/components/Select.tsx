@@ -5,8 +5,8 @@ import style from './Select.css';
 
 interface Props {
   defaults: Map<string, string>;
-  uid: string;
-  path: string;
+  //uid: string;
+  //path: string;
   onChange: (value: string) => any;
   value: string;
 }
@@ -22,12 +22,12 @@ class Select extends PureComponent<Props, State> {
 
   async componentDidUpdate(prevProps: Props, prevState: State) {
     // Check that the path changed and is valid
-    if (
-      this.props.uid &&
+    /*if (
+      /!*this.props.uid &&*!/
       this.props.path !== prevProps.path &&
       !this.props.path.split('/').includes('')
     ) {
-      const firestore = await firebase.firestore(this.props.uid);
+      /!*const firestore = await firebase.firestore(this.props.uid);
       const collectionRef = firestore.collection(this.props.path);
       const querySnapshot = await collectionRef.get();
       const docSnapshots = querySnapshot.docs;
@@ -40,8 +40,8 @@ class Select extends PureComponent<Props, State> {
         new Map(this.props.defaults)
       );
 
-      this.setState({ options: options });
-    }
+      this.setState({ options: options });*!/
+    }*/
   }
 
   handleChange = (event: Event) => {

@@ -1,9 +1,6 @@
 import { h } from 'preact';
 import PureComponent from './PureComponent';
 
-import { connect } from 'unistore/full/preact';
-
-import firebase from '../utils/asyncFirebase';
 import Profile from './Profile';
 
 interface Props {
@@ -11,15 +8,13 @@ interface Props {
   wcaProfile?: any;
 }
 
-@connect('uid,wcaProfile')
 class ProfileContainer extends PureComponent<Props, {}> {
   public handleLoginClick = async () => {
-    window.open('popup.html', '_blank', 'height=585,width=400');
+
   };
 
   public handleAvatarClick = async () => {
-    const auth = await firebase.auth();
-    await auth.signOut();
+
   };
 
   public componentWillUnmount() {}

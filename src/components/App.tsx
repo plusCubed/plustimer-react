@@ -9,10 +9,12 @@ import AppBar from './AppBar';
 import SolvesListContainer from './SolvesListContainer';
 import TimerContainer from './TimerDisplayContainer';
 import * as style from './App.css';
+import { IPuzzle } from './AppWrapper';
 
 interface IProps {
   signingIn: boolean;
   updateAvailable: boolean;
+  puzzle: IPuzzle
 }
 
 const SigningInDialog = () => {
@@ -50,8 +52,8 @@ const App = (props: IProps) => {
     <div className={style.app}>
       {/*{props.signingIn ? <SigningInDialog /> : null}*/}
       <AppBar />
-      <TimerContainer />
-      <SolvesListContainer />
+      <TimerContainer puzzle={props.puzzle}/>
+      <SolvesListContainer puzzle={props.puzzle}/>
       {props.updateAvailable ? <UpdateAvailable /> : null}
     </div>
   );
