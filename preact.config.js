@@ -6,7 +6,7 @@ const path = require('path');
 //const fastAsyncPlugin = require('preact-cli-plugin-fast-async');
 //const criticalCssPlugin = require('preact-cli-plugin-critical-css');
 
-const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+// const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 // const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 export default function(config, env, helpers) {
@@ -66,11 +66,11 @@ export default function(config, env, helpers) {
     })
   );*/
 
-  if (!env.ssr && env.production) {
+  /*if (!env.ssr && env.production) {
     config.plugins.push(
       new BundleAnalyzerPlugin({
         analyzerMode: 'static'
       })
     );
-  }
+  }*/
 }

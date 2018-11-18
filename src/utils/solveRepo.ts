@@ -1,5 +1,3 @@
-import { nSQL } from 'nano-sql';
-
 export abstract class SolveRepo{
   public static TABLE = {
     CATEGORIES: 'categories',
@@ -7,21 +5,26 @@ export abstract class SolveRepo{
     SOLVES: 'solves'
   };
 
-  public static init(){
-    nSQL('puzzles')
+  public static async nSQL(setTablePointer?: string | any[] | undefined) {
+    const nsql = await import('nano-sql');
+    return nsql.nSQL(setTablePointer);
+  }
+
+  public static async init(){
+    (await SolveRepo.nSQL('puzzles'))
       .model([
         {key:'id',type:'int',props:['pk','ai']},
         {key:'name',type:'string'},
         {key:'categories',type:'int[]'}
       ]);
-    nSQL('categories')
+    (await SolveRepo.nSQL('categories'))
       .model([
         {key:'id',type:'int',props:['pk','ai']},
         {key:'puzzleId',type:'int'},
         {key:'name',type:'string'},
         {key:'scrambler', type:'string'}
       ]);
-    nSQL('solves')
+    (await SolveRepo.nSQL('solves'))
       .model([
         {key:'id',type:'int',props:['pk','ai']},
         {key:'categoryId',type:'int'},
@@ -32,16 +35,16 @@ export abstract class SolveRepo{
         {key:'scramble',type:'string'}
       ]);
 
-    nSQL()
+    (await SolveRepo.nSQL())
       .config({id: 'default', mode: 'PERM'})
       .connect();
   }
 
   public static onConnected(){
-    return new Promise((resolve, reject) => {
-      nSQL().onConnected(()=> {
+    return SolveRepo.nSQL().then((nsql) => new Promise((resolve, reject) => {
+      nsql.onConnected(()=> {
         resolve();
       })
-    });
+    }));
   }
 }

@@ -1,5 +1,4 @@
 import { h } from 'preact';
-import { nSQL } from 'nano-sql';
 import PureComponent from './PureComponent';
 
 import TimerDisplay, { TimerMode } from './TimerDisplay';
@@ -135,7 +134,7 @@ class TimerDisplayContainer extends PureComponent<Props, State> {
 
     await SolveRepo.onConnected();
 
-    await nSQL(SolveRepo.TABLE.SOLVES).query('upsert', {
+    await (await SolveRepo.nSQL(SolveRepo.TABLE.SOLVES)).query('upsert', {
       categoryId: this.props.puzzle.categoryId,
       //TODO:
       sessionId: 0,

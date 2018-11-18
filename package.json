@@ -4,8 +4,8 @@
   "version": "0.0.0",
   "scripts": {
     "app:start": "if-env NODE_ENV=production && npm run -s serve || npm run -s dev",
-    "app:build": "firebase use default && preact build && preact serve --server config --dest .",
-    "app:serve": "npm run build && preact serve",
+    "app:build": "firebase use default && preact build --analyze",
+    "app:serve": "npm run build",
     "app:dev": "preact watch --port 5000",
     "app:deploy": "firebase use default && npm run app:build && firebase deploy --only hosting",
     "lint": "flow check",

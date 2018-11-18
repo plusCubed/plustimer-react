@@ -1,5 +1,4 @@
 import { h } from 'preact';
-import { nSQL } from 'nano-sql';
 
 import PureComponent from './PureComponent';
 
@@ -31,7 +30,7 @@ class PuzzleSelect extends PureComponent<IProps, IState> {
   private async init() {
     await SolveRepo.onConnected();
 
-    const puzzles = await nSQL(SolveRepo.TABLE.PUZZLES)
+    const puzzles = await (await SolveRepo.nSQL(SolveRepo.TABLE.PUZZLES))
       .query('select')
       .orderBy({'name': 'asc'})
       .exec();
@@ -41,7 +40,7 @@ class PuzzleSelect extends PureComponent<IProps, IState> {
       puzzleMap.set(puzzle.id, puzzle.name);
     });
 
-    const categories = await nSQL(SolveRepo.TABLE.CATEGORIES)
+    const categories = await (await SolveRepo.nSQL(SolveRepo.TABLE.CATEGORIES))
       .query('select')
       .exec();
 
@@ -67,7 +66,7 @@ class PuzzleSelect extends PureComponent<IProps, IState> {
     console.log('New puzzle', puzzleId);
 
     const puzzle = (await
-      nSQL(SolveRepo.TABLE.PUZZLES)
+      (await SolveRepo.nSQL(SolveRepo.TABLE.PUZZLES))
         .query('select')
         .where(['id','=',puzzleId])
         .exec()

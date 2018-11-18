@@ -10,8 +10,8 @@ import Statistics from './Statistics';
 
 import style from './SolvesList.css';
 import { IPuzzle, ISolve } from './AppWrapper';
-import { DatabaseEvent, nSQL } from 'nano-sql';
 import { SolveRepo } from '../utils/solveRepo';
+import { DatabaseEvent } from 'nano-sql';
 
 // 15 minutes
 //const TIME_BETWEEN_SESSIONS = 15 * 60 * 1000;
@@ -66,7 +66,7 @@ class SolvesListContainer extends PureComponent<Props, State> {
 
       this.unsubscribe();
 
-      const solves = (await nSQL(SolveRepo.TABLE.SOLVES)
+      const solves = (await (await SolveRepo.nSQL(SolveRepo.TABLE.SOLVES))
         .query('select')
         .where(['categoryId', '=', puzzle.categoryId])
         .exec()) as ISolve[];
@@ -105,7 +105,7 @@ class SolvesListContainer extends PureComponent<Props, State> {
         });
       };
 
-      nSQL(SolveRepo.TABLE.SOLVES).on('change', this.onSolvesChange);
+      (await SolveRepo.nSQL(SolveRepo.TABLE.SOLVES)).on('change', this.onSolvesChange);
     }
   }
 
@@ -113,16 +113,16 @@ class SolvesListContainer extends PureComponent<Props, State> {
     this.unsubscribe();
   }
 
-  public unsubscribe() {
+  public async unsubscribe() {
     if(this.onSolvesChange) {
-      nSQL(SolveRepo.TABLE.SOLVES).off('change', this.onSolvesChange);
+      (await SolveRepo.nSQL(SolveRepo.TABLE.SOLVES)).off('change', this.onSolvesChange);
     }
   }
 
   public handleSolvePenalty = (solve: ISolve, penalty: number) => async () => {
     await SolveRepo.onConnected();
 
-    await nSQL(SolveRepo.TABLE.SOLVES)
+    await (await SolveRepo.nSQL(SolveRepo.TABLE.SOLVES))
       .query('upsert', {penalty})
       .where(['id','=',solve.id])
       .exec();
@@ -131,7 +131,7 @@ class SolvesListContainer extends PureComponent<Props, State> {
   public handleSolveDelete = (solve: ISolve) => async () => {
     await SolveRepo.onConnected();
 
-    await nSQL(SolveRepo.TABLE.SOLVES)
+    await (await SolveRepo.nSQL(SolveRepo.TABLE.SOLVES))
       .query('delete')
       .where(['id','=',solve.id])
       .exec();

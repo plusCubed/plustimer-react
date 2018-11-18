@@ -1,5 +1,4 @@
 import { h } from 'preact';
-import { nSQL } from 'nano-sql';
 
 import PureComponent from './PureComponent';
 import App from '../components/App';
@@ -62,12 +61,14 @@ class AppWrapper extends PureComponent<void, IState> {
     SolveRepo.init();
     await SolveRepo.onConnected();
 
-    const rows = await nSQL(SolveRepo.TABLE.PUZZLES).query("select").exec();
+    const nanoSQLPuzzles = await SolveRepo.nSQL(SolveRepo.TABLE.PUZZLES);
+    const rows = await nanoSQLPuzzles.query("select").exec();
     if(rows.length===0){
       try {
         const res = await import('../defaultPuzzles');
-        await nSQL().loadJS(SolveRepo.TABLE.PUZZLES, res.default.puzzles);
-        await nSQL().loadJS(SolveRepo.TABLE.CATEGORIES, res.default.categories);
+        const nanoSQL = await SolveRepo.nSQL();
+        await nanoSQL.loadJS(SolveRepo.TABLE.PUZZLES, res.default.puzzles);
+        await nanoSQL.loadJS(SolveRepo.TABLE.CATEGORIES, res.default.categories);
       }catch(e){
         console.error(e);
       }
@@ -83,8 +84,9 @@ class AppWrapper extends PureComponent<void, IState> {
         categoryId = parseInt(categoryIdString, 10);
       }
 
-      const category = (await nSQL(SolveRepo.TABLE.CATEGORIES).query('select').where(['id','=',categoryId]).exec())[0];
-      const puzzle = (await nSQL(SolveRepo.TABLE.PUZZLES).query('select').where(['id','=',category.puzzleId]).exec())[0];
+      const nanoSQLCategories = await SolveRepo.nSQL(SolveRepo.TABLE.CATEGORIES);
+      const category = (await nanoSQLCategories.query('select').where(['id','=',categoryId]).exec())[0];
+      const puzzle = (await nanoSQLPuzzles.query('select').where(['id','=',category.puzzleId]).exec())[0];
 
       this.setState({puzzle: {
           category: category.name,
