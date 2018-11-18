@@ -33,6 +33,7 @@ class PuzzleSelect extends PureComponent<IProps, IState> {
 
     const puzzles = await nSQL(SolveRepo.TABLE.PUZZLES)
       .query('select')
+      .orderBy({'name': 'asc'})
       .exec();
 
     const puzzleMap = new Map;
