@@ -3,8 +3,8 @@ import { nSQL } from 'nano-sql';
 
 import PureComponent from './PureComponent';
 import App from '../components/App';
-import * as preferences from '../utils/preferences';
 import { SolveRepo } from '../utils/solveRepo';
+import { Preferences } from '../utils/preferences';
 
 interface IState {
   signingIn: boolean;
@@ -33,10 +33,12 @@ export interface ISolve{
 
 class AppWrapper extends PureComponent<void, IState> {
   public readonly state = {
-    puzzle: {categoryId: 0, puzzleId: 0, puzzle: '', category: '', scrambler: ''},
+    puzzle: {categoryId: -1, puzzleId: -1, puzzle: '', category: '', scrambler: ''},
     signingIn: false,
     updateAvailable: false
   };
+
+  private unsubscribePreferences: ()=>void;
 
   constructor(props) {
     super(props);
@@ -71,29 +73,34 @@ class AppWrapper extends PureComponent<void, IState> {
       }
     }
 
-    const categoryIdString = preferences.getItem('categoryId');
-    let categoryId;
-    if(!categoryIdString){
-      // Default category id 1: 3x3x3 Normal
-      categoryId = 1;
-      preferences.setItem('categoryId', categoryId.toString());
-    }else{
-      categoryId = parseInt(categoryIdString, 10);
-    }
+    this.unsubscribePreferences = Preferences.onChange(true, 'categoryId', async (categoryIdString: string) => {
+      let categoryId;
+      if(!categoryIdString){
+        // Default category id 1: 3x3x3 Normal
+        categoryId = 1;
+        Preferences.setItem('categoryId', categoryId.toString());
+      }else{
+        categoryId = parseInt(categoryIdString, 10);
+      }
 
-    const category = (await nSQL(SolveRepo.TABLE.CATEGORIES).query('select').where(['id','=',categoryId]).exec())[0];
-    const puzzle = (await nSQL(SolveRepo.TABLE.PUZZLES).query('select').where(['id','=',category.puzzleId]).exec())[0];
-    
-    this.setState({puzzle: {
-      category: category.name,
-      categoryId: category.id, 
-      puzzle: puzzle.name,
-      puzzleId: puzzle.id,
-      scrambler: category.scrambler
-    }});
+      const category = (await nSQL(SolveRepo.TABLE.CATEGORIES).query('select').where(['id','=',categoryId]).exec())[0];
+      const puzzle = (await nSQL(SolveRepo.TABLE.PUZZLES).query('select').where(['id','=',category.puzzleId]).exec())[0];
+
+      this.setState({puzzle: {
+          category: category.name,
+          categoryId: category.id,
+          puzzle: puzzle.name,
+          puzzleId: puzzle.id,
+          scrambler: category.scrambler
+        }});
+    });
   }
 
-  public componentWillUnmount() {}
+  public componentWillUnmount() {
+    if(this.unsubscribePreferences){
+      this.unsubscribePreferences();
+    }
+  }
 
   public render() {
     return (

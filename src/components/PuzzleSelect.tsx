@@ -1,135 +1,111 @@
 import { h } from 'preact';
-import PureComponent from './PureComponent';
+import { nSQL } from 'nano-sql';
 
-import { buildMapFromObject } from '../utils/utils';
-import * as preferences from '../utils/preferences';
+import PureComponent from './PureComponent';
 
 import Select from './Select';
 
-import puzzleDefaults from '../defaultPuzzles';
+import { Preferences } from '../utils/preferences';
+import { IPuzzle } from './AppWrapper';
+import { SolveRepo } from '../utils/solveRepo';
 
-interface Props {
+interface IProps {
+  puzzle: IPuzzle
 }
 
-interface State {
-  puzzle: string;
-  category: string;
+interface IState {
+  puzzles: Map<string, string>;
+  categories: {[puzzleId: number]: Map<string, string>};
 }
 
-class PuzzleCategorySelect extends PureComponent<Props, State> {
-  public defaultPuzzles: Map<string, string>; // puzzle: GUI name
-  public defaultCategories: Map<string, Map<string, string>>; // puzzle: (category: GUI name)
-
-  state = {
-    puzzle: '',
-    category: ''
+class PuzzleSelect extends PureComponent<IProps, IState> {
+  public readonly state = {
+    puzzles: new Map(),
+    categories: {}
   };
 
-  constructor(props: Props) {
+  constructor(props: IProps) {
     super(props);
-    this.defaultPuzzles = Object.entries(puzzleDefaults).reduce(
-      (map, [key, value]: [string, any]) => {
-        map.set(key, value.name);
-        return map;
-      },
-      new Map()
-    );
-
-    this.defaultCategories = Object.entries(puzzleDefaults).reduce(
-      (map, [key, value]: [string, any]) => {
-        map.set(key, buildMapFromObject(value.categories));
-        return map;
-      },
-      new Map()
-    );
   }
 
-  public async componentDidUpdate(prevProps: Props, prevState: State) {
-    //if (this.props.uid !== prevProps.uid && this.props.uid) {
-      let currentPuzzle = preferences.getItem('puzzle');
-      if (!currentPuzzle) {
-        currentPuzzle = '333';
-      }
+  private async init() {
+    await SolveRepo.onConnected();
 
-      await this.handlePuzzleChange(currentPuzzle);
-    //}
+    const puzzles = await nSQL(SolveRepo.TABLE.PUZZLES)
+      .query('select')
+      .exec();
+
+    const puzzleMap = new Map;
+    puzzles.forEach(puzzle => {
+      puzzleMap.set(puzzle.id, puzzle.name);
+    });
+
+    const categories = await nSQL(SolveRepo.TABLE.CATEGORIES)
+      .query('select')
+      .exec();
+
+    const categoryMapMap = {};
+    categories.forEach(category => {
+      if(!(category.puzzleId in categoryMapMap)){
+        categoryMapMap[category.puzzleId] = new Map;
+      }
+      categoryMapMap[category.puzzleId].set(category.id, category.name);
+    });
+
+    this.setState({puzzles: puzzleMap, categories: categoryMapMap});
   }
 
-  private handlePuzzleChange = async (puzzle: string) => {
-    this.setState({ puzzle: puzzle });
 
-    console.log('New puzzle', puzzle);
+  public componentDidMount() {
+    this.init();
+  }
 
-    /*const firestore = await firebase.firestore(this.props.uid);
-    const userRef = firestore.collection('users').doc(this.props.uid);
+  private handlePuzzleChange = async (puzzleId: number) => {
+    if(puzzleId <= 0) { return; }
 
-    // Set current puzzle
-    preferences.setItem('puzzle', puzzle);
+    console.log('New puzzle', puzzleId);
 
-    // Get the current category for the selected puzzle
-    const puzzleRef = userRef.collection('puzzles').doc(puzzle);
-    const puzzleDoc = await firebaseUtils.getDoc(puzzleRef);
-    let newCategory;
+    const puzzle = (await
+      nSQL(SolveRepo.TABLE.PUZZLES)
+        .query('select')
+        .where(['id','=',puzzleId])
+        .exec()
+    )[0];
 
-    const savedCategory = JSON.parse(preferences.getItem('category'));
-    if (savedCategory) {
-      newCategory = savedCategory[puzzle];
-    }
-
-    if (!newCategory) {
-      if (puzzleDoc.exists) {
-        const categoriesSnapshot = await puzzleDoc.ref
-          .collection('categories')
-          .get();
-        newCategory = categoriesSnapshot.docs[0].id;
-      } else {
-        newCategory = 'normal';
-      }
-    }
-
-    await this.handleCategoryChange(newCategory, puzzle);*/
+    this.handleCategoryChange(puzzle.categories[0]);
   };
 
-  private handleCategoryChange = async (
-    category: string,
-    puzzle: string = this.state.puzzle
-  ) => {
-    this.setState({ category: category });
+  private handleCategoryChange = (categoryId: number) => {
+    if(categoryId <= 0) { return; }
 
-    console.log('New category', category, puzzle);
+    console.log('New category', categoryId);
 
-    if (!category) {
-      return;
-    }
-
-    // Set current category in the puzzle doc
-    const savedCategories = JSON.parse(preferences.getItem('category'));
-    preferences.setItem(
-      'category',
-      JSON.stringify({
-        ...savedCategories,
-        [puzzle]: category
-      })
-    );
+    Preferences.setItem('categoryId', categoryId.toString());
   };
 
-  render() {
+  private handlePuzzleSelectChange = (puzzleId: string) => 
+    this.handlePuzzleChange(parseInt(puzzleId,10));
+  private handleCategorySelectChange = (categoryId: string) =>
+    this.handleCategoryChange(parseInt(categoryId,10));
+
+
+  public render() {
     return (
       <span>
         <Select
-          value={this.state.puzzle}
-          defaults={this.defaultPuzzles}
-          onChange={this.handlePuzzleChange}
+          options={this.state.puzzles}
+          value={this.props.puzzle.puzzleId.toString()}
+          onChange={this.handlePuzzleSelectChange}
         />
 
         <Select
-          value={this.state.category}
-          defaults={this.defaultCategories.get(this.state.puzzle)}
-          onChange={this.handleCategoryChange}
+          options={this.state.categories[this.props.puzzle.puzzleId]}
+          value={this.props.puzzle.categoryId.toString()}
+          onChange={this.handleCategorySelectChange}
         />
       </span>
     );
   }
 }
 
-export default PuzzleCategorySelect;
+export default PuzzleSelect;

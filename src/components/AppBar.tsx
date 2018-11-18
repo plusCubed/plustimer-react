@@ -1,15 +1,14 @@
-import { h } from 'preact';
+import { FunctionalComponent, h } from 'preact';
 
 import ProfileContainer from './ProfileContainer';
 import PuzzleSelect from './PuzzleSelect';
 import * as style from './AppBar.css';
 
-const AppBar = () => {
+const AppBar: FunctionalComponent<{}> = (props) => {
   return (
     <header className={style.toolbar}>
-{/*
-      <PuzzleSelect />
-*/}
+
+      {props.children}
 
       <span className={style.toolbarSpacer} />
 

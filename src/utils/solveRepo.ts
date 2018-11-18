@@ -1,12 +1,13 @@
 import { nSQL } from 'nano-sql';
 
-export const SolveRepo = {
-  TABLE: {
+export abstract class SolveRepo{
+  public static TABLE = {
     CATEGORIES: 'categories',
     PUZZLES: 'puzzles',
     SOLVES: 'solves'
-  },
-  init: () => {
+  };
+
+  public static init(){
     nSQL('puzzles')
       .model([
         {key:'id',type:'int',props:['pk','ai']},
@@ -34,12 +35,13 @@ export const SolveRepo = {
     nSQL()
       .config({id: 'default', mode: 'PERM'})
       .connect();
-  },
-  onConnected: () => {
+  }
+
+  public static onConnected(){
     return new Promise((resolve, reject) => {
       nSQL().onConnected(()=> {
         resolve();
       })
     });
   }
-};
+}
