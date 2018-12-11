@@ -15,7 +15,8 @@ import PuzzleSelect from './PuzzleSelect';
 interface IProps {
   signingIn: boolean;
   updateAvailable: boolean;
-  puzzle: IPuzzle
+  puzzle: IPuzzle;
+  puzzlesReady: boolean;
 }
 
 const SigningInDialog = () => {
@@ -53,7 +54,7 @@ const App = (props: IProps) => {
     <div className={style.app}>
       {/*{props.signingIn ? <SigningInDialog /> : null}*/}
       <AppBar>
-        <PuzzleSelect puzzle={props.puzzle}/>
+        <PuzzleSelect puzzle={props.puzzle} puzzlesReady={props.puzzlesReady}/>
       </AppBar>
       <TimerContainer puzzle={props.puzzle}/>
       <SolvesListContainer puzzle={props.puzzle}/>

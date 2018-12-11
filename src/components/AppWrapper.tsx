@@ -9,6 +9,7 @@ interface IState {
   signingIn: boolean;
   updateAvailable: boolean;
   puzzle: IPuzzle;
+  puzzlesReady: boolean;
 }
 
 export interface IPuzzle {
@@ -33,6 +34,7 @@ export interface ISolve{
 class AppWrapper extends PureComponent<void, IState> {
   public readonly state = {
     puzzle: {categoryId: -1, puzzleId: -1, puzzle: '', category: '', scrambler: ''},
+    puzzlesReady: false,
     signingIn: false,
     updateAvailable: false
   };
@@ -69,9 +71,12 @@ class AppWrapper extends PureComponent<void, IState> {
         const nanoSQL = await SolveRepo.nSQL();
         await nanoSQL.loadJS(SolveRepo.TABLE.PUZZLES, res.default.puzzles);
         await nanoSQL.loadJS(SolveRepo.TABLE.CATEGORIES, res.default.categories);
+        this.setState({puzzlesReady: true});
       }catch(e){
         console.error(e);
       }
+    }else{
+      this.setState({puzzlesReady: true});
     }
 
     this.unsubscribePreferences = Preferences.onChange(true, 'categoryId', async (categoryIdString: string) => {
@@ -108,6 +113,7 @@ class AppWrapper extends PureComponent<void, IState> {
     return (
       <App
         puzzle={this.state.puzzle}
+        puzzlesReady={this.state.puzzlesReady}
         signingIn={this.state.signingIn}
         updateAvailable={this.state.updateAvailable}
       />

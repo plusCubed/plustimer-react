@@ -9,7 +9,8 @@ import { IPuzzle } from './AppWrapper';
 import { SolveRepo } from '../utils/solveRepo';
 
 interface IProps {
-  puzzle: IPuzzle
+  puzzle: IPuzzle;
+  puzzlesReady: boolean;
 }
 
 interface IState {
@@ -27,7 +28,14 @@ class PuzzleSelect extends PureComponent<IProps, IState> {
     super(props);
   }
 
-  private async init() {
+
+  public componentDidUpdate(previousProps: Readonly<IProps>, previousState: Readonly<IState>, previousContext: any): void {
+    if(!previousProps.puzzlesReady && this.props.puzzlesReady){
+      this.updatePuzzles();
+    }
+  }
+
+  private async updatePuzzles() {
     await SolveRepo.onConnected();
 
     const puzzles = await (await SolveRepo.nSQL(SolveRepo.TABLE.PUZZLES))
@@ -53,11 +61,6 @@ class PuzzleSelect extends PureComponent<IProps, IState> {
     });
 
     this.setState({puzzles: puzzleMap, categories: categoryMapMap});
-  }
-
-
-  public componentDidMount() {
-    this.init();
   }
 
   private handlePuzzleChange = async (puzzleId: number) => {
