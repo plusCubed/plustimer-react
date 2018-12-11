@@ -89,7 +89,7 @@ class SolvesListContainer extends PureComponent<Props, State> {
             }
 
             const newSolves = this.state.solves.slice();
-            if (foundIndex) {
+            if (foundIndex!==-1) {
               newSolves[foundIndex] = row;
             } else {
               newSolves.push(row);
