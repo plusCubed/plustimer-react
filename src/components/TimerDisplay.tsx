@@ -70,7 +70,7 @@ class TimerDisplay extends PureComponent<Props, {}> {
         <div className={`${style.timerText} ${style[mode]}`}>
           {formatTime(displayTime)}
         </div>
-        <Media query="(max-width: 840px)" render={() => <Statistics />} />
+       {/* <Media query="(max-width: 840px)" render={() => <Statistics />} />*/}
       </div>
     );
   }

@@ -58,13 +58,13 @@ const getAverage = (count: number, solves: ISolve[], best: boolean) => {
   }
 };
 
-interface Props {
-  //sessions?: IRepoSolve[][]
+interface IProps {
+  solves: ISolve[]
 }
 
-class StatisticsWrapper extends PureComponent<Props, {}> {
+class StatisticsWrapper extends PureComponent<IProps, {}> {
   public render() {
-    /*const solves = this.props.sessions[0];
+    const {solves} = this.props;
     const stats: Array<{ name: string, current: number, best: number }> = [];
 
     stats.push({
@@ -93,8 +93,7 @@ class StatisticsWrapper extends PureComponent<Props, {}> {
       return true;
     });
 
-    return <Statistics stats={stats} />;*/
-    return <div></div>
+    return <Statistics stats={stats} />;
   }
 }
 

@@ -6,7 +6,7 @@ import { Penalty } from './SolvesList';
 
 import scrambleService from '../utils/scrambleService';
 
-import { IPuzzle } from './AppWrapper';
+import { IPuzzle, ISolve } from './AppWrapper';
 import { SolveRepo } from '../utils/solveRepo';
 
 export const TimerModeAction = {
@@ -64,6 +64,7 @@ class TimerDisplayContainer extends PureComponent<Props, State> {
   private scrambling: Promise<any> = null;
 
   private animationFrameId = 0;
+  private sessionId = -1;
 
   public async componentDidUpdate(prevProps) {
     if (
@@ -74,8 +75,10 @@ class TimerDisplayContainer extends PureComponent<Props, State> {
 
       if (!this.scrambling) {
         this.startFetchScramble();
-        await this.advanceScramble();
+        this.advanceScramble().then();
       }
+
+
     }
   }
 
@@ -101,34 +104,38 @@ class TimerDisplayContainer extends PureComponent<Props, State> {
     }
 
     const now = Math.trunc(performance.now());
-    this.setState({ mode: newMode });
 
     switch (newMode) {
       case TimerMode.Ready:
         if (oldMode === TimerMode.Stopped) {
-          await this.advanceScramble();
+          this.advanceScramble().then();
         }
         break;
       case TimerMode.HandOnTimer:
         this.resetTimer();
         break;
       case TimerMode.Running:
-        if (!this.scrambling) {
-          this.startTimer(now);
-          this.startFetchScramble();
+        if (this.scrambling) {
+          // Current scrambling: cancel transition to running, reset to ready
+          this.setState({ mode: TimerMode.Ready });
+          return;
         }
+        this.startTimer(now);
+        this.startFetchScramble();
         break;
       case TimerMode.Stopped:
         this.stopTimer(now);
-        await this.addSolve(now);
+        this.addSolve(now).then();
         break;
       default:
         break;
     }
+
+    this.setState({ mode: newMode });
   }
 
   private async addSolve(now) {
-    if (!this.props.puzzle) {
+    if (!this.props.puzzle || !this.sessionId) {
       return;
     }
 
@@ -136,8 +143,7 @@ class TimerDisplayContainer extends PureComponent<Props, State> {
 
     await (await SolveRepo.nSQL(SolveRepo.TABLE.SOLVES)).query('upsert', {
       categoryId: this.props.puzzle.categoryId,
-      //TODO:
-      sessionId: 0,
+      sessionId: this.sessionId,
       penalty: Penalty.NONE,
       scramble: this.state.currentScramble,
       time: Math.floor(now - this.state.startTime),

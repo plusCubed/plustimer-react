@@ -2,7 +2,8 @@ export abstract class SolveRepo{
   public static TABLE = {
     CATEGORIES: 'categories',
     PUZZLES: 'puzzles',
-    SOLVES: 'solves'
+    SOLVES: 'solves',
+    SESSIONS: 'sessions'
   };
 
   public static async nSQL(setTablePointer?: string | any[] | undefined) {
@@ -11,25 +12,31 @@ export abstract class SolveRepo{
   }
 
   public static async init(){
-    (await SolveRepo.nSQL('puzzles'))
+    (await SolveRepo.nSQL(SolveRepo.TABLE.PUZZLES))
       .model([
         {key:'id',type:'int',props:['pk','ai']},
         {key:'name',type:'string'},
         {key:'categories',type:'int[]'}
       ]);
-    (await SolveRepo.nSQL('categories'))
+    (await SolveRepo.nSQL(SolveRepo.TABLE.CATEGORIES))
       .model([
         {key:'id',type:'int',props:['pk','ai']},
         {key:'puzzleId',type:'int'},
         {key:'name',type:'string'},
         {key:'scrambler', type:'string'}
       ]);
-    (await SolveRepo.nSQL('solves'))
+    (await SolveRepo.nSQL(SolveRepo.TABLE.SESSIONS))
+      .model([
+        {key:'id',type:'int',props:['pk']},
+        {key:'categoryId',type:'int'},
+        {key:'timestamp',type:'int', props:['idx']}
+      ]);
+    (await SolveRepo.nSQL(SolveRepo.TABLE.SOLVES))
       .model([
         {key:'id',type:'int',props:['pk','ai']},
         {key:'categoryId',type:'int'},
         {key:'sessionId', type:'int'},
-        {key:'timestamp',type:'int'},
+        {key:'timestamp',type:'int', props:['idx']},
         {key:'penalty',type:'int'},
         {key:'time',type:'int'},
         {key:'scramble',type:'string'}
