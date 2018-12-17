@@ -91,7 +91,7 @@
     "preact-slots": "^1.0.0",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
-    "react-media": "^1.8.0",
+    "react-media": "^1.9.2",
     "unistore": "^3.1.0"
   }
 }

@@ -179,7 +179,10 @@ class SolvesListContainer extends PureComponent<Props, State> {
         </div>
       );
     };
+
+
     return (
+      // @ts-ignore - something's up with react-media's typescript defs
       <Media
         query="(min-width: 841px)">
         {body}
