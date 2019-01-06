@@ -12,13 +12,6 @@ import * as style from './App.css';
 import { IPuzzle } from './AppWrapper';
 import PuzzleSelect from './PuzzleSelect';
 
-interface IProps {
-  signingIn: boolean;
-  updateAvailable: boolean;
-  puzzle: IPuzzle;
-  puzzlesReady: boolean;
-}
-
 const SigningInDialog = () => {
   return (
     <div className={style.dialog}>
@@ -49,6 +42,14 @@ class UpdateAvailable extends PureComponent<{}, {}> {
   }
 }
 
+interface IProps {
+  signingIn: boolean;
+  updateAvailable: boolean;
+  puzzle: IPuzzle;
+  puzzlesReady: boolean;
+  currentSessionId: number;
+}
+
 const App = (props: IProps) => {
   return (
     <div className={style.app}>
@@ -56,8 +57,8 @@ const App = (props: IProps) => {
       <AppBar>
         <PuzzleSelect puzzle={props.puzzle} puzzlesReady={props.puzzlesReady}/>
       </AppBar>
-      <TimerContainer puzzle={props.puzzle}/>
-      <SolvesListContainer puzzle={props.puzzle}/>
+      <TimerContainer puzzle={props.puzzle} currentSessionId={props.currentSessionId}/>
+      <SolvesListContainer puzzle={props.puzzle} currentSessionId={props.currentSessionId}/>
       {props.updateAvailable ? <UpdateAvailable /> : null}
     </div>
   );

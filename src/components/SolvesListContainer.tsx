@@ -9,7 +9,7 @@ import SolvesList from './SolvesList';
 import Statistics from './Statistics';
 
 import style from './SolvesList.css';
-import { IPuzzle, ISolve } from './AppWrapper';
+import { IPuzzle, IRepoSession, ISolve } from './AppWrapper';
 import { SolveRepo } from '../utils/solveRepo';
 import { DatabaseEvent } from 'nano-sql';
 
@@ -34,39 +34,50 @@ import { DatabaseEvent } from 'nano-sql';
   }
 });*/
 
-interface Props {
+interface IProps {
   //uid?: string,
-  puzzle: IPuzzle,
+  puzzle: IPuzzle;
+  currentSessionId: number;
   //category?: string,
   //sessions?: IRepoSolve[][],
   // updateSessions?: (solves: IRepoSolve[]) => Promise<any>
 }
 
-interface State {
-  expanded: boolean,
-  solves: ISolve[]
+interface IState {
+  expanded: boolean;
+  solves: ISolve[];
+  sessions: IRepoSession[];
 }
 
-class SolvesListContainer extends PureComponent<Props, State> {
-  public state = {
+class SolvesListContainer extends PureComponent<IProps, IState> {
+  public readonly state: Readonly<IState> = {
     expanded: false,
-    solves: []
+    solves: [],
+    sessions: []
   };
-
-  //public unsubscribeSolves = null;
   
   public onSolvesChange = null;
 
-  public async componentDidUpdate(prevProps: Props) {
-    const { puzzle } = this.props;
+  public async componentDidUpdate(prevProps: IProps) {
+    const { puzzle, currentSessionId } = this.props;
 
-    if (puzzle.categoryId !== prevProps.puzzle.categoryId
-      && puzzle.categoryId) {
-      await SolveRepo.onConnected();
+    if (puzzle.categoryId !== prevProps.puzzle.categoryId && puzzle.categoryId ||
+      currentSessionId !== prevProps.currentSessionId && currentSessionId) {
+      const nanoSQL = await SolveRepo.onConnected();
 
       this.unsubscribe();
 
-      const solves = (await (await SolveRepo.nSQL(SolveRepo.TABLE.SOLVES))
+
+      const sessions = (await nanoSQL.table(SolveRepo.TABLE.SESSIONS)
+        .query('select')
+        .where(['categoryId', '=', puzzle.categoryId])
+        .orderBy({timestamp:"asc"})
+        .exec()) as IRepoSession[];
+      this.setState({ sessions });
+
+
+
+      const solves = (await nanoSQL.table(SolveRepo.TABLE.SOLVES)
         .query('select')
         .where(['categoryId', '=', puzzle.categoryId])
         .orderBy({timestamp:"asc"})
@@ -74,7 +85,7 @@ class SolvesListContainer extends PureComponent<Props, State> {
       this.setState({ solves });
 
       this.onSolvesChange = (event: DatabaseEvent) => {
-        event.affectedRows.forEach((row) => {
+        (event.affectedRows as ISolve[]).forEach((row) => {
           if (row.categoryId !== puzzle.categoryId) {
             return;
           }
@@ -110,7 +121,7 @@ class SolvesListContainer extends PureComponent<Props, State> {
         });
       };
 
-      (await SolveRepo.nSQL(SolveRepo.TABLE.SOLVES)).on('change', this.onSolvesChange);
+      nanoSQL.table(SolveRepo.TABLE.SOLVES).on('change', this.onSolvesChange);
     }
   }
 
@@ -150,16 +161,14 @@ class SolvesListContainer extends PureComponent<Props, State> {
     const {expanded, solves} = this.state;
     const solvesReversed = solves.slice().reverse();
 
-    const body = desktop => {
-      const onlyLast = !expanded && !desktop;
+    const body = (desktop: boolean) => {
+      const onlyLastSession = !expanded && !desktop;
       return (
         <div className={expanded ? style.solvesExpanded : style.solves}>
           { desktop ? <Statistics solves={solves}/> : null}
 
-
-
           <SolvesList
-            onlyLast={onlyLast}
+            onlyLast={onlyLastSession}
             expanded={expanded}
             solves={solvesReversed}
             onPenalty={this.handleSolvePenalty}

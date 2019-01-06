@@ -41,19 +41,20 @@ export const transitionMode = (action: string, timerMode: string): string => {
   return timerMode;
 };
 
-interface Props {
+interface IProps {
   puzzle: IPuzzle;
+  currentSessionId: number;
 }
 
-interface State {
+interface IState {
   startTime: number;
   displayTime: number;
   mode: string;
   currentScramble: string;
 }
 
-class TimerDisplayContainer extends PureComponent<Props, State> {
-  public state = {
+class TimerDisplayContainer extends PureComponent<IProps, IState> {
+  public readonly state: Readonly<IState> = {
     startTime: -1,
     displayTime: 0,
     mode: TimerMode.Ready,
@@ -64,7 +65,6 @@ class TimerDisplayContainer extends PureComponent<Props, State> {
   private scrambling: Promise<any> = null;
 
   private animationFrameId = 0;
-  private sessionId = -1;
 
   public async componentDidUpdate(prevProps) {
     if (
@@ -135,15 +135,15 @@ class TimerDisplayContainer extends PureComponent<Props, State> {
   }
 
   private async addSolve(now) {
-    if (!this.props.puzzle || !this.sessionId) {
+    if (!this.props.puzzle) {
       return;
     }
 
-    await SolveRepo.onConnected();
+    const nanoSQL = await SolveRepo.onConnected();
 
-    await (await SolveRepo.nSQL(SolveRepo.TABLE.SOLVES)).query('upsert', {
+    await nanoSQL.table(SolveRepo.TABLE.SOLVES).query('upsert', {
       categoryId: this.props.puzzle.categoryId,
-      sessionId: this.sessionId,
+      sessionId: this.props.currentSessionId,
       penalty: Penalty.NONE,
       scramble: this.state.currentScramble,
       time: Math.floor(now - this.state.startTime),

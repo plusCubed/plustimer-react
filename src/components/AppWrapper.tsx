@@ -6,14 +6,6 @@ import { SolveRepo } from '../utils/solveRepo';
 import { Preferences } from '../utils/preferences';
 import { Penalty } from './SolvesList';
 
-interface IState {
-  signingIn: boolean;
-  updateAvailable: boolean;
-  puzzle: IPuzzle;
-  puzzlesReady: boolean;
-  currentSessionId: number;
-}
-
 // NOT repo format
 export interface IPuzzle {
   categoryId: number;
@@ -41,8 +33,16 @@ export interface IRepoSession {
   timestamp: number
 }
 
+interface IState {
+  signingIn: boolean;
+  updateAvailable: boolean;
+  puzzle: IPuzzle;
+  puzzlesReady: boolean;
+  currentSessionId: number;
+}
+
 class AppWrapper extends PureComponent<void, IState> {
-  public readonly state = {
+  public readonly state: Readonly<IState> = {
     currentSessionId: -1,
     puzzle: {categoryId: -1, puzzleId: -1, puzzle: '', category: '', scrambler: ''},
     puzzlesReady: false,
@@ -72,15 +72,13 @@ class AppWrapper extends PureComponent<void, IState> {
 
   public async componentDidMount() {
     SolveRepo.init();
-    await SolveRepo.onConnected();
+    const nanoSQL = await SolveRepo.onConnected();
 
     // Check if there are any puzzles: if not load defaults
-    const nanoSQLPuzzles = await SolveRepo.nSQL(SolveRepo.TABLE.PUZZLES);
-    const rows = await nanoSQLPuzzles.query("select").exec();
+    const rows = await nanoSQL.table(SolveRepo.TABLE.PUZZLES).query("select").exec();
     if(rows.length===0){
       try {
         const res = await import('../defaultPuzzles');
-        const nanoSQL = await SolveRepo.nSQL();
         await nanoSQL.loadJS(SolveRepo.TABLE.PUZZLES, res.default.puzzles);
         await nanoSQL.loadJS(SolveRepo.TABLE.CATEGORIES, res.default.categories);
         this.setState({puzzlesReady: true});
@@ -102,10 +100,9 @@ class AppWrapper extends PureComponent<void, IState> {
         categoryId = parseInt(categoryIdString, 10);
       }
 
-      const nanoSQLCategories = await SolveRepo.nSQL(SolveRepo.TABLE.CATEGORIES);
-      const category = (await nanoSQLCategories.query('select')
+      const category = (await nanoSQL.table(SolveRepo.TABLE.CATEGORIES).query('select')
         .where(['id','=',categoryId]).exec())[0];
-      const puzzle = (await nanoSQLPuzzles.query('select')
+      const puzzle = (await nanoSQL.table(SolveRepo.TABLE.PUZZLES).query('select')
         .where(['id','=',category.puzzleId]).exec())[0];
 
       this.setState({puzzle: {
@@ -117,7 +114,7 @@ class AppWrapper extends PureComponent<void, IState> {
         }});
 
       // Get latest solve session ID, default to that
-      const latestSessionResult = await (await SolveRepo.nSQL(SolveRepo.TABLE.SESSIONS))
+      const latestSessionResult = await nanoSQL.table(SolveRepo.TABLE.SESSIONS)
         .query('select',["MAX(timestamp)"])
         .where(['categoryId', '=', category.id])
         .exec() as IRepoSession[];
@@ -127,7 +124,7 @@ class AppWrapper extends PureComponent<void, IState> {
       }else{
         const newSessionId = parseInt(`${Date.now()/1000}${Math.floor(Math.random() * 10000)}`,10);
 
-        await (await SolveRepo.nSQL(SolveRepo.TABLE.SESSIONS)).query('upsert', {
+        await nanoSQL.table(SolveRepo.TABLE.SESSIONS).query('upsert', {
           id: newSessionId,
           categoryId: category.id,
           timestamp: Date.now()
@@ -148,6 +145,7 @@ class AppWrapper extends PureComponent<void, IState> {
       <App
         puzzle={this.state.puzzle}
         puzzlesReady={this.state.puzzlesReady}
+        currentSessionId={this.state.currentSessionId}
         signingIn={this.state.signingIn}
         updateAvailable={this.state.updateAvailable}
       />
